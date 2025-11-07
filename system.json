@@ -1,0 +1,32 @@
+{
+  "id": "colonial-weather",
+  "title": "Colonial Weather (Storyteller Sci\u2011Fi)",
+  "description": "A lightweight Storyteller-style d10 dice-pool system scaffold for sci\u2011fi space opera campaigns.",
+  "version": "0.0.1",
+  "compatibility": {
+    "minimum": "11",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "Hampus Barck & assistant"
+    }
+  ],
+  "url": "https://example.com/colonial-weather",
+  "manifest": "https://example.com/colonial-weather/system.json",
+  "download": "https://example.com/colonial-weather/colonial-weather.zip",
+  "initiative": "dex + wit",
+  "grid": {
+    "type": 1,
+    "distance": 1,
+    "units": "m"
+  },
+  "packs": [],
+  "esmodules": [
+    "scripts/colonial-weather.js"
+  ],
+  "styles": [
+    "styles/colonial-weather.css"
+  ],
+  "templateVersion": 1
+}

@@ -1,0 +1,67 @@
+{
+  "Actor": {
+    "types": [
+      "character"
+    ],
+    "templates": {
+      "base": {
+        "attributes": {
+          "str": 1,
+          "dex": 1,
+          "sta": 1,
+          "cha": 1,
+          "soc": 1,
+          "app": 1,
+          "int": 1,
+          "edu": 1,
+          "wit": 1
+        },
+        "skills": {
+          "athletics": 0,
+          "awareness": 0,
+          "brawl": 0,
+          "firearms": 0,
+          "melee": 0,
+          "drive": 0,
+          "pilot": 0,
+          "repair": 0,
+          "technology": 0,
+          "medicine": 0
+        },
+        "specializations": {
+          "athletics": false,
+          "awareness": false,
+          "brawl": false,
+          "firearms": false,
+          "melee": false,
+          "drive": false,
+          "pilot": false,
+          "repair": false,
+          "technology": false,
+          "medicine": false
+        },
+        "vitals": {
+          "will_perm": 3,
+          "will_curr": 3,
+          "health_levels": 7,
+          "wound_pen": 0
+        }
+      }
+    },
+    "character": {
+      "templates": [
+        "base"
+      ]
+    }
+  },
+  "Item": {
+    "types": [
+      "equipment",
+      "enhancement",
+      "background",
+      "merit",
+      "flaw"
+    ],
+    "templates": {}
+  }
+}

@@ -1,0 +1,8 @@
+
+.cw .grid-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.cw .grid-2col { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.cw .resource { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+.cw .resource label { width: 130px; }
+.cw .small { width: auto; }
+.cw .cw-roll { margin-top: 8px; }
+.cw-chat .botch { color: red; font-weight: bold; }

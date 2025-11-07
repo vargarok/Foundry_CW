@@ -1,0 +1,68 @@
+
+<form class="cw flexcol" autocomplete="off">
+  <header class="sheet-header">
+    <img class="profile-img" src="{{actor.img}}" title="{{actor.name}}" height="64" width="64"/>
+    <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Name"/></h1>
+  </header>
+
+  <nav class="sheet-tabs tabs" data-group="primary">
+    <a class="item" data-tab="core">Core</a>
+    <a class="item" data-tab="skills">Skills</a>
+  </nav>
+
+  <section class="sheet-body">
+    <div class="tab core" data-group="primary" data-tab="core">
+      <div class="grid-3col">
+        <section>
+          <h3>Attributes</h3>
+          {{#each system.attributes as |val key|}}
+            <div class="resource">
+              <label>{{uppercase key}}</label>
+              <input type="number" name="system.attributes.{{key}}" value="{{val}}" min="0" max="10"/>
+            </div>
+          {{/each}}
+        </section>
+        <section>
+          <h3>Vitals</h3>
+          <div class="resource"><label>Will (Perm)</label><input type="number" name="system.vitals.will_perm" value="{{system.vitals.will_perm}}" min="0" max="10"/></div>
+          <div class="resource"><label>Will (Curr)</label><input type="number" name="system.vitals.will_curr" value="{{system.vitals.will_curr}}" min="0" max="10"/></div>
+          <div class="resource"><label>Health Lvls</label><input type="number" name="system.vitals.health_levels" value="{{system.vitals.health_levels}}" min="0" max="7"/></div>
+          <div class="resource"><label>Wound Pen</label><input type="number" name="system.vitals.wound_pen" value="{{system.vitals.wound_pen}}" min="-5" max="0"/></div>
+        </section>
+        <section>
+          <h3>Test Roller</h3>
+          <div>
+            <label>Attribute</label>
+            <select name="cw-attr">
+              <option value="str">STR</option><option value="dex">DEX</option><option value="sta">STA</option>
+              <option value="cha">CHA</option><option value="soc">SOC</option><option value="app">APP</option>
+              <option value="int">INT</option><option value="edu">EDU</option><option value="wit">WIT</option>
+            </select>
+          </div>
+          <div>
+            <label>Skill</label>
+            <select name="cw-skill">
+              {{#each system.skills as |val key|}}
+                <option value="{{key}}">{{capitalize key}}</option>
+              {{/each}}
+            </select>
+          </div>
+          <div><label>Specialized (10-again)</label><input type="checkbox" name="cw-spec"/></div>
+          <button type="button" class="cw-roll">Roll Standard Test</button>
+        </section>
+      </div>
+    </div>
+
+    <div class="tab skills" data-group="primary" data-tab="skills">
+      <div class="grid-2col">
+        {{#each system.skills as |val key|}}
+          <div class="resource">
+            <label>{{capitalize key}}</label>
+            <input type="number" name="system.skills.{{key}}" value="{{val}}" min="0" max="5"/>
+            <label class="small">Spec</label><input type="checkbox" name="system.specializations.{{key}}" {{checked (lookup ../system.specializations key)}}/>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </section>
+</form>
