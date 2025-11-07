@@ -9,11 +9,11 @@
   },
   "authors": [
     {
-      "name": "Anders Sandberg"
+      "name": "-"
     }
   ],
-  "manifest": "https://raw.githubusercontent.com/vargarok/Foundry_CS/main/system.json",
-  "download": "https://github.com/vargarok/Foundry_CW/releases/download/release/Foundry_CS.zip",
+  "manifest": "https://raw.githubusercontent.com/vargarok/Foundry_CW/main/system.json",
+  "download": "https://github.com/vargarok/Foundry_CW/releases/download/release/Foundry_CW.zip",
   "initiative": "dex + wit",
   "grid": {
     "type": 1,
