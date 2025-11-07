@@ -17,33 +17,23 @@ class CWActorSheet extends ActorSheet {
     return ctx;
   }
 
-  activateListeners(html) {
-    super.activateListeners(html);
+activateListeners(html) {
+  super.activateListeners(html);
 
-    // Existing “Standard Test” button on Core tab
-    html.find(".cw-roll").on("click", (ev) => this._onRoll(ev));
+  // Core "Standard Test"
+  html.on("click", ".cw-roll", ev => this._onRoll(ev));
 
-    // New: per-skill roll buttons on the Skills tab
-    html.find(".cw-skill-roll").on("click", (ev) => {
-      const skill = ev.currentTarget.dataset.skill;
-      // Use the attribute currently selected in the Core tab dropdown (fallback DEX)
-      const attr = html.find("select[name='cw-attr']").val() || "dex";
-      this._rollStandard(attr, skill);
-    });
+  // Per-skill buttons on the Skills tab
+  html.on("click", ".cw-skill-roll", ev => {
+    const skill = ev.currentTarget.dataset.skill;
+    // Use the attribute currently selected in Core (fallback DEX)
+    const attr = html.find("select[name='cw-attr']").val() || "dex";
+    this._rollStandard(attr, skill);
+  });
 
-    // New: Initiative (DEX+WIT)
-    html.find(".cw-roll-init").on("click", (ev) => {
-      ev.preventDefault();
-      const dex = Number(this.actor.system.attributes.dex || 0);
-      const wit = Number(this.actor.system.attributes.wit || 0);
-      const dice = Math.max(1, dex + wit);
-      const roll = new Roll(`${dice}d10`).roll({ async: false });
-      roll.toMessage({
-        speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-        flavor: `<b>Initiative</b> (DEX ${dex} + WIT ${wit} = ${dice}d10)`
-      });
-    });
-  }
+  // Initiative (DEX+WIT)
+  html.on("click", ".cw-roll-init", ev => this._onInitRoll(ev));
+}
 
   // Button handler for the Core tab’s “Standard Test”
   _onRoll(ev) {
@@ -52,6 +42,17 @@ class CWActorSheet extends ActorSheet {
     const attr = form.find("select[name='cw-attr']").val() || "dex";
     const skill = form.find("select[name='cw-skill']").val() || "athletics";
     return this._rollStandard(attr, skill);
+  }
+  _onInitRoll(ev) {
+  ev.preventDefault();
+  const dex = Number(this.actor.system.attributes?.dex || 0);
+  const wit = Number(this.actor.system.attributes?.wit || 0);
+  const dice = Math.max(1, dex + wit);
+  const roll = new Roll(`${dice}d10`).roll({ async: false });
+  roll.toMessage({
+    speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+    flavor: `<b>Initiative</b> (DEX ${dex} + WIT ${wit} = ${dice}d10)`
+  });
   }
 
   // Core roller: Attribute + Skill − Wound Penalty; successes on 7–10; 10-again if specialized
