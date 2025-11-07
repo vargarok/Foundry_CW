@@ -1,4 +1,3 @@
-
 <form class="cw flexcol" autocomplete="off">
   <header class="sheet-header">
     <img class="profile-img" src="{{actor.img}}" title="{{actor.name}}" height="64" width="64"/>
@@ -13,40 +12,7 @@
   </nav>
 
   <section class="sheet-body">
-    <div class="tab backgrounds" data-group="primary" data-tab="backgrounds">
-  <div class="grid-2col">
-    <section>
-      <h3>Backgrounds</h3>
-      {{#each system.backgrounds as |val key|}}
-        <div class="resource">
-          <label>{{capitalize key}}</label>
-          <input type="text" name="system.backgrounds.{{key}}" value="{{val}}"/>
-        </div>
-      {{/each}}
-    </section>
-    <section>
-      <h3>Allegiances</h3>
-      {{#each system.allegiances as |val key|}}
-        <div class="resource">
-          <label>{{capitalize key}}</label>
-          <input type="text" name="system.allegiances.{{key}}" value="{{val}}"/>
-        </div>
-      {{/each}}
-      <h3 style="margin-top:10px;">Cybernetics</h3>
-      <div class="resource">
-        <label>Immune Load</label>
-        <input type="number" name="system.cyber.immune_load" value="{{system.cyber.immune_load}}" min="0" max="20"/>
-      </div>
-    </section>
-  </div>
-</div>
-
-<div class="tab notes" data-group="primary" data-tab="notes">
-  <div class="resource" style="flex-direction:column; align-items:stretch;">
-    <label>Notes</label>
-    <textarea name="system.notes" rows="12">{{system.notes}}</textarea>
-  </div>
-</div>
+    <!-- CORE TAB -->
     <div class="tab core" data-group="primary" data-tab="core">
       <div class="grid-3col">
         <section>
@@ -58,6 +24,7 @@
             </div>
           {{/each}}
         </section>
+
         <section>
           <h3>Vitals</h3>
           <div class="resource"><label>Will (Perm)</label><input type="number" name="system.vitals.will_perm" value="{{system.vitals.will_perm}}" min="0" max="10"/></div>
@@ -65,6 +32,7 @@
           <div class="resource"><label>Health Lvls</label><input type="number" name="system.vitals.health_levels" value="{{system.vitals.health_levels}}" min="0" max="7"/></div>
           <div class="resource"><label>Wound Pen</label><input type="number" name="system.vitals.wound_pen" value="{{system.vitals.wound_pen}}" min="-5" max="0"/></div>
         </section>
+
         <section>
           <h3>Test Roller</h3>
           <div>
@@ -85,19 +53,91 @@
           </div>
           <div><label>Specialized (10-again)</label><input type="checkbox" name="cw-spec"/></div>
           <button type="button" class="cw-roll">Roll Standard Test</button>
+          <hr/>
+          <button type="button" class="cw-roll-init">Roll Initiative (DEX+WIT)</button>
         </section>
       </div>
     </div>
 
+    <!-- SKILLS TAB -->
     <div class="tab skills" data-group="primary" data-tab="skills">
+      <div class="grid-3col">
+        <section>
+          <h3>Physical</h3>
+          {{#each (pick system.skills "athletics" "awareness" "brawl" "drive" "martial_arts" "firearms" "heavy_weapons" "melee" "stealth" "pilot" "navigation") as |val key|}}
+            <div class="resource">
+              <label>{{capitalize key}}</label>
+              <input type="number" name="system.skills.{{key}}" value="{{val}}" min="0" max="5"/>
+              <label class="small">Spec</label>
+              <input type="checkbox" name="system.specializations.{{key}}" {{checked (lookup ../system.specializations key)}}/>
+              <button type="button" class="cw-skill-roll" data-skill="{{key}}">Roll</button>
+            </div>
+          {{/each}}
+        </section>
+
+        <section>
+          <h3>Social</h3>
+          {{#each (pick system.skills "business" "disguise" "empathy" "etiquette" "gambling" "gather_information" "intimidate" "leadership" "linguistics" "perform" "politics" "streetwise" "subterfuge") as |val key|}}
+            <div class="resource">
+              <label>{{capitalize key}}</label>
+              <input type="number" name="system.skills.{{key}}" value="{{val}}" min="0" max="5"/>
+              <label class="small">Spec</label>
+              <input type="checkbox" name="system.specializations.{{key}}" {{checked (lookup ../system.specializations key)}}/>
+              <button type="button" class="cw-skill-roll" data-skill="{{key}}">Roll</button>
+            </div>
+          {{/each}}
+        </section>
+
+        <section>
+          <h3>Technical / Knowledge</h3>
+          {{#each (pick system.skills "computer_use" "engineering" "medicine" "repair" "technology" "demolitions" "security") as |val key|}}
+            <div class="resource">
+              <label>{{capitalize key}}</label>
+              <input type="number" name="system.skills.{{key}}" value="{{val}}" min="0" max="5"/>
+              <label class="small">Spec</label>
+              <input type="checkbox" name="system.specializations.{{key}}" {{checked (lookup ../system.specializations key)}}/>
+              <button type="button" class="cw-skill-roll" data-skill="{{key}}">Roll</button>
+            </div>
+          {{/each}}
+        </section>
+      </div>
+    </div>
+
+    <!-- BACKGROUNDS TAB -->
+    <div class="tab backgrounds" data-group="primary" data-tab="backgrounds">
       <div class="grid-2col">
-        {{#each system.skills as |val key|}}
+        <section>
+          <h3>Backgrounds</h3>
+          {{#each system.backgrounds as |val key|}}
+            <div class="resource">
+              <label>{{capitalize key}}</label>
+              <input type="text" name="system.backgrounds.{{key}}" value="{{val}}"/>
+            </div>
+          {{/each}}
+        </section>
+        <section>
+          <h3>Allegiances</h3>
+          {{#each system.allegiances as |val key|}}
+            <div class="resource">
+              <label>{{capitalize key}}</label>
+              <input type="text" name="system.allegiances.{{key}}" value="{{val}}"/>
+            </div>
+          {{/each}}
+
+          <h3 style="margin-top:10px;">Cybernetics</h3>
           <div class="resource">
-            <label>{{capitalize key}}</label>
-            <input type="number" name="system.skills.{{key}}" value="{{val}}" min="0" max="5"/>
-            <label class="small">Spec</label><input type="checkbox" name="system.specializations.{{key}}" {{checked (lookup ../system.specializations key)}}/>
+            <label>Immune Load</label>
+            <input type="number" name="system.cyber.immune_load" value="{{system.cyber.immune_load}}" min="0" max="20"/>
           </div>
-        {{/each}}
+        </section>
+      </div>
+    </div>
+
+    <!-- NOTES TAB -->
+    <div class="tab notes" data-group="primary" data-tab="notes">
+      <div class="resource" style="flex-direction:column; align-items:stretch;">
+        <label>Notes</label>
+        <textarea name="system.notes" rows="12">{{system.notes}}</textarea>
       </div>
     </div>
   </section>
