@@ -1,0 +1,32 @@
+/* Colonial Weather base stylesheet */
+.cw {
+  font-family: sans-serif;
+  font-size: 13px;
+  padding: 4px;
+}
+
+.cw .resource {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.cw label {
+  width: 120px;
+  font-weight: 600;
+}
+
+.cw input[type="number"],
+.cw input[type="text"] {
+  width: 50px;
+  text-align: center;
+}
+
+.cw button {
+  padding: 3px 8px;
+  border: 1px solid #999;
+  border-radius: 4px;
+  background: #ddd;
+  cursor: pointer;
+}
