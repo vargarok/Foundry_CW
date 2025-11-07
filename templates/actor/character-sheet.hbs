@@ -26,25 +26,54 @@
         </section>
 
         <section>
-          <h3>Vitals</h3>
-          <div class="resource"><label>Will (Perm)</label><input type="number" name="system.vitals.will_perm" value="{{system.vitals.will_perm}}" min="0" max="10"/></div>
-          <div class="resource"><label>Will (Curr)</label><input type="number" name="system.vitals.will_curr" value="{{system.vitals.will_curr}}" min="0" max="10"/></div>
-          <div class="resource"><label>Health Lvls</label><input type="number" name="system.vitals.health_levels" value="{{system.vitals.health_levels}}" min="0" max="7"/></div>
-          <div class="resource"><label>Wound Pen</label><input type="number" name="system.vitals.wound_pen" value="{{system.vitals.wound_pen}}" min="-5" max="0"/></div>
-          <div class="resource"><label>Initiative</label><input type="number" name="system.vitals.initiative" value="{{system.vitals.initiative}}" readonly/>
-          <h4>Health</h4>
-          <div class="cw-health">  {{#each system.vitals.health.labels as |lab idx|}}<label class="cw-hbox"><input type="radio" name="cw-health" value="{{idx}}"
-             {{#if (gte ../system.vitals.health.damage idx)}}checked{{/if}}
-             data-index="{{idx}}" /><span class="cw-hlabel">{{lab}}</span>
-    </label>
-  {{/each}}
-</div>
-<div class="cw-health-controls">
-  <button type="button" class="cw-dmg-minus">Heal</button>
-  <button type="button" class="cw-dmg-plus">Damage</button>
-</div>
-</div>
-        </section>
+  <h3>Vitals</h3>
+
+  <div class="resource">
+    <label>Will (Perm)</label>
+    <input type="number" name="system.vitals.will_perm" value="{{system.vitals.will_perm}}" min="0" max="10"/>
+  </div>
+
+  <div class="resource">
+    <label>Will (Curr)</label>
+    <input type="number" name="system.vitals.will_curr" value="{{system.vitals.will_curr}}" min="0" max="10"/>
+  </div>
+
+  <div class="resource">
+    <label>Health Lvls</label>
+    <input type="number" name="system.vitals.health_levels" value="{{system.vitals.health_levels}}" min="0" max="7"/>
+  </div>
+
+  <div class="resource">
+    <label>Wound Pen</label>
+    <input type="number" name="system.vitals.wound_pen" value="{{system.vitals.wound_pen}}" min="-5" max="0"/>
+  </div>
+
+  <div class="resource">
+    <label>Initiative</label>
+    <input type="number" name="system.vitals.initiative" value="{{system.vitals.initiative}}" readonly/>
+  </div>
+
+  <h4>Health</h4>
+  <div class="cw-health">
+    {{#each system.vitals.health.labels as |lab idx|}}
+      <label class="cw-hbox">
+        <input
+          type="radio"
+          name="cw-health"
+          data-index="{{idx}}"
+          {{#if (lte idx ../system.vitals.health.damage)}}checked{{/if}}
+        />
+        <span class="cw-hlabel">{{lab}}</span>
+      </label>
+    {{/each}}
+  </div>
+
+  <div class="cw-health-controls">
+    <button type="button" class="cw-dmg-minus">Heal</button>
+    <button type="button" class="cw-dmg-plus">Damage</button>
+  </div>
+</section>
+
 
         <section>
           <h3>Test Roller</h3>
