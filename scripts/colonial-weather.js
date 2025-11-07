@@ -13,30 +13,28 @@ class CWActorSheet extends ActorSheet {
 
 async getData(options = {}) {
   const data = await super.getData(options);
-
-  // ✅ Make sure the template always has `system`
   data.system = this.actor.system;
 
   const sys = data.system;
-
-  // Health fallbacks (so boxes always render)
   sys.vitals ??= {};
   const h = (sys.vitals.health ??= {});
-  if (!Array.isArray(h.labels) || h.labels.length !== 7) {
-    h.labels = ["-0", "-0", "-1", "-1", "-2", "-2", "X"];
+
+  // ✅ force 8-state track
+  if (!Array.isArray(h.labels) || h.labels.length !== 8) {
+    h.labels = ["0","0","-1","-1","-2","-2","-5","X"];
   }
-  if (!Array.isArray(h.penalties) || h.penalties.length !== 7) {
-    h.penalties = [0, 0, -1, -1, -2, -2, -5];
+  if (!Array.isArray(h.penalties) || h.penalties.length !== 8) {
+    h.penalties = [0,0,-1,-1,-2,-2,-5,-5];
   }
   if (typeof h.max !== "number") h.max = 7;
   if (typeof h.damage !== "number") h.damage = 0;
 
-  // Keep Initiative in sync for display
+  // Keep Initiative display in sync (non-destructive)
   const dex = Number(sys.attributes?.dex ?? 0);
   const wit = Number(sys.attributes?.wit ?? 0);
   sys.vitals.initiative = dex + wit;
 
-  // Convenience for the HBS loop (optional)
+  // Helper for HBS (optional)
   data.hLabels = h.labels;
 
   return data;
