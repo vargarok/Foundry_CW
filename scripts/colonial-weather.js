@@ -33,10 +33,9 @@ class CWActorSheet extends ActorSheet {
 
     // Initiative (DEX+WIT)
     html.on("click", ".cw-roll-init", ev => this._onInitRoll(ev));
-    html.on("change", "input[name^='system.attributes.']", ev => this._updateDerivedData());
+    // This listener is what updates the "Initiative" vital on the sheet
+    html.on("change", "input[name^='system.attributes.']", ev => this._updateDerivedData(ev));
     html.on("click", ".cw-roll-save", ev => this._onSaveRoll(ev));
-    // REMOVED: this._updateDerivedData(); 
-    // This was firing on sheet load and breaking other listeners.
   }
 
   async _onSaveRoll(ev) {
@@ -84,11 +83,17 @@ class CWActorSheet extends ActorSheet {
     });
   }
 
-  _updateDerivedData() {
-    const dex = Number(this.actor.system.attributes?.dex || 0);
-    const wit = Number(this.actor.system.attributes?.wit || 0);
+  _updateDerivedData(event) {
+    // FIX: Read from the form elements directly to get the current values,
+    // as 'this.actor.system' is one step behind during the 'change' event.
+    // We use 'this.element' which is the jQuery-wrapped form.
+    const dex = Number(this.element.find("input[name='system.attributes.dex']").val() || 0);
+    const wit = Number(this.element.find("input[name='system.attributes.wit']").val() || 0);
+
     const initiative = dex + wit;
+    
     // Write back to the actor’s system data
+    // We use { diff: false } to prevent recursion on the 'change' listener
     this.actor.update({ "system.vitals.initiative": initiative }, { diff: false });
   }
 
