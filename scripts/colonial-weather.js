@@ -11,26 +11,35 @@ class CWActorSheet extends ActorSheet {
     });
   }
 
-getData(options) {
-  const ctx = super.getData(options);
-  const sys = ctx.system ?? this.actor.system;
+async getData(options = {}) {
+  // 1) Start with the full context from Foundry
+  const data = await super.getData(options);
 
-  // Ensure health structure + labels exist for older actors
-  if (!sys.vitals) sys.vitals = {};
-  if (!sys.vitals.health) sys.vitals.health = {};
-  if (!Array.isArray(sys.vitals.health.labels) || sys.vitals.health.labels.length !== 7) {
-    sys.vitals.health.labels = ["-0", "-0", "-1", "-1", "-2", "-2", "X"];
+  // 2) Work with the existing system data; don't replace it
+  const sys = data.system ?? this.actor.system ?? {};
+
+  // 3) Ensure health structure exists (fallbacks for older actors)
+  sys.vitals ??= {};
+  const h = (sys.vitals.health ??= {});
+  if (!Array.isArray(h.labels) || h.labels.length !== 7) {
+    h.labels = ["-0", "-0", "-1", "-1", "-2", "-2", "X"];
   }
-  if (!Array.isArray(sys.vitals.health.penalties) || sys.vitals.health.penalties.length !== 7) {
-    sys.vitals.health.penalties = [0, 0, -1, -1, -2, -2, -5];
+  if (!Array.isArray(h.penalties) || h.penalties.length !== 7) {
+    h.penalties = [0, 0, -1, -1, -2, -2, -5];
   }
-  if (typeof sys.vitals.health.max !== "number") sys.vitals.health.max = 7;
-  if (typeof sys.vitals.health.damage !== "number") sys.vitals.health.damage = 0;
+  if (typeof h.max !== "number") h.max = 7;
+  if (typeof h.damage !== "number") h.damage = 0;
 
-  // Optional: expose a convenient array for the HBS
-  ctx.hLabels = sys.vitals.health.labels;
+  // 4) (Optional) keep Initiative always in sync here too
+  const dex = Number(sys.attributes?.dex ?? 0);
+  const wit = Number(sys.attributes?.wit ?? 0);
+  sys.vitals.initiative = dex + wit;
 
-  return ctx;
+  // 5) Expose a convenience array for the template (optional)
+  data.hLabels = h.labels;
+
+  // 6) Return the original context, augmented (do NOT replace it)
+  return data;
 }
 
 
