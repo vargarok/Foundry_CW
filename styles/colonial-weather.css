@@ -54,6 +54,18 @@
 .cw .grid-3col { grid-template-columns: repeat(3, 1fr); }
 .cw .grid-2col { grid-template-columns: repeat(2, 1fr); }
 
+/* --- Flexbox Layout Rules (THE FIX) --- */
+/* Make the form fill the window's content area */
+.cw.flexcol {
+  height: 100%;
+}
+/* Make the sheet-body grow and scroll */
+.cw .sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px; /* Add some padding so content isn't flush */
+}
+
 /* --- Resource rows --- */
 .cw .resource {
   display: flex;
