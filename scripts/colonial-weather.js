@@ -16,6 +16,13 @@ class CWActorSheet extends ActorSheet {
     ctx.system = this.actor.system;
     return ctx;
   }
+  
+  render(force=false, options={}) {
+  super.render(force, options);
+  // Schedule after render to avoid the previous “locked UI” issue
+  setTimeout(() => this._updateWoundPenalty(), 0);
+  return this;
+}
 
   activateListeners(html) {
     super.activateListeners(html);
@@ -36,6 +43,19 @@ class CWActorSheet extends ActorSheet {
     // This listener is what updates the "Initiative" vital on the sheet
     html.on("change", "input[name^='system.attributes.']", ev => this._updateDerivedData(ev));
     html.on("click", ".cw-roll-save", ev => this._onSaveRoll(ev));
+
+    // Click a box (radio) to set damage directly
+    html.on("change", "input[name='cw-health']", ev => {
+      const idx = Number(ev.currentTarget.dataset.index || 0);
+      this.actor.update({ "system.vitals.health.damage": idx }).then(() => this._updateWoundPenalty());
+    });
+
+    // Heal / Damage buttons
+    html.on("click", ".cw-dmg-minus", ev => this._applyDamage(-1));
+    html.on("click", ".cw-dmg-plus",  ev => this._applyDamage(+1));
+
+    // Also recompute penalty when DEX/WIT change, since some UIs overwrite fields
+    html.on("change", "input[name='system.attributes.dex'], input[name='system.attributes.wit']", () => this.render(false));
   }
 
   async _onSaveRoll(ev) {
@@ -96,6 +116,24 @@ class CWActorSheet extends ActorSheet {
     // We use { diff: false } to prevent recursion on the 'change' listener
     this.actor.update({ "system.vitals.initiative": initiative }, { diff: false });
   }
+  _updateWoundPenalty() {
+  const h = this.actor.system.vitals.health;
+  const dmg = Math.min(Math.max(Number(h?.damage || 0), 0), Number(h?.max || 7));
+  const penalties = Array.isArray(h?.penalties) ? h.penalties : [0,0,-1,-1,-2,-2,-5];
+  // Sum penalties up to the damage taken, excluding the incapacitated last box
+  const capped = Math.min(dmg, penalties.length - 1);
+  const pen = penalties.slice(0, capped).reduce((a,b) => a + b, 0);
+  this.actor.update({
+    "system.vitals.health.damage": dmg,
+    "system.vitals.wound_pen": pen
+  }, { diff: false });
+}
+
+_applyDamage(delta) {
+  const h = foundry.utils.duplicate(this.actor.system.vitals.health);
+  h.damage = Math.min(Math.max(Number(h.damage || 0) + delta, 0), Number(h.max || 7));
+  this.actor.update({ "system.vitals.health": h }).then(() => this._updateWoundPenalty());
+}
 
   // Core roller: Attribute + Skill − Wound Penalty; successes on 7–10; 10-again if specialized
   async _rollStandard(attr, skill) {
@@ -143,6 +181,7 @@ class CWActorSheet extends ActorSheet {
 }
 
 // System init: register sheet + helpers
+
 Hooks.once("init", () => {
   console.log("Colonial Weather | Initializing sheet & helpers");
   Actors.unregisterSheet("core", ActorSheet);

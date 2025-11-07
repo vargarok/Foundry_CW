@@ -33,6 +33,13 @@
   "initiative": 0
 },
 
+"health": {
+  "max": 7,
+  "damage": 0,
+  "penalties": [0, 0, -1, -1, -2, -2, -5],
+  "labels": ["-0", "-0", "-1", "-1", "-2", "-2", "X"]
+},
+
   "backgrounds": { "bg1": "", "bg2": "", "bg3": "", "bg4": "", "bg5": "" },
   "allegiances": { "alleg1": "", "alleg2": "", "alleg3": "" },
   "cyber": { "immune_load": 0 }
