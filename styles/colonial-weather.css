@@ -39,6 +39,7 @@
 /* --- Tabs --- */
 .cw .sheet-tabs {
   margin: 6px 0 10px;
+  flex: 0 auto; /* ADDED: Stop tabs nav from stretching full-width */
 }
 .cw .sheet-tabs a.item {
   padding: 4px 10px;
@@ -51,8 +52,8 @@
   display: grid;
   gap: 8px;
 }
-.cw .grid-3col { grid-template-columns: repeat(3, 1fr); }
-.cw .grid-2col { grid-template-columns: repeat(2, 1fr); }
+.cw .grid-3col { grid-template-columns: repeat(3, auto); } /* MODIFIED: Use 'auto' instead of '1fr' to prevent huge gaps */
+.cw .grid-2col { grid-template-columns: repeat(2, auto); } /* MODIFIED: Use 'auto' here too for consistency */
 
 /* --- Flexbox Layout Rules (THE FIX) --- */
 /* Make the form fill the window's content area */
@@ -106,6 +107,7 @@
   font-size: 0.85em;
   font-weight: 600;
   cursor: pointer;
+  width: max-content; /* ADDED: Stop buttons from stretching to 100% width of the wide column */
 }
 .cw .cw-skill-roll { margin-left: auto; }
 .cw .cw-roll:hover,
