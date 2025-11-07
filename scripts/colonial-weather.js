@@ -35,7 +35,7 @@
       html.on("click", ".cw-roll-init", ev => this._onInitRoll(ev));
       html.on("change", "input[name^='system.attributes.']", ev => this._updateDerivedData());
       html.on("click", ".cw-roll-save", ev => this._onSaveRoll(ev));
-      this._updateDerivedData();
+      // this._updateDerivedData(); // REMOVED: This line was likely causing a silent error, breaking all listeners.
     }
     
     _onSaveRoll(ev) {
