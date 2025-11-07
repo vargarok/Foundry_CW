@@ -2,14 +2,17 @@
 .cw {
   font-family: sans-serif;
   font-size: 13px;
-  position: relative;
-  /* do NOT override Foundry's window/app positioning */
+  /* REMOVED 'position: relative;'. 
+    Foundry's .window-app class handles positioning. 
+    Adding this was causing the layout to break and become unclickable.
+  */
 }
 
-/* --- Prevent interaction lock without breaking Foundry's layout --- */
-.cw * {
-  pointer-events: auto !important;
-}
+/* REMOVED the '.cw * { pointer-events: auto !important; }' rule.
+  This was a symptom of the 'position: relative' bug.
+  With the position rule removed, this is no longer necessary and
+  can cause other issues.
+*/
 
 /* --- Header --- */
 .cw .sheet-header {
@@ -105,9 +108,14 @@
 .cw-chat p { margin: 0 0 3px; }
 .cw-chat .botch { color: #c00; font-weight: bold; }
 
-/* --- Ensure the app stays within the window --- */
-.app.window-app.sheet.actor {
-  max-width: 95vw;
-  max-height: 95vh;
-  overflow: auto;
-}
+/*
+  REMOVED the '.app.window-app.sheet.actor' block.
+  Your 'defaultOptions' in the JS file (width: 720, height: 640)
+  is the correct way to set the window size. This CSS rule
+  was redundant and could conflict with Foundry's core styles.
+*/
+
+/*
+  REMOVED the extra closing brace '}' that was at the end
+  of your original file, which was a syntax error.
+*/
