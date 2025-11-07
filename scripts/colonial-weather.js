@@ -33,6 +33,28 @@ activateListeners(html) {
 
   // Initiative (DEX+WIT)
   html.on("click", ".cw-roll-init", ev => this._onInitRoll(ev));
+  html.on("change", "input[name^='system.attributes.']", ev => this._updateDerivedData());
+  html.on("click", ".cw-roll-save", ev => this._onSaveRoll(ev));
+  this._updateDerivedData();
+}
+
+_onSaveRoll(ev) {
+  ev.preventDefault();
+  const sta = Number(this.actor.system.attributes?.sta || 0);
+  const wit = Number(this.actor.system.attributes?.wit || 0);
+  const wound = Number(this.actor.system.vitals?.wound_pen || 0);
+  const dice = Math.max(1, sta + wit - Math.abs(wound));
+
+  const roll = new Roll(`${dice}d10`);
+  roll.evaluate({ async: false });
+  const faces = roll.dice[0].results.map(r => r.result);
+  const successes = faces.filter(n => n >= 7).length;
+
+  roll.toMessage({
+    speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+    flavor: `<b>Save Roll</b> (STA ${sta} + WIT ${wit} − Wounds ${Math.abs(wound)} = ${dice}d10)<br/>
+             <b>Successes (7-10):</b> ${successes}`
+  });
 }
 
   // Button handler for the Core tab’s “Standard Test”
@@ -57,6 +79,13 @@ activateListeners(html) {
     speaker: ChatMessage.getSpeaker({ actor: this.actor }),
     flavor: `<b>Initiative</b> (DEX ${dex} + WIT ${wit} = ${dice}d10)`
   });
+}
+  _updateDerivedData() {
+  const dex = Number(this.actor.system.attributes?.dex || 0);
+  const wit = Number(this.actor.system.attributes?.wit || 0);
+  const initiative = dex + wit;
+  // Write back to the actor’s system data
+  this.actor.update({ "system.vitals.initiative": initiative }, { diff: false });
 }
 
   // Core roller: Attribute + Skill − Wound Penalty; successes on 7–10; 10-again if specialized

@@ -31,6 +31,8 @@
           <div class="resource"><label>Will (Curr)</label><input type="number" name="system.vitals.will_curr" value="{{system.vitals.will_curr}}" min="0" max="10"/></div>
           <div class="resource"><label>Health Lvls</label><input type="number" name="system.vitals.health_levels" value="{{system.vitals.health_levels}}" min="0" max="7"/></div>
           <div class="resource"><label>Wound Pen</label><input type="number" name="system.vitals.wound_pen" value="{{system.vitals.wound_pen}}" min="-5" max="0"/></div>
+          <div class="resource"><label>Initiative</label><input type="number" name="system.vitals.initiative" value="{{system.vitals.initiative}}" readonly/>
+</div>
         </section>
 
         <section>
@@ -55,6 +57,7 @@
           <button type="button" class="cw-roll">Roll Standard Test</button>
           <hr/>
           <button type="button" class="cw-roll-init">Roll Initiative (DEX+WIT)</button>
+          <button type="button" class="cw-roll-save">Roll Save (STA+WIT)</button>
         </section>
       </div>
     </div>

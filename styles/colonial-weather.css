@@ -148,3 +148,7 @@
   background: #aaa;
   border-radius: 4px;
 }
+.cw input[readonly] {
+  background: #f0f0f0;
+  color: #444;
+}

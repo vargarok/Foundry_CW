@@ -25,7 +25,13 @@
     "stealth": false, "streetwise": false, "subterfuge": false, "survival": false, "technology": false
   },
 
-  "vitals": { "will_perm": 3, "will_curr": 3, "health_levels": 7, "wound_pen": 0 },
+  "vitals": {
+  "will_perm": 3,
+  "will_curr": 3,
+  "health_levels": 7,
+  "wound_pen": 0,
+  "initiative": 0
+},
 
   "backgrounds": { "bg1": "", "bg2": "", "bg3": "", "bg4": "", "bg5": "" },
   "allegiances": { "alleg1": "", "alleg2": "", "alleg3": "" },
