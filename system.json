@@ -13,7 +13,7 @@
     }
   ],
   "manifest": "https://raw.githubusercontent.com/vargarok/Foundry_CS/main/system.json",
-  "download": "https://github.com/vargarok/Foundry_CS/releases/download/release/colonial-weather-system.zip",
+  "download": "https://github.com/vargarok/Foundry_CW/releases/download/release/Foundry_CS.zip",
   "initiative": "dex + wit",
   "grid": {
     "type": 1,
