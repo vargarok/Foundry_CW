@@ -1,154 +1,81 @@
-/* === Colonial Weather — Actor Sheet Layout === */
+/* === Colonial Weather — minimal, safe styles === */
+/* Nothing here sets fixed heights or blocks scrolling/clicks. */
 
-.cw {
-  font-size: 13px;
-  padding: 4px;
-}
+.cw { font-size: 13px; }
 
-/* HEADER */
+/* Header */
 .cw .sheet-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 6px;
+  margin: 6px 0;
 }
-
 .cw .charname input {
   width: 100%;
-  font-size: 1.3em;
+  font-size: 1.25rem;      /* slightly larger so full names are readable */
   font-weight: 700;
-  text-transform: uppercase;
   border: none;
   background: transparent;
   border-bottom: 1px solid #666;
 }
+.cw .charname input:focus { outline: none; border-color: #999; }
 
-.cw .charname input:focus {
-  outline: none;
-  border-color: #999;
-}
+/* Tabs */
+.cw .sheet-tabs { margin: 6px 0 10px; }
+.cw .sheet-tabs a.item { padding: 4px 10px; font-weight: 600; }
 
-/* === TABS === */
-.cw .sheet-tabs {
-  border-bottom: 1px solid #999;
-  margin-bottom: 5px;
-}
-
-.cw .sheet-tabs a.item {
-  padding: 4px 10px;
-  cursor: pointer;
-  border-radius: 4px 4px 0 0;
-  margin-right: 2px;
-  background: #ddd;
-  font-weight: 600;
-}
-
-.cw .sheet-tabs a.active {
-  background: #bbb;
-}
-
-/* === BODY === */
-.cw .sheet-body {
-  overflow: hidden;
-  height: 100%;
-}
-
-/* Each tab scrolls independently */
-.cw .sheet-body .tab {
-  overflow-y: auto;
-  max-height: calc(100% - 5px);
-  padding-right: 6px;
-}
-
-/* === GRIDS === */
+/* Grids */
 .cw .grid-3col,
 .cw .grid-2col {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
+.cw .grid-3col { grid-template-columns: repeat(3, 1fr); }
+.cw .grid-2col { grid-template-columns: repeat(2, 1fr); }
 
-.cw .grid-3col {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.cw .grid-2col {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-/* === RESOURCE ROWS === */
+/* Rows */
 .cw .resource {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
-
 .cw .resource label {
-  flex: 0 0 120px;
+  width: 120px;
   font-weight: 500;
 }
 
+/* Inputs */
 .cw input[type="number"],
 .cw input[type="text"] {
-  width: 45px;
+  width: 48px;
   text-align: center;
 }
+.cw textarea { width: 100%; resize: vertical; }
 
-.cw .small {
-  font-size: 0.85em;
-  flex: 0 0 auto;
-}
-
-.cw textarea {
-  width: 100%;
-  resize: vertical;
-  min-height: 200px;
-}
-
-/* === BUTTONS === */
+/* Buttons */
 .cw .cw-roll,
 .cw .cw-roll-init,
+.cw .cw-roll-save,
 .cw .cw-skill-roll {
   padding: 3px 8px;
   border: 1px solid #999;
   border-radius: 4px;
-  background: #dcdcdc;
+  background: #ddd;
   font-size: 0.85em;
   font-weight: 600;
   cursor: pointer;
 }
-
+.cw .cw-skill-roll { margin-left: auto; }
 .cw .cw-roll:hover,
 .cw .cw-roll-init:hover,
-.cw .cw-skill-roll:hover {
-  background: #c8c8c8;
-}
+.cw .cw-roll-save:hover,
+.cw .cw-skill-roll:hover { background: #c8c8c8; }
 
-.cw .cw-skill-roll {
-  margin-left: auto;
-}
+/* Readonly field hint */
+.cw input[readonly] { background: #f2f2f2; color: #444; }
 
-/* === CHAT OUTPUT === */
-.cw-chat h3 {
-  margin-bottom: 4px;
-}
-.cw-chat p {
-  margin: 0 0 3px;
-}
-.cw-chat .botch {
-  color: #c00;
-  font-weight: bold;
-}
-
-/* === Scrollbar styling (optional) === */
-.cw .tab::-webkit-scrollbar {
-  width: 8px;
-}
-.cw .tab::-webkit-scrollbar-thumb {
-  background: #aaa;
-  border-radius: 4px;
-}
-.cw input[readonly] {
-  background: #f0f0f0;
-  color: #444;
-}
+/* Chat card */
+.cw-chat h3 { margin-bottom: 4px; }
+.cw-chat p  { margin: 0 0 3px; }
+.cw-chat .botch { color: #c00; font-weight: bold; }
