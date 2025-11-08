@@ -50,15 +50,14 @@
       ]
     }
   },
-"Item": {
+  "Item": {
     "templates": {
-      "base": {},
       "withEffects": { "effects": [] },
-      "withOnUse": { "onUse": [] }
+      "withOnUse":   { "onUse": [] }
     },
     "types": {
       "implant": {
-        "templates": ["base", "withEffects"],
+        "templates": ["withEffects"],
         "category": "cybernetic",
         "techLevel": 10,
         "legal": "legal",
@@ -66,17 +65,17 @@
         "description": ""
       },
       "drug": {
-        "templates": ["base", "withOnUse"],
+        "templates": ["withOnUse"],
         "duration": { "type": "turns", "value": 10 },
         "cost": 0,
         "description": "",
         "sideEffects": []
       },
-      "equipment":   { "templates": ["base", "withEffects"] },
-      "enhancement": { "templates": ["base", "withEffects"] },
-      "background":  { "templates": ["base", "withEffects"] },
-      "merit":       { "templates": ["base", "withEffects"] },
-      "flaw":        { "templates": ["base", "withEffects"] }
+      "equipment":   { "templates": ["withEffects"] },
+      "enhancement": { "templates": ["withEffects"] },
+      "background":  { "templates": ["withEffects"] },
+      "merit":       { "templates": ["withEffects"] },
+      "flaw":        { "templates": ["withEffects"] }
     }
   }
 }

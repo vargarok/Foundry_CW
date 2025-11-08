@@ -32,23 +32,23 @@
     </div>
 
     <div class="tab" data-group="primary" data-tab="effects">
-      {{#each system.effects as |eff i|}}
-        <fieldset class="effect-row">
+      {{#each item.system.effects as |eff i|}}
+        <fieldset class="cw-effect">
           <legend>{{eff.label}}</legend>
-          <div class="grid-3">
-            <label>Roll Type</label>
-            <input name="system.effects.{{i}}.when.rollType" value="{{eff.when.rollType}}"/>
-            <label>Tags (csv)</label>
-            <input name="system.effects.{{i}}.when.tagsCsv" value="{{join eff.when.tags ', '}}"/>
-            <label>Label</label>
-            <input name="system.effects.{{i}}.label" value="{{eff.label}}"/>
+          <div class="form-group">
+            <label>When:</label>
+            <input type="text" name="system.effects.{{i}}.when.tagsCsv" value="{{eff.when.tagsCsv}}">
+            <label>Roll Type:</label>
+            <input type="text" name="system.effects.{{i}}.when.rollType" value="{{eff.when.rollType}}">
           </div>
-          <div>
-            <label>Mods JSON</label>
-            <textarea name="system.effects.{{i}}.mods" rows="3">{{json eff.mods}}</textarea>
+          <div class="form-group">
+            <label>Mods:</label>
+            <input type="text" name="system.effects.{{i}}.mods.0.path"  value="{{eff.mods.0.path}}"  size="10">
+            <input type="text" name="system.effects.{{i}}.mods.0.op"    value="{{eff.mods.0.op}}"    size="5">
+            <input type="number" name="system.effects.{{i}}.mods.0.value" value="{{eff.mods.0.value}}" size="3">
           </div>
         </fieldset>
-      {{/each}}
+{{/each}}
       <button type="button" class="add-effect">Add Effect</button>
     </div>
   </section>
