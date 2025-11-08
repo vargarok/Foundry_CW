@@ -14,11 +14,17 @@ export class CWImplantSheet extends ItemSheet {
     if (!Handlebars.helpers.join) {
       Handlebars.registerHelper("join", (arr, sep) => (Array.isArray(arr) ? arr.join(sep ?? ", ") : ""));
     }
-    // Normalize effects for the template: allow {0:{...}} shape to render as an array
-    const eff = data.item?.system?.effects;
-    if (!Array.isArray(eff)) {
-        data.item.system.effects = Array.isArray(eff) ? eff : Object.values(eff ?? []);
+    if (!Handlebars.helpers.json) {
+        Handlebars.registerHelper("json", (v) => JSON.stringify(v ?? [], null, 0));
     }
+    
+    // Normalize effects for BOTH contexts the HBS might use:
+    const effItem = data.item?.system?.effects;
+    const normalized = Array.isArray(effItem) ? effItem : Object.values(effItem ?? {});
+    // a) item.system.* (some templates use this)
+    if (data.item?.system) data.item.system.effects = normalized;
+    // b) system.* (your HBS uses this alias)
+    if (data.system) data.system.effects = normalized;
     return data;
   }
   activateListeners(html) {
