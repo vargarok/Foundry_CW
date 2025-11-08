@@ -17,8 +17,10 @@ export class CWImplantSheet extends ItemSheet {
     return data;
   }
   activateListeners(html) {
+    console.log("CW Implant Sheet listeners ready for", this.item.id);  
     super.activateListeners(html);
     html.find(".add-effect").on("click", async () => {
+        console.log("CW Add Effect clicked for", this.item.id);
   if (!Array.isArray(this.item.system.effects)) {
     await this.item.update({ "system.effects": [] }, { render: false });
   }
