@@ -33,43 +33,55 @@
 
     <div class="tab" data-group="primary" data-tab="effects">
   {{#each item.system.effects as |eff i|}}
-    <fieldset class="cw-effect space-y-2">
-      <legend>
+    <fieldset class="cw-effect">
+      <legend class="cw-flex">
         <input name="system.effects.{{i}}.label" value="{{eff.label}}" placeholder="Effect label" />
-        <button type="button" class="effect-remove" data-index="{{i}}" title="Remove effect">🗑️</button>
+        <button type="button" class="effect-remove" data-index="{{i}}" title="Remove effect" aria-label="Remove effect">🗑️</button>
       </legend>
 
-      <div class="grid-3">
-        <label>Tags (csv)</label>
-        <input name="system.effects.{{i}}.when.tagsCsv" value="{{eff.when.tagsCsv}}" placeholder="cold, survival"/>
+      <div class="cw-grid-3">
+        <div class="cw-field">
+          <label>Tags</label>
+          <input name="system.effects.{{i}}.when.tagsCsv" value="{{eff.when.tagsCsv}}" list="cw-tags-list" placeholder="cold, survival"/>
+        </div>
 
-        <label>Roll Type</label>
-        <select name="system.effects.{{i}}.when.rollType">
-          <option value=""        {{#if (eq eff.when.rollType "")}}selected{{/if}}>(any)</option>
-          <option value="standard"{{#if (eq eff.when.rollType "standard")}}selected{{/if}}>standard</option>
-          <option value="initiative"{{#if (eq eff.when.rollType "initiative")}}selected{{/if}}>initiative</option>
-          <option value="save"    {{#if (eq eff.when.rollType "save")}}selected{{/if}}>save</option>
-        </select>
+        <div class="cw-field">
+          <label>Roll Type</label>
+          <select name="system.effects.{{i}}.when.rollType">
+            <option value=""           {{#if (eq eff.when.rollType "")}}selected{{/if}}>(any)</option>
+            <option value="standard"   {{#if (eq eff.when.rollType "standard")}}selected{{/if}}>standard</option>
+            <option value="initiative" {{#if (eq eff.when.rollType "initiative")}}selected{{/if}}>initiative</option>
+            <option value="save"       {{#if (eq eff.when.rollType "save")}}selected{{/if}}>save</option>
+          </select>
+        </div>
+
+        <div class="cw-field"></div>
       </div>
 
       <div class="mods">
         {{#each eff.mods as |m j|}}
-          <div class="mod-row grid-4">
-            <label>Path</label>
-            <select name="system.effects.{{i}}.mods.{{j}}.path">
-              <option value="dicePool"   {{#if (eq m.path "dicePool")}}selected{{/if}}>dicePool</option>
-              <option value="initiative" {{#if (eq m.path "initiative")}}selected{{/if}}>initiative</option>
-            </select>
+          <div class="mod-row cw-grid-4">
+            <div class="cw-field">
+              <label>Target</label>
+              <select name="system.effects.{{../i}}.mods.{{j}}.path">
+                <option value="dicePool" selected>dicePool</option>
+              </select>
+            </div>
 
-            <label>Op</label>
-            <select name="system.effects.{{i}}.mods.{{j}}.op">
-              <option value="add" {{#if (eq m.op "add")}}selected{{/if}}>add</option>
-            </select>
+            <div class="cw-field cw-op">
+              <label>Op</label>
+              <input type="text" value="add" readonly name="system.effects.{{../i}}.mods.{{j}}.op" />
+            </div>
 
-            <label>Value</label>
-            <input type="number" name="system.effects.{{i}}.mods.{{j}}.value" value="{{m.value}}" step="1"/>
+            <div class="cw-field">
+              <label>Dice</label>
+              <input type="number" name="system.effects.{{../i}}.mods.{{j}}.value" value="{{m.value}}" step="1"/>
+            </div>
 
-            <button type="button" class="mod-remove" data-index="{{i}}" data-mod="{{j}}" title="Remove modifier">✖</button>
+            <div class="cw-field cw-actions">
+              <label>&nbsp;</label>
+              <button type="button" class="mod-remove" data-index="{{../i}}" data-mod="{{j}}" title="Remove modifier" aria-label="Remove modifier">✖</button>
+            </div>
           </div>
         {{/each}}
         <button type="button" class="mod-add" data-index="{{i}}">+ Add Modifier</button>
@@ -78,6 +90,15 @@
   {{/each}}
 
   <button type="button" class="add-effect">Add Effect</button>
+
+  <datalist id="cw-tags-list">
+    <option value="cold" />
+    <option value="survival" />
+    <option value="melee" />
+    <option value="ranged" />
+    <option value="fear" />
+  </datalist>
 </div>
+
   </section>
 </form>

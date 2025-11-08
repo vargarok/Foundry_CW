@@ -130,10 +130,13 @@
   width: 100%;
   box-sizing: border-box;
 }
-.cw-item-sheet .grid-3 { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:.5rem; }
-.cw-item-sheet .grid-4 { display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:.5rem; align-items:center; }
+/* Effects editor layout */
+.cw-item-sheet fieldset.cw-effect { border:1px solid #9993; padding:.75rem; margin:.75rem 0; border-radius:4px; }
+.cw-item-sheet legend.cw-flex { display:flex; align-items:center; gap:.5rem; }
+.cw-item-sheet legend.cw-flex input { flex:1 1 auto; }
+
+.cw-item-sheet .cw-grid-3 { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:.5rem; }
+.cw-item-sheet .cw-grid-4 { display:grid; grid-template-columns: 1.3fr .7fr .7fr .3fr; gap:.5rem; }
+.cw-item-sheet .cw-field label { display:block; font-size:.85rem; opacity:.9; margin-bottom:.2rem; }
+.cw-item-sheet .cw-actions button { width:100%; }
 .cw-item-sheet .mods { margin-top:.5rem; }
-.cw-item-sheet fieldset.cw-effect { border:1px solid #9993; padding:.5rem; margin:.5rem 0; }
-.cw-item-sheet fieldset.cw-effect legend { display:flex; align-items:center; gap:.5rem; }
-.cw-item-sheet fieldset.cw-effect legend input { flex:1 1 auto; }
-.cw-item-sheet button.effect-remove, .cw-item-sheet button.mod-remove { line-height:1; }
