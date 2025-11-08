@@ -20,19 +20,26 @@ export class CWImplantSheet extends ItemSheet {
     console.log("CW Implant Sheet listeners ready for", this.item.id);  
     super.activateListeners(html);
     html.find(".add-effect").on("click", async () => {
-        console.log("CW Add Effect clicked for", this.item.id);
+  console.log("CW Add Effect clicked for", this.item.id, "type:", this.item.type);
+
+  // Initialize for legacy items that predate the schema
   if (!Array.isArray(this.item.system.effects)) {
     await this.item.update({ "system.effects": [] }, { render: false });
   }
-  const index = this.item.system.effects.length;
+
+  const index = Array.isArray(this.item.system.effects) ? this.item.system.effects.length : 0;
   const newEff = {
+    label: "New Effect",
     when: { rollType: "", tagsCsv: "" },
-    mods: [{ path: "dicePool", op: "add", value: 1 }],
-    label: "New Effect"
+    mods: [{ path: "dicePool", op: "add", value: 1 }]
   };
-  // write directly to the next array slot; Foundry will create the array if needed
-  await this.item.update({ [`system.effects.${index}`]: newEff });
-  this.render(true);
+
+  // Path write is safest for array append
+  const upd = await this.item.update({ [`system.effects.${index}`]: newEff }, { render: false });
+  await this.item.sheet.render(true);
+
+  // Sanity log
+  console.log("CW effects after update:", foundry.utils.deepClone(this.item.system.effects));
 });
   }
 }
