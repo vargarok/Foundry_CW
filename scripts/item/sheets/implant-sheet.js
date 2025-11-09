@@ -26,18 +26,10 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
   activateListeners(html) {
     super.activateListeners(html);
 
-    html.find("input:not([name^='system.effects']), select:not([name^='system.effects']), textarea:not([name^='system.effects'])")
-        .on("change", async (ev) => {
-          ev.preventDefault();
-          ev.stopPropagation();
-          const el = ev.currentTarget;
-          await this.item.update({ [el.name]: el.type === "number" ? Number(el.value) : el.value });
-        });
-
-    html.find("[name^='system.effects']").on("change", async (ev) => {
+    html.find("input, select, textarea").on("change", async (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
-        await this._saveEffectsFromForm(html);
+        await this._proccessForm(html);
     });
 
     html.find(".add-effect").on("click", async (ev) => {
@@ -64,8 +56,9 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
       const idx = Number(ev.currentTarget.dataset.index);
       const effects = this._getEffectsArray();
       if (effects[idx]) {
-          effects[idx].mods.push({ path: "dicePool", op: "add", value: 1 });
-          await this.item.update({ "system.effects": effects });
+         if (!effects[idx].mods) effects[idx].mods = [];
+         effects[idx].mods.push({ path: "dicePool", op: "add", value: 1 });
+         await this.item.update({ "system.effects": effects });
       }
     });
 
@@ -74,7 +67,7 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
       const i = Number(ev.currentTarget.dataset.index);
       const j = Number(ev.currentTarget.dataset.mod);
       const effects = this._getEffectsArray();
-      if (effects[i]?.mods) {
+      if (effects[i]?.mods && effects[i].mods[j]) {
           effects[i].mods.splice(j, 1);
           await this.item.update({ "system.effects": effects });
       }
@@ -86,37 +79,32 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
     let eff = sys.effects || [];
     if (!Array.isArray(eff)) eff = Object.values(eff);
     return eff.map(e => {
+       if (!e) return { when: {}, mods: [] };
        if (!e.mods || !Array.isArray(e.mods)) e.mods = Object.values(e.mods || {});
        return e;
     });
   }
 
-  async _saveEffectsFromForm(html) {
-      const formData = new FormDataExtended(html[0].closest("form")).object;
-      const effects = [];
-      for (const [key, value] of Object.entries(formData)) {
-          if (key.startsWith("system.effects.")) {
-              const match = key.match(/system\.effects\.(\d+)\.(.+)/);
-              if (match) {
-                  const idx = Number(match[1]);
-                  const path = match[2];
-                  if (!effects[idx]) effects[idx] = { when: {}, mods: [] };
-                  if (path.startsWith("mods.")) {
-                      const modMatch = path.match(/mods\.(\d+)\.(.+)/);
-                      if (modMatch) {
-                          const mIdx = Number(modMatch[1]);
-                          const mPath = modMatch[2];
-                          if (!effects[idx].mods[mIdx]) effects[idx].mods[mIdx] = {};
-                          effects[idx].mods[mIdx][mPath] = value;
-                      }
-                  } else {
-                      foundry.utils.setProperty(effects[idx], path, value);
-                  }
-              }
-          }
+  async _proccessForm(html) {
+      const form = html[0].closest("form");
+      // V13 safe access
+      const FDE = foundry.applications?.ux?.FormDataExtended || FormDataExtended;
+      const formData = new FDE(form).object;
+      const data = foundry.utils.expandObject(formData);
+
+      // ENFORCE ARRAYS
+      if (data.system?.effects && !Array.isArray(data.system.effects)) {
+          data.system.effects = Object.values(data.system.effects);
       }
-      const cleanEffects = effects.filter(e => e);
-      await this.item.update({ "system.effects": cleanEffects });
+      if (Array.isArray(data.system?.effects)) {
+          data.system.effects.forEach(eff => {
+              if (eff.mods && !Array.isArray(eff.mods)) {
+                  eff.mods = Object.values(eff.mods);
+              }
+          });
+      }
+
+      await this.item.update(data);
   }
 }
 
