@@ -1,4 +1,3 @@
-// scripts/item/sheets/trait-sheet.js
 const TEMPLATE = "systems/colonial-weather/templates/items/trait-sheet.hbs";
 
 // V13: Use namespaced ItemSheet
@@ -8,7 +7,7 @@ export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
       classes: ["cw", "sheet", "item"],
       width: 550, height: 500, template: TEMPLATE,
       tabs: [{ navSelector: ".tabs", contentSelector: ".sheet-body", initial: "details" }],
-      submitOnChange: false, // DISABLE automatic submission to prevent race conditions
+      submitOnChange: false,
       closeOnSubmit: false
     });
   }
@@ -16,28 +15,16 @@ export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
   getData(opts) {
     const data = super.getData(opts);
     if (!Handlebars.helpers.eq) Handlebars.registerHelper("eq", (a, b) => a === b);
-    
-    // Ensure effects is always an array for handlebars
-    const eff = data.item.toObject().system.effects || [];
-    const normalized = Array.isArray(eff) ? eff : Object.values(eff);
-    
-    // Ensure every effect has a mods array
-    normalized.forEach(e => {
-      if (!e.mods || !Array.isArray(e.mods)) e.mods = [];
-    });
-
-    // We don't need to write back to data.item.system here, Handlebars will use 'normalized' if we pass it
-    data.effectsArray = normalized;
+    data.effectsArray = this._getEffectsArray();
     return data;
   }
 
   activateListeners(html) {
     super.activateListeners(html);
 
-    // Manually handle all standard inputs since we disabled submitOnChange
     html.find("input, select, textarea").on("change", ev => this._onStandardChange(ev));
 
-    html.find(".add-effect").on("click", ev => {
+    html.find(".add-effect").on("click", async (ev) => {
       ev.preventDefault();
       const effects = this._getEffectsArray();
       effects.push({
@@ -45,42 +32,55 @@ export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
         when: { rollType: "", tagsCsv: "" },
         mods: [{ path: "dicePool", op: "add", value: 1 }]
       });
-      this.item.update({ "system.effects": effects });
+      await this.item.update({ "system.effects": effects });
     });
 
-    html.find(".effect-remove").on("click", ev => {
+    html.find(".effect-remove").on("click", async (ev) => {
       ev.preventDefault();
       const idx = Number(ev.currentTarget.dataset.index);
       const effects = this._getEffectsArray();
-      effects.splice(idx, 1);
-      this.item.update({ "system.effects": effects });
+      if (idx >= 0 && idx < effects.length) {
+         effects.splice(idx, 1);
+         await this.item.update({ "system.effects": effects });
+      }
     });
 
-    html.find(".mod-add").on("click", ev => {
+    html.find(".mod-add").on("click", async (ev) => {
       ev.preventDefault();
       const idx = Number(ev.currentTarget.dataset.index);
       const effects = this._getEffectsArray();
-      effects[idx].mods.push({ path: "dicePool", op: "add", value: 1 });
-      this.item.update({ "system.effects": effects });
+      // Guard against race conditions where the index might be invalid
+      if (effects[idx]) {
+          if (!Array.isArray(effects[idx].mods)) effects[idx].mods = [];
+          effects[idx].mods.push({ path: "dicePool", op: "add", value: 1 });
+          await this.item.update({ "system.effects": effects });
+      }
     });
 
-    html.find(".mod-remove").on("click", ev => {
+    html.find(".mod-remove").on("click", async (ev) => {
       ev.preventDefault();
       const i = Number(ev.currentTarget.dataset.index);
       const j = Number(ev.currentTarget.dataset.mod);
       const effects = this._getEffectsArray();
-      effects[i].mods.splice(j, 1);
-      this.item.update({ "system.effects": effects });
+      // Guard against invalid indices for both effect and mod
+      if (effects[i] && Array.isArray(effects[i].mods) && effects[i].mods[j]) {
+          effects[i].mods.splice(j, 1);
+          await this.item.update({ "system.effects": effects });
+      }
     });
   }
 
-  // Helper to get a clean array of current effects
+  // Robust helper to get guaranteed clean data
   _getEffectsArray() {
     const system = this.item.toObject().system;
-    return Array.isArray(system.effects) ? system.effects : [];
+    let effects = Array.isArray(system.effects) ? system.effects : Object.values(system.effects || {});
+    // Ensure every effect has a valid 'mods' array to prevent future undefined errors
+    return effects.map(e => {
+        if (!e.mods || !Array.isArray(e.mods)) e.mods = [];
+        return e;
+    });
   }
 
-  // Manual handler for normal fields
   async _onStandardChange(event) {
     event.preventDefault();
     const field = event.currentTarget.name;
