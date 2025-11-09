@@ -1,6 +1,7 @@
 const TEMPLATE = "systems/colonial-weather/templates/items/trait-sheet.hbs";
 
-export class CWTraitSheet extends ItemSheet {
+// V13: Use namespaced ItemSheet
+export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["cw", "sheet", "item"],
@@ -11,10 +12,8 @@ export class CWTraitSheet extends ItemSheet {
 
   getData(opts) {
     const data = super.getData(opts);
-    // Standard Handlebars helpers if not already global
     if (!Handlebars.helpers.eq) Handlebars.registerHelper("eq", (a, b) => a === b);
     
-    // Normalize effects data structure
     const eff = data.item?.system?.effects;
     const normalized = Array.isArray(eff) ? eff : Object.values(eff ?? {});
     for (const e of normalized) {

@@ -1,7 +1,8 @@
 // scripts/item/sheets/implant-sheet.js
 const TEMPLATE = "systems/colonial-weather/templates/items/implant-sheet.hbs";
 
-export class CWImplantSheet extends ItemSheet {
+// V13: Use namespaced ItemSheet
+export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["cw", "sheet", "item"],
@@ -17,7 +18,6 @@ export class CWImplantSheet extends ItemSheet {
     if (!Handlebars.helpers.join) Handlebars.registerHelper("join", (arr, sep) => Array.isArray(arr) ? arr.join(sep ?? ", ") : "");
     if (!Handlebars.helpers.json) Handlebars.registerHelper("json", (v) => JSON.stringify(v ?? [], null, 0));
 
-    // Normalize effects and nested mods to arrays for rendering
     const eff = data.item?.system?.effects;
     const normalized = Array.isArray(eff) ? eff : Object.values(eff ?? {});
     for (const e of normalized) {
@@ -29,60 +29,61 @@ export class CWImplantSheet extends ItemSheet {
   }
 
   activateListeners(html) {
-  super.activateListeners(html);
+    super.activateListeners(html);
 
-  const pushEffect = (list) => {
-    list.push({
-      label: "New Effect",
-      when: { rollType: "", tagsCsv: "" },
-      mods: [{ path: "dicePool", op: "add", value: 1 }]
+    const pushEffect = (list) => {
+      list.push({
+        label: "New Effect",
+        when: { rollType: "", tagsCsv: "" },
+        mods: [{ path: "dicePool", op: "add", value: 1 }]
+      });
+    };
+    const pushMod = (eff) => {
+      eff.mods = Array.isArray(eff.mods) ? eff.mods : [];
+      eff.mods.push({ path: "dicePool", op: "add", value: 1 });
+    };
+
+    html.find(".add-effect").on("click", async () => {
+      const current = Array.isArray(this.item.system.effects)
+        ? foundry.utils.deepClone(this.item.system.effects)
+        : Object.values(this.item.system.effects ?? {});
+      pushEffect(current);
+      await this.item.update({ "system.effects": current }, { render: false });
+      this.render(true);
     });
-  };
-  const pushMod = (eff) => {
-    eff.mods = Array.isArray(eff.mods) ? eff.mods : [];
-    eff.mods.push({ path: "dicePool", op: "add", value: 1 });
-  };
 
-  html.find(".add-effect").on("click", async () => {
-    const current = Array.isArray(this.item.system.effects)
-      ? foundry.utils.deepClone(this.item.system.effects)
-      : Object.values(this.item.system.effects ?? {});
-    pushEffect(current);
-    await this.item.update({ "system.effects": current }, { render: false });
-    this.render(true);
-  });
+    html.find(".effect-remove").on("click", async (ev) => {
+      const i = Number(ev.currentTarget.dataset.index);
+      const current = Array.isArray(this.item.system.effects)
+        ? foundry.utils.deepClone(this.item.system.effects)
+        : Object.values(this.item.system.effects ?? {});
+      current.splice(i, 1);
+      await this.item.update({ "system.effects": current }, { render: false });
+      this.render(true);
+    });
 
-  html.find(".effect-remove").on("click", async (ev) => {
-    const i = Number(ev.currentTarget.dataset.index);
-    const current = Array.isArray(this.item.system.effects)
-      ? foundry.utils.deepClone(this.item.system.effects)
-      : Object.values(this.item.system.effects ?? {});
-    current.splice(i, 1);
-    await this.item.update({ "system.effects": current }, { render: false });
-    this.render(true);
-  });
+    html.find(".mod-add").on("click", async (ev) => {
+      const i = Number(ev.currentTarget.dataset.index);
+      const current = Array.isArray(this.item.system.effects)
+        ? foundry.utils.deepClone(this.item.system.effects)
+        : Object.values(this.item.system.effects ?? {});
+      pushMod(current[i]);
+      await this.item.update({ "system.effects": current }, { render: false });
+      this.render(true);
+    });
 
-  html.find(".mod-add").on("click", async (ev) => {
-    const i = Number(ev.currentTarget.dataset.index);
-    const current = Array.isArray(this.item.system.effects)
-      ? foundry.utils.deepClone(this.item.system.effects)
-      : Object.values(this.item.system.effects ?? {});
-    pushMod(current[i]);
-    await this.item.update({ "system.effects": current }, { render: false });
-    this.render(true);
-  });
-
-  html.find(".mod-remove").on("click", async (ev) => {
-    const i = Number(ev.currentTarget.dataset.index);
-    const j = Number(ev.currentTarget.dataset.mod);
-    const current = Array.isArray(this.item.system.effects)
-      ? foundry.utils.deepClone(this.item.system.effects)
-      : Object.values(this.item.system.effects ?? {});
-    if (Array.isArray(current[i]?.mods)) current[i].mods.splice(j, 1);
-    await this.item.update({ "system.effects": current }, { render: false });
-    this.render(true);
-  });
-}
+    html.find(".mod-remove").on("click", async (ev) => {
+      const i = Number(ev.currentTarget.dataset.index);
+      const j = Number(ev.currentTarget.dataset.mod);
+      const current = Array.isArray(this.item.system.effects)
+        ? foundry.utils.deepClone(this.item.system.effects)
+        : Object.values(this.item.system.effects ?? {});
+      if (Array.isArray(current[i]?.mods)) current[i].mods.splice(j, 1);
+      await this.item.update({ "system.effects": current }, { render: false });
+      this.render(true);
+    });
+  }
 }
 
-Items.registerSheet("colonial-weather", CWImplantSheet, { types: ["implant"], makeDefault: true });
+// V13: Use namespaced Items collection
+foundry.documents.collections.Items.registerSheet("colonial-weather", CWImplantSheet, { types: ["implant"], makeDefault: true });
