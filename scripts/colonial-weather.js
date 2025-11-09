@@ -59,8 +59,10 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
   activateListeners(html) {
     super.activateListeners(html);
 
-    // Everything below here is standard for Actor Sheets to handle item interaction
-    html.find(".item-edit").click(ev => {
+    // Use .on("click") for better reliability
+    html.find(".item-create").on("click", this._onItemCreate.bind(this));
+
+    html.find(".item-edit").on("click", ev => {
       const li = $(ev.currentTarget).parents(".item");
       const item = this.actor.items.get(li.data("itemId"));
       item.sheet.render(true);

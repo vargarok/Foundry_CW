@@ -33,7 +33,7 @@
     </div>
 
     <div class="tab" data-group="primary" data-tab="effects">
-  {{#each item.system.effects as |eff i|}}
+  {{#each effectsArray as |eff i|}}
     <fieldset class="cw-effect">
       <legend class="cw-flex">
         <input name="system.effects.{{i}}.label" value="{{eff.label}}" placeholder="Effect label" />
