@@ -16,7 +16,8 @@
       </div>
       <div class="grid-2">
         <label>Cost</label><input name="system.cost" type="number" value="{{system.cost}}"/>
-        <label>Notes</label><input name="system.description" type="text" value="{{system.description}}"/>
+        <!-- Added Immune Load field here as requested by previous plan, good to have early -->
+        <label>Immune Load</label><input name="system.immuneLoadCost" type="number" value="{{system.immuneLoadCost}}" placeholder="0"/>
       </div>
     </div>
   </header>
@@ -63,8 +64,12 @@
           <div class="mod-row cw-grid-4">
             <div class="cw-field">
               <label>Target</label>
+              <!-- UPDATED: Added new mod targets -->
               <select name="system.effects.{{../i}}.mods.{{j}}.path">
-                <option value="dicePool" selected>dicePool</option>
+                <option value="dicePool"   {{#if (eq m.path "dicePool")}}selected{{/if}}>Dice Pool</option>
+                <option value="difficulty" {{#if (eq m.path "difficulty")}}selected{{/if}}>Target Number</option>
+                <option value="successes"  {{#if (eq m.path "successes")}}selected{{/if}}>Auto Successes</option>
+                <option value="initiative" {{#if (eq m.path "initiative")}}selected{{/if}}>Initiative</option>
               </select>
             </div>
 
@@ -74,7 +79,7 @@
             </div>
 
             <div class="cw-field">
-              <label>Dice</label>
+              <label>Value</label>
               <input type="number" name="system.effects.{{../i}}.mods.{{j}}.value" value="{{m.value}}" step="1"/>
             </div>
 

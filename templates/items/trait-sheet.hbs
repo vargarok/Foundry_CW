@@ -1,0 +1,90 @@
+<form class="cw cw-item-sheet" autocomplete="off">
+  <header class="sheet-header flexrow">
+    <img class="profile" src="{{item.img}}" data-edit="img"/>
+    <div class="header-fields">
+      <h1><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
+      <!-- Generic header for simple items -->
+      <div class="grid-2">
+        <label>Type</label>
+        <input type="text" value="{{capitalize item.type}}" readonly />
+      </div>
+    </div>
+  </header>
+
+  <section class="sheet-body">
+    <nav class="tabs" data-group="primary">
+      <a class="item" data-tab="details">Details</a>
+      <a class="item" data-tab="effects">Effects</a>
+    </nav>
+
+    <!-- DETAILS TAB -->
+    <div class="tab" data-group="primary" data-tab="details">
+      <textarea name="system.description" rows="10" placeholder="Description...">{{system.description}}</textarea>
+    </div>
+
+    <!-- EFFECTS TAB (Identical to Implant Sheet's tab) -->
+    <div class="tab" data-group="primary" data-tab="effects">
+      {{#each item.system.effects as |eff i|}}
+        <fieldset class="cw-effect">
+          <legend class="cw-flex">
+            <input name="system.effects.{{i}}.label" value="{{eff.label}}" placeholder="Effect label" />
+            <button type="button" class="effect-remove" data-index="{{i}}" title="Remove effect">🗑️</button>
+          </legend>
+
+          <div class="cw-grid-3">
+            <div class="cw-field">
+              <label>Tags</label>
+              <input name="system.effects.{{i}}.when.tagsCsv" value="{{eff.when.tagsCsv}}" list="cw-tags-list" placeholder="cold, social, fear"/>
+            </div>
+            <div class="cw-field">
+              <label>Roll Type</label>
+              <select name="system.effects.{{i}}.when.rollType">
+                <option value=""           {{#if (eq eff.when.rollType "")}}selected{{/if}}>(any)</option>
+                <option value="standard"   {{#if (eq eff.when.rollType "standard")}}selected{{/if}}>standard</option>
+                <option value="initiative" {{#if (eq eff.when.rollType "initiative")}}selected{{/if}}>initiative</option>
+                <option value="save"       {{#if (eq eff.when.rollType "save")}}selected{{/if}}>save</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mods">
+            {{#each eff.mods as |m j|}}
+              <div class="mod-row cw-grid-4">
+                <div class="cw-field">
+                  <label>Target</label>
+                  <select name="system.effects.{{../i}}.mods.{{j}}.path">
+                    <option value="dicePool"   {{#if (eq m.path "dicePool")}}selected{{/if}}>Dice Pool</option>
+                    <option value="difficulty" {{#if (eq m.path "difficulty")}}selected{{/if}}>Target Number</option>
+                    <option value="successes"  {{#if (eq m.path "successes")}}selected{{/if}}>Auto Successes</option>
+                    <option value="initiative" {{#if (eq m.path "initiative")}}selected{{/if}}>Initiative</option>
+                  </select>
+                </div>
+                <div class="cw-field cw-op">
+                  <label>Op</label>
+                  <input type="text" value="add" readonly name="system.effects.{{../i}}.mods.{{j}}.op" />
+                </div>
+                <div class="cw-field">
+                  <label>Value</label>
+                  <input type="number" name="system.effects.{{../i}}.mods.{{j}}.value" value="{{m.value}}"/>
+                </div>
+                <div class="cw-field cw-actions">
+                  <label>&nbsp;</label>
+                  <button type="button" class="mod-remove" data-index="{{../i}}" data-mod="{{j}}">✖</button>
+                </div>
+              </div>
+            {{/each}}
+            <button type="button" class="mod-add" data-index="{{i}}">+ Add Modifier</button>
+          </div>
+        </fieldset>
+      {{/each}}
+      <button type="button" class="add-effect">Add Effect</button>
+
+      <datalist id="cw-tags-list">
+        <option value="social"/>
+        <option value="combat"/>
+        <option value="survival"/>
+        <option value="fear"/>
+      </datalist>
+    </div>
+  </section>
+</form>
