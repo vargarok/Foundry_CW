@@ -49,28 +49,26 @@
       "withEffects": { "effects": [] },
       "withOnUse":   { "onUse": [] }
     },
-    "types": {
-      "base":        { "templates": ["withEffects"] },
-      "implant": {
-        "templates": ["withEffects"],
-        "category": "cybernetic",
-        "techLevel": 10,
-        "legal": "legal",
-        "cost": 0,
-        "immuneLoadCost": 0,
-        "description": ""
-      },
-      "drug": {
-        "templates": ["withOnUse"],
-        "duration": { "type": "turns", "value": 10 },
-        "cost": 0,
-        "description": "",
-        "sideEffects": []
-      },
-      "enhancement": { "templates": ["withEffects"] },
-      "background":  { "templates": ["withEffects"] },
-      "merit":       { "templates": ["withEffects"] },
-      "flaw":        { "templates": ["withEffects"] }
-    }
+    "base":        { "templates": ["withEffects"] },
+    "implant": {
+      "templates": ["withEffects"],
+      "category": "cybernetic",
+      "techLevel": 10,
+      "legal": "legal",
+      "cost": 0,
+      "immuneLoadCost": 0,
+      "description": ""
+    },
+    "drug": {
+      "templates": ["withOnUse"],
+      "duration": { "type": "turns", "value": 10 },
+      "cost": 0,
+      "description": "",
+      "sideEffects": []
+    },
+    "enhancement": { "templates": ["withEffects"] },
+    "background":  { "templates": ["withEffects"] },
+    "merit":       { "templates": ["withEffects"] },
+    "flaw":        { "templates": ["withEffects"] }
   }
 }
