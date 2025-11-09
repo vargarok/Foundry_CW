@@ -1,4 +1,3 @@
-// scripts/item/sheets/trait-sheet.js
 const TEMPLATE = "systems/colonial-weather/templates/items/trait-sheet.hbs";
 
 export class CWTraitSheet extends ItemSheet {
@@ -28,9 +27,6 @@ export class CWTraitSheet extends ItemSheet {
 
   activateListeners(html) {
     super.activateListeners(html);
-
-    // -- Effects UI Handlers (copied from Implant sheet for now) --
-    // In a future refactor, we should move this to a shared mixin or utility class.
 
     html.find(".add-effect").on("click", async () => {
       const current = this._getEffectsClone();
