@@ -136,7 +136,7 @@
       </div>
     </div>
 
-    <!-- TRAITS TAB (NEW) -->
+    <!-- TRAITS TAB -->
     <div class="tab traits" data-group="primary" data-tab="traits">
       <div class="grid-2col">
         <section>
@@ -148,7 +148,7 @@
           </h3>
           <ul class="item-list">
             {{#each merits as |item|}}
-              <li class="item flexrow" data-item-id="{{item.id}}">
+              <li class="item flexrow" data-item-id="{{item._id}}">
                 <div class="item-image"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></div>
                 <h4 class="item-name">{{item.name}}</h4>
                 <div class="item-controls">
@@ -167,7 +167,7 @@
           </h3>
           <ul class="item-list">
             {{#each flaws as |item|}}
-              <li class="item flexrow" data-item-id="{{item.id}}">
+              <li class="item flexrow" data-item-id="{{item._id}}">
                 <div class="item-image"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></div>
                 <h4 class="item-name">{{item.name}}</h4>
                 <div class="item-controls">
@@ -187,7 +187,7 @@
           </h3>
            <ul class="item-list">
             {{#each backgrounds as |item|}}
-              <li class="item flexrow" data-item-id="{{item.id}}">
+              <li class="item flexrow" data-item-id="{{item._id}}">
                 <div class="item-image"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></div>
                 <h4 class="item-name">{{item.name}}</h4>
                 <div class="item-controls">
@@ -205,7 +205,7 @@
           </h3>
            <ul class="item-list">
             {{#each enhancements as |item|}}
-              <li class="item flexrow" data-item-id="{{item.id}}">
+              <li class="item flexrow" data-item-id="{{item._id}}">
                 <div class="item-image"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></div>
                 <h4 class="item-name">{{item.name}}</h4>
                 <div class="item-controls">
@@ -219,19 +219,13 @@
       </div>
     </div>
 
-    <!-- BACKGROUNDS TAB (OLD - KEEPING FOR NOW FOR BIO) -->
+    <!-- BACKGROUNDS TAB (Legacy + Cybernetics) -->
     <div class="tab backgrounds" data-group="primary" data-tab="backgrounds">
       <div class="grid-2col">
         <section>
-          <h3>Biography & Notes</h3>
-          {{#each system.backgrounds as |val key|}}
-            <div class="resource">
-              <label>{{capitalize key}}</label>
-              <input type="text" name="system.backgrounds.{{key}}" value="{{val}}"/>
-            </div>
-          {{/each}}
-        </section>
-        <section>
+           <!-- Removed the old text-based backgrounds to avoid confusion with new Item-based ones, 
+                or keep them if you want both systems temporarily. 
+                I'm keeping Allegiances and Cybernetics here. -->
           <h3>Allegiances</h3>
           {{#each system.allegiances as |val key|}}
             <div class="resource">
@@ -239,12 +233,32 @@
               <input type="text" name="system.allegiances.{{key}}" value="{{val}}"/>
             </div>
           {{/each}}
+        </section>
 
-          <h3 style="margin-top:10px;">Cybernetics</h3>
+        <section>
+          <h3>
+            Implants
+            <a class="item-control item-create" title="Create Implant" data-type="implant">
+              <i class="fas fa-plus"></i> Add
+            </a>
+          </h3>
           <div class="resource">
             <label>Immune Load</label>
-            <input type="number" name="system.cyber.immune_load" value="{{system.cyber.immune_load}}" min="0" max="20"/>
+            <!-- Read-only for now until we automate it completely -->
+            <input type="number" name="system.cyber.immune_load" value="{{system.cyber.immune_load}}" min="0" max="20" readonly style="background:#eee;"/>
           </div>
+          <ul class="item-list">
+             {{#each implants as |item|}}
+              <li class="item flexrow" data-item-id="{{item._id}}">
+                <div class="item-image"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></div>
+                <h4 class="item-name">{{item.name}}</h4>
+                <div class="item-controls">
+                  <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                  <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                </div>
+              </li>
+            {{/each}}
+          </ul>
         </section>
       </div>
     </div>

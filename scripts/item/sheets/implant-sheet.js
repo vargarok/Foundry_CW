@@ -26,7 +26,12 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
   activateListeners(html) {
     super.activateListeners(html);
 
-    html.find("input, select, textarea").on("change", ev => this._onStandardChange(ev));
+    html.find("input, select, textarea").on("change", async (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const el = ev.currentTarget;
+      await this.item.update({ [el.name]: el.type === "number" ? Number(el.value) : el.value });
+    });
 
     html.find(".add-effect").on("click", async (ev) => {
       ev.preventDefault();
@@ -83,15 +88,6 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
         if (!e.mods || !Array.isArray(e.mods)) e.mods = [];
         return e;
     });
-  }
-
-  async _onStandardChange(event) {
-    event.preventDefault();
-    const field = event.currentTarget.name;
-    const value = event.currentTarget.type === "number" 
-      ? Number(event.currentTarget.value) 
-      : event.currentTarget.value;
-    await this.item.update({ [field]: value });
   }
 }
 
