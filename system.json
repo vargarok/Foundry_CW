@@ -1,25 +1,28 @@
 {
   "id": "colonial-weather",
-  "title": "Colonial Weather (Storyteller Sci\u2011Fi)",
-  "description": "A lightweight Storyteller-style d10 dice-pool system scaffold for sci\u2011fi space opera campaigns.",
-  "version": "0.0.2",
+  "title": "Colonial Weather (Storyteller Sci‑Fi)",
+  "description": "A lightweight Storyteller-style d10 dice-pool system scaffold for sci‑fi space opera campaigns.",
+  "version": "0.0.3",
   "compatibility": {
     "minimum": "11",
     "verified": "13"
   },
-  "system": {
-    "templates": ["template.json"]
+  "Actor": {
+    "types": ["character"]
   },
-  "items": {
-    "types": ["base", "implant", "drug"],
-    "templates": {
-      "base": "templates/items/base.hbs"
-    }
+  "Item": {
+    "types": ["base", "implant", "drug", "merit", "flaw", "background", "enhancement"]
   },
-  "authors": [
-    {
-      "name": "-"
-    }
+  "esmodules": [
+    "scripts/colonial-weather.js",
+    "scripts/rules/effects.js",
+    "scripts/item/cw-item.js",
+    "scripts/item/sheets/implant-sheet.js",
+    "scripts/item/sheets/drug-sheet.js",
+    "scripts/item/sheets/trait-sheet.js"
+  ],
+  "styles": [
+    "styles/colonial-weather.css"
   ],
   "manifest": "https://raw.githubusercontent.com/vargarok/Foundry_CW/main/system.json",
   "download": "https://github.com/vargarok/Foundry_CW/releases/download/release/Foundry_CW.zip",
@@ -28,16 +31,5 @@
     "type": 1,
     "distance": 1,
     "units": "m"
-  },
-  "packs": [],
-  "esmodules": [
-    "scripts/colonial-weather.js",
-    "scripts/rules/effects.js",
-    "scripts/item/cw-item.js",
-    "scripts/item/sheets/implant-sheet.js",
-    "scripts/item/sheets/drug-sheet.js"
-  ],
-  "styles": [
-    "styles/colonial-weather.css"
-  ]
+  }
 }
