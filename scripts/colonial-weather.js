@@ -17,6 +17,7 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
 
   async getData(options = {}) {
     const context = await super.getData(options);
+    // Use toObject(false) to get raw data including _id
     const actorData = this.actor.toObject(false);
     context.system = actorData.system;
     context.flags = actorData.flags;
@@ -29,12 +30,10 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
     h.max ??= 7;
     h.damage ??= 0;
 
-    // Derived Initiative for display
     const dex = Number(context.system.attributes?.dex ?? 0);
     const wit = Number(context.system.attributes?.wit ?? 0);
     context.system.vitals.initiative = dex + wit;
 
-    // CRITICAL FIX: Categorize items so they appear in the lists
     this._prepareItems(context);
 
     context.hLabels = h.labels;
@@ -50,19 +49,21 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
     const implants = [];
     const drugs = [];
 
-    // Iterate through all items and sort them by type
-    for (const i of context.items) {
-      i.img = i.img || Item.DEFAULT_ICON;
-      if (i.type === 'merit') merits.push(i);
-      else if (i.type === 'flaw') flaws.push(i);
-      else if (i.type === 'background') backgrounds.push(i);
-      else if (i.type === 'enhancement') enhancements.push(i);
-      else if (i.type === 'gear') gear.push(i);
-      else if (i.type === 'implant') implants.push(i);
-      else if (i.type === 'drug') drugs.push(i);
+    // ITERATE OVER THIS.ACTOR.ITEMS directly to be safe
+    for (const i of this.actor.items) {
+      // Use .toObject(false) so templates get normal data with _id
+      const itemData = i.toObject(false);
+      itemData.img = i.img || Item.DEFAULT_ICON;
+      
+      if (i.type === 'merit') merits.push(itemData);
+      else if (i.type === 'flaw') flaws.push(itemData);
+      else if (i.type === 'background') backgrounds.push(itemData);
+      else if (i.type === 'enhancement') enhancements.push(itemData);
+      else if (i.type === 'gear') gear.push(itemData);
+      else if (i.type === 'implant') implants.push(itemData);
+      else if (i.type === 'drug') drugs.push(itemData);
     }
 
-    // Assign to context so Handlebars can see them
     context.merits = merits;
     context.flaws = flaws;
     context.backgrounds = backgrounds;
@@ -75,7 +76,7 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
   activateListeners(html) {
     super.activateListeners(html);
 
-    // Standard Roller handlers
+    // Roller handlers
     html.find(".cw-roll").on("click", ev => this._onRoll(ev));
     html.find(".cw-skill-roll").on("click", ev => {
       const skill = ev.currentTarget.dataset.skill;
@@ -85,7 +86,7 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
     html.find(".cw-roll-init").on("click", ev => this._onInitRoll(ev));
     html.find(".cw-roll-save").on("click", ev => this._onSaveRoll(ev));
 
-    // Health handlers
+    // Health & Attributes
     html.on("change", "input[name^='system.attributes.']", ev => this._updateDerivedData(ev));
     html.find("input[name='cw-health']").on("change", ev => {
       const idx = Number(ev.currentTarget.dataset.index || 0);
@@ -94,16 +95,15 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
     html.find(".cw-dmg-minus").on("click", () => this._applyDamage(-1));
     html.find(".cw-dmg-plus").on("click",  () => this._applyDamage(+1));
 
-    // ITEM MANAGEMENT HANDLERS
+    // ITEM HANDLERS
     html.find(".item-create").on("click", this._onItemCreate.bind(this));
 
-    // Use .attr('data-item-id') for more robust ID retrieval
     html.find(".item-edit").on("click", ev => {
       const li = $(ev.currentTarget).closest(".item");
+      // .attr("data-item-id") is safer than .data("itemId") for dynamic lists
       const itemId = li.attr("data-item-id");
       const item = this.actor.items.get(itemId);
       if (item) return item.sheet.render(true);
-      console.error(`Colonial Weather | Item edit failed: No item found with ID ${itemId}`);
     });
 
     html.find(".item-delete").on("click", ev => {
@@ -113,15 +113,12 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
       if (item) {
         item.delete();
         li.slideUp(200, () => this.render(false));
-      } else {
-        console.error(`Colonial Weather | Item delete failed: No item found with ID ${itemId}`);
       }
     });
   }
 
   // ... [Keep _onSaveRoll, _onRoll, _onInitRoll, _updateDerivedData, _updateWoundPenalty, _applyDamage, _rollStandard as they were] ...
-  // Re-inserting them here to ensure the file is complete if you copy-paste the whole thing.
-  
+  // Re-inserting to ensure file completeness
   async _onSaveRoll(ev) {
       ev.preventDefault();
       const sta = Number(this.actor.system.attributes?.sta || 0);
@@ -151,7 +148,6 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
       const dex = Number(this.actor.system.attributes?.dex || 0);
       const wit = Number(this.actor.system.attributes?.wit || 0);
       const wound = Number(this.actor.system.vitals?.wound_pen || 0);
-      // Use globalThis to safely access the effect helper
       const mods = globalThis.CWEffects?.collectRollMods(this.actor, { rollType: "initiative", tags: [] }) || { dicePool: 0, initiative: 0 };
       const dice = Math.max(1, dex + wit - Math.abs(wound)) + (mods.dicePool || 0);
       const roll = new Roll(`${dice}d10 + ${mods.initiative || 0}`);
@@ -167,7 +163,6 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
      const wit = Number(this.element.find("input[name='system.attributes.wit']").val() || 0);
      const wound = Number(this.actor.system.vitals?.wound_pen || 0);
      let initiative = Math.max(1, dex + wit - Math.abs(wound));
-     // Try to add mods if possible, otherwise just base
      try {
          const mods = globalThis.CWEffects?.collectRollMods(this.actor, { rollType: "initiative" });
          if (mods?.initiative) initiative += mods.initiative;
@@ -202,7 +197,6 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
       let autoSuccesses = 0;
       let modSources = [];
 
-      // NEW: Use the updated effects collector
       if (globalThis.CWEffects?.collectRollMods) {
           const mods = globalThis.CWEffects.collectRollMods(this.actor, { rollType: "standard", tags: [skill] });
           dice += (mods.dicePool || 0);
@@ -212,13 +206,11 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
       }
 
       dice = Math.max(1, dice);
-      // Ensure TN doesn't get too crazy (min 2, max 10 is standard for d10 systems)
       targetNumber = Math.min(Math.max(2, targetNumber), 10);
 
       const roll = new Roll(`${dice}d10xs[>=${targetNumber}]`);
       await roll.evaluate();
 
-      // Manual success counting to handle specialization rerolls if needed
       let faces = roll.dice[0].results.map(r => r.result);
       let successes = faces.filter(n => n >= targetNumber).length;
       let ones = faces.filter(n => n === 1).length;
@@ -230,7 +222,7 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
               await extraRoll.evaluate();
               const extraFaces = extraRoll.dice[0].results.map(r => r.result);
               successes += extraFaces.filter(n => n >= targetNumber).length;
-              faces.push(...extraFaces.map(f => `+${f}`)); // Show rerolls
+              faces.push(...extraFaces.map(f => `+${f}`));
           }
       }
 
@@ -271,18 +263,16 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
   }
 }
 
-// Init hook
 Hooks.once("init", () => {
   console.log("Colonial Weather | Initializing");
-  // V13: Namespaced collection
   foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
   foundry.documents.collections.Actors.registerSheet("colonial-weather", CWActorSheet, { makeDefault: true });
 
-  // Handlebars helpers
   Handlebars.registerHelper("uppercase", s => String(s).toUpperCase());
   Handlebars.registerHelper("capitalize", s => String(s).charAt(0).toUpperCase() + String(s).slice(1));
   Handlebars.registerHelper("checked", val => val ? "checked" : "");
   Handlebars.registerHelper("eq", (a,b) => a === b);
+  Handlebars.registerHelper("lte", (a,b) => Number(a) <= Number(b));
   Handlebars.registerHelper("pick", (obj, ...keys) => {
       const opts = keys.pop();
       const out = {};
@@ -292,5 +282,4 @@ Hooks.once("init", () => {
   });
 });
 
-// Global export for effects to use
 globalThis.CWActorSheet = CWActorSheet;
