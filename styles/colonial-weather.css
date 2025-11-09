@@ -140,3 +140,50 @@
 .cw-item-sheet .cw-field label { display:block; font-size:.85rem; opacity:.9; margin-bottom:.2rem; }
 .cw-item-sheet .cw-actions button { width:100%; }
 .cw-item-sheet .mods { margin-top:.5rem; }
+
+/* --- Item Lists (New for Traits Tab) --- */
+.cw .item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cw .item-list .item {
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid #ccc;
+}
+
+.cw .item-list .item:last-child {
+  border-bottom: none;
+}
+
+.cw .item-list .item-image {
+  flex: 0 0 30px;
+  margin-right: 5px;
+}
+
+.cw .item-list .item-name {
+  flex: 1;
+  margin: 0;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.cw .item-list .item-controls {
+  flex: 0 0 50px;
+  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.cw .item-list .item-control {
+  color: #666;
+  cursor: pointer;
+}
+
+.cw .item-list .item-control:hover {
+  color: #111;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.7);
+}

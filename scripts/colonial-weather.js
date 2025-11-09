@@ -1,4 +1,3 @@
-// systems/colonial-weather/scripts/colonial-weather.js
 import { CWTraitSheet } from "./item/sheets/trait-sheet.js";
 
 // V13: Use namespaced ActorSheet
@@ -35,11 +34,32 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
     sys.vitals.initiative = dex + wit;
 
     data.hLabels = h.labels;
+
+    // Prepare items for the new Traits tab
+    data.merits = data.items.filter(i => i.type === "merit");
+    data.flaws = data.items.filter(i => i.type === "flaw");
+    data.backgrounds = data.items.filter(i => i.type === "background");
+    data.enhancements = data.items.filter(i => i.type === "enhancement");
+
     return data;
   }
 
   activateListeners(html) {
     super.activateListeners(html);
+
+    // Everything below here is standard for Actor Sheets to handle item interaction
+    html.find(".item-edit").click(ev => {
+      const li = $(ev.currentTarget).parents(".item");
+      const item = this.actor.items.get(li.data("itemId"));
+      item.sheet.render(true);
+    });
+
+    html.find(".item-delete").click(ev => {
+      const li = $(ev.currentTarget).parents(".item");
+      const item = this.actor.items.get(li.data("itemId"));
+      item.delete();
+      li.slideUp(200, () => this.render(false));
+    });
 
     html.on("click", ".cw-roll", ev => this._onRoll(ev));
     html.on("click", ".cw-skill-roll", ev => {
@@ -58,6 +78,7 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
     html.on("change", "input[name^='system.attributes.']", ev => this.render(false));
   }
 
+// ... rest of the file (rollers, etc.) remains the same as previous version ...
   async _onSaveRoll(ev) {
     ev.preventDefault();
     const sta = Number(this.actor.system.attributes?.sta || 0);

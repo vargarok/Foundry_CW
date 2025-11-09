@@ -7,6 +7,7 @@
   <nav class="sheet-tabs tabs" data-group="primary">
     <a class="item" data-tab="core">Core</a>
     <a class="item" data-tab="skills">Skills</a>
+    <a class="item" data-tab="traits">Traits</a>
     <a class="item" data-tab="backgrounds">Backgrounds</a>
     <a class="item" data-tab="notes">Notes</a>
   </nav>
@@ -26,49 +27,43 @@
         </section>
 
         <section>
-  <h3>Vitals</h3>
+          <h3>Vitals</h3>
+          <div class="resource">
+            <label>Will (Perm)</label>
+            <input type="number" name="system.vitals.will_perm" value="{{system.vitals.will_perm}}" min="0" max="10"/>
+          </div>
+          <div class="resource">
+            <label>Will (Curr)</label>
+            <input type="number" name="system.vitals.will_curr" value="{{system.vitals.will_curr}}" min="0" max="10"/>
+          </div>
+          <div class="resource">
+            <label>Health Lvls</label>
+            <input type="number" name="system.vitals.health_levels" value="{{system.vitals.health_levels}}" min="0" max="7"/>
+          </div>
+          <div class="resource">
+            <label>Wound Pen</label>
+            <input type="number" name="system.vitals.wound_pen" value="{{system.vitals.wound_pen}}" min="-5" max="0"/>
+          </div>
+          <div class="resource">
+            <label>Initiative</label>
+            <input type="number" name="system.vitals.initiative" value="{{system.vitals.initiative}}" readonly/>
+          </div>
 
-  <div class="resource">
-    <label>Will (Perm)</label>
-    <input type="number" name="system.vitals.will_perm" value="{{system.vitals.will_perm}}" min="0" max="10"/>
-  </div>
-
-  <div class="resource">
-    <label>Will (Curr)</label>
-    <input type="number" name="system.vitals.will_curr" value="{{system.vitals.will_curr}}" min="0" max="10"/>
-  </div>
-
-  <div class="resource">
-    <label>Health Lvls</label>
-    <input type="number" name="system.vitals.health_levels" value="{{system.vitals.health_levels}}" min="0" max="7"/>
-  </div>
-
-  <div class="resource">
-    <label>Wound Pen</label>
-    <input type="number" name="system.vitals.wound_pen" value="{{system.vitals.wound_pen}}" min="-5" max="0"/>
-  </div>
-
-  <div class="resource">
-    <label>Initiative</label>
-    <input type="number" name="system.vitals.initiative" value="{{system.vitals.initiative}}" readonly/>
-  </div>
-
-<h4>Health</h4>
-<div class="cw-health">
-  {{#each hLabels as |lab idx|}}
-    <label class="cw-hbox">
-      <input type="radio" name="cw-health" data-index="{{idx}}"
-             {{#if (lte idx ../system.vitals.health.damage)}}checked{{/if}} />
-      <span class="cw-hlabel">{{lab}}</span>
-    </label>
-  {{/each}}
-</div>
-<div class="cw-health-controls">
-  <button type="button" class="cw-dmg-minus">Heal</button>
-  <button type="button" class="cw-dmg-plus">Damage</button>
-</div>
-</section>
-
+          <h4>Health</h4>
+          <div class="cw-health">
+            {{#each hLabels as |lab idx|}}
+              <label class="cw-hbox">
+                <input type="radio" name="cw-health" data-index="{{idx}}"
+                       {{#if (lte idx ../system.vitals.health.damage)}}checked{{/if}} />
+                <span class="cw-hlabel">{{lab}}</span>
+              </label>
+            {{/each}}
+          </div>
+          <div class="cw-health-controls">
+            <button type="button" class="cw-dmg-minus">Heal</button>
+            <button type="button" class="cw-dmg-plus">Damage</button>
+          </div>
+        </section>
 
         <section>
           <h3>Test Roller</h3>
@@ -141,11 +136,74 @@
       </div>
     </div>
 
-    <!-- BACKGROUNDS TAB -->
+    <!-- TRAITS TAB (NEW) -->
+    <div class="tab traits" data-group="primary" data-tab="traits">
+      <div class="grid-2col">
+        <section>
+          <h3>Merits</h3>
+          <ul class="item-list">
+            {{#each merits as |item|}}
+              <li class="item flexrow" data-item-id="{{item.id}}">
+                <div class="item-image"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></div>
+                <h4 class="item-name">{{item.name}}</h4>
+                <div class="item-controls">
+                  <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                  <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                </div>
+              </li>
+            {{/each}}
+          </ul>
+
+          <h3 style="margin-top: 10px;">Flaws</h3>
+          <ul class="item-list">
+            {{#each flaws as |item|}}
+              <li class="item flexrow" data-item-id="{{item.id}}">
+                <div class="item-image"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></div>
+                <h4 class="item-name">{{item.name}}</h4>
+                <div class="item-controls">
+                  <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                  <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                </div>
+              </li>
+            {{/each}}
+          </ul>
+        </section>
+        <section>
+          <h3>Backgrounds</h3>
+           <ul class="item-list">
+            {{#each backgrounds as |item|}}
+              <li class="item flexrow" data-item-id="{{item.id}}">
+                <div class="item-image"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></div>
+                <h4 class="item-name">{{item.name}}</h4>
+                <div class="item-controls">
+                  <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                  <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                </div>
+              </li>
+            {{/each}}
+          </ul>
+          <h3 style="margin-top: 10px;">Enhancements</h3>
+           <ul class="item-list">
+            {{#each enhancements as |item|}}
+              <li class="item flexrow" data-item-id="{{item.id}}">
+                <div class="item-image"><img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/></div>
+                <h4 class="item-name">{{item.name}}</h4>
+                <div class="item-controls">
+                  <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                  <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                </div>
+              </li>
+            {{/each}}
+          </ul>
+        </section>
+      </div>
+    </div>
+
+    <!-- BACKGROUNDS TAB (OLD - KEEPING FOR NOW FOR BIO) -->
     <div class="tab backgrounds" data-group="primary" data-tab="backgrounds">
       <div class="grid-2col">
         <section>
-          <h3>Backgrounds</h3>
+          <h3>Biography & Notes</h3>
           {{#each system.backgrounds as |val key|}}
             <div class="resource">
               <label>{{capitalize key}}</label>
