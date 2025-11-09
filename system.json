@@ -2,7 +2,7 @@
   "id": "colonial-weather",
   "title": "Colonial Weather (Storyteller Sci‑Fi)",
   "description": "A lightweight Storyteller-style d10 dice-pool system scaffold for sci‑fi space opera campaigns.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "compatibility": {
     "minimum": "12",
     "verified": "13"
@@ -12,7 +12,7 @@
       "character": {}
     },
     "Item": {
-      "base": {},
+      "gear": {},
       "implant": {},
       "drug": {},
       "merit": {},

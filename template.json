@@ -49,7 +49,7 @@
       "withEffects": { "effects": [] },
       "withOnUse":   { "onUse": [] }
     },
-    "base":        { "templates": ["withEffects"] },
+    "gear":        { "templates": ["withEffects"] },
     "implant": {
       "templates": ["withEffects"],
       "category": "cybernetic",
