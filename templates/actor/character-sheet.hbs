@@ -140,7 +140,12 @@
     <div class="tab traits" data-group="primary" data-tab="traits">
       <div class="grid-2col">
         <section>
-          <h3>Merits</h3>
+          <h3>
+            Merits
+            <a class="item-control item-create" title="Create Merit" data-type="merit">
+              <i class="fas fa-plus"></i> Add
+            </a>
+          </h3>
           <ul class="item-list">
             {{#each merits as |item|}}
               <li class="item flexrow" data-item-id="{{item.id}}">
@@ -154,7 +159,12 @@
             {{/each}}
           </ul>
 
-          <h3 style="margin-top: 10px;">Flaws</h3>
+          <h3 style="margin-top: 10px;">
+            Flaws
+            <a class="item-control item-create" title="Create Flaw" data-type="flaw">
+              <i class="fas fa-plus"></i> Add
+            </a>
+          </h3>
           <ul class="item-list">
             {{#each flaws as |item|}}
               <li class="item flexrow" data-item-id="{{item.id}}">
@@ -169,7 +179,12 @@
           </ul>
         </section>
         <section>
-          <h3>Backgrounds</h3>
+          <h3>
+            Backgrounds
+            <a class="item-control item-create" title="Create Background" data-type="background">
+              <i class="fas fa-plus"></i> Add
+            </a>
+          </h3>
            <ul class="item-list">
             {{#each backgrounds as |item|}}
               <li class="item flexrow" data-item-id="{{item.id}}">
@@ -182,7 +197,12 @@
               </li>
             {{/each}}
           </ul>
-          <h3 style="margin-top: 10px;">Enhancements</h3>
+          <h3 style="margin-top: 10px;">
+            Enhancements
+            <a class="item-control item-create" title="Create Enhancement" data-type="enhancement">
+              <i class="fas fa-plus"></i> Add
+            </a>
+          </h3>
            <ul class="item-list">
             {{#each enhancements as |item|}}
               <li class="item flexrow" data-item-id="{{item.id}}">

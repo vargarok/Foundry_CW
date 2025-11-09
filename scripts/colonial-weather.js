@@ -11,6 +11,18 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
       tabs: [{ navSelector: ".tabs", contentSelector: ".sheet-body", initial: "core" }]
     });
   }
+  async _onItemCreate(event) {
+    event.preventDefault();
+    const header = event.currentTarget;
+    const type = header.dataset.type;
+    const data = foundry.utils.mergeObject({
+      name: `New ${type.capitalize()}`,
+      type: type
+    }, { system: foundry.utils.deepClone(this.actor.system) }); // Optional: pass default system data if needed
+    
+    const item = await Item.create(data, {parent: this.actor});
+    item.sheet.render(true);
+  }
 
   async getData(options = {}) {
     const data = await super.getData(options);

@@ -1,7 +1,7 @@
+// scripts/item/sheets/trait-sheet.js
 const TEMPLATE = "systems/colonial-weather/templates/items/trait-sheet.hbs";
 
-// V13: Use namespaced ItemSheet
-export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
+export class CWTraitSheet extends ItemSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["cw", "sheet", "item"],
@@ -12,8 +12,10 @@ export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
 
   getData(opts) {
     const data = super.getData(opts);
+    // Standard Handlebars helpers if not already global
     if (!Handlebars.helpers.eq) Handlebars.registerHelper("eq", (a, b) => a === b);
     
+    // Normalize effects data structure
     const eff = data.item?.system?.effects;
     const normalized = Array.isArray(eff) ? eff : Object.values(eff ?? {});
     for (const e of normalized) {
@@ -27,7 +29,8 @@ export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
   activateListeners(html) {
     super.activateListeners(html);
 
-    html.find(".add-effect").on("click", async () => {
+    html.find(".add-effect").on("click", async (ev) => {
+      ev.preventDefault(); // Stop any form submission
       const current = this._getEffectsClone();
       current.push({
         label: "New Effect",
@@ -38,6 +41,7 @@ export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
     });
 
     html.find(".effect-remove").on("click", async (ev) => {
+      ev.preventDefault();
       const i = Number(ev.currentTarget.dataset.index);
       const current = this._getEffectsClone();
       current.splice(i, 1);
@@ -45,6 +49,7 @@ export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
     });
 
     html.find(".mod-add").on("click", async (ev) => {
+      ev.preventDefault();
       const i = Number(ev.currentTarget.dataset.index);
       const current = this._getEffectsClone();
       if (!current[i].mods) current[i].mods = [];
@@ -53,6 +58,7 @@ export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
     });
 
     html.find(".mod-remove").on("click", async (ev) => {
+      ev.preventDefault();
       const i = Number(ev.currentTarget.dataset.index);
       const j = Number(ev.currentTarget.dataset.mod);
       const current = this._getEffectsClone();

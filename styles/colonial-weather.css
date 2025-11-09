@@ -187,3 +187,15 @@
   color: #111;
   text-shadow: 0 0 4px rgba(255, 255, 255, 0.7);
 }
+
+.cw h3 .item-create {
+  font-size: 0.8em;
+  float: right;
+  color: #444;
+  cursor: pointer;
+}
+
+.cw h3 .item-create:hover {
+  color: #000;
+  text-shadow: 0 0 4px rgba(255, 255, 255, 0.7);
+}
