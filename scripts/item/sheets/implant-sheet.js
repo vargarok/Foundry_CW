@@ -1,7 +1,6 @@
 // scripts/item/sheets/implant-sheet.js
 const TEMPLATE = "systems/colonial-weather/templates/items/implant-sheet.hbs";
 
-// V13: Use namespaced ItemSheet
 export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
   static get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
@@ -20,8 +19,7 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
     if (!Handlebars.helpers.join) Handlebars.registerHelper("join", (arr, sep) => Array.isArray(arr) ? arr.join(sep ?? ", ") : "");
     if (!Handlebars.helpers.json) Handlebars.registerHelper("json", (v) => JSON.stringify(v ?? [], null, 0));
 
-    // Use the robust helper to ensure data is clean for rendering
-    data.effectsArray = this._getEffectsArray();
+    data.effectsArray = this._getEffectsClone();
     return data;
   }
 
@@ -32,7 +30,8 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
 
     html.find(".add-effect").on("click", async (ev) => {
       ev.preventDefault();
-      const effects = this._getEffectsArray();
+      ev.stopPropagation();
+      const effects = this._getEffectsClone();
       effects.push({
         label: "New Effect",
         when: { rollType: "", tagsCsv: "" },
@@ -43,8 +42,9 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
 
     html.find(".effect-remove").on("click", async (ev) => {
       ev.preventDefault();
+      ev.stopPropagation();
       const idx = Number(ev.currentTarget.dataset.index);
-      const effects = this._getEffectsArray();
+      const effects = this._getEffectsClone();
       if (idx >= 0 && idx < effects.length) {
          effects.splice(idx, 1);
          await this.item.update({ "system.effects": effects });
@@ -53,8 +53,9 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
 
     html.find(".mod-add").on("click", async (ev) => {
       ev.preventDefault();
+      ev.stopPropagation();
       const idx = Number(ev.currentTarget.dataset.index);
-      const effects = this._getEffectsArray();
+      const effects = this._getEffectsClone();
       if (effects[idx]) {
           if (!Array.isArray(effects[idx].mods)) effects[idx].mods = [];
           effects[idx].mods.push({ path: "dicePool", op: "add", value: 1 });
@@ -64,9 +65,10 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
 
     html.find(".mod-remove").on("click", async (ev) => {
       ev.preventDefault();
+      ev.stopPropagation();
       const i = Number(ev.currentTarget.dataset.index);
       const j = Number(ev.currentTarget.dataset.mod);
-      const effects = this._getEffectsArray();
+      const effects = this._getEffectsClone();
       if (effects[i] && Array.isArray(effects[i].mods) && effects[i].mods[j]) {
           effects[i].mods.splice(j, 1);
           await this.item.update({ "system.effects": effects });
@@ -74,10 +76,10 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
     });
   }
 
-  _getEffectsArray() {
+  _getEffectsClone() {
     const system = this.item.toObject().system;
     let effects = Array.isArray(system.effects) ? system.effects : Object.values(system.effects || {});
-    return effects.map(e => {
+    return effects.filter(e => e).map(e => {
         if (!e.mods || !Array.isArray(e.mods)) e.mods = [];
         return e;
     });
@@ -93,5 +95,4 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
   }
 }
 
-// V13: Use namespaced Items collection
 foundry.documents.collections.Items.registerSheet("colonial-weather", CWImplantSheet, { types: ["implant"], makeDefault: true });

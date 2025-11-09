@@ -63,16 +63,26 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
     html.find(".item-create").on("click", this._onItemCreate.bind(this));
 
     html.find(".item-edit").on("click", ev => {
-      const li = $(ev.currentTarget).parents(".item");
-      const item = this.actor.items.get(li.data("itemId"));
-      item.sheet.render(true);
+      const li = $(ev.currentTarget).closest(".item");
+      const itemId = li.data("itemId");
+      const item = this.actor.items.get(itemId);
+      if (item) {
+          item.sheet.render(true);
+      } else {
+          console.error("Colonial Weather | Could not find item with ID: " + itemId);
+      }
     });
 
-    html.find(".item-delete").click(ev => {
-      const li = $(ev.currentTarget).parents(".item");
-      const item = this.actor.items.get(li.data("itemId"));
-      item.delete();
-      li.slideUp(200, () => this.render(false));
+    html.find(".item-delete").on("click", ev => {
+      const li = $(ev.currentTarget).closest(".item");
+      const itemId = li.data("itemId");
+      const item = this.actor.items.get(itemId);
+      if (item) {
+          item.delete();
+          li.slideUp(200, () => this.render(false));
+      } else {
+          console.error("Colonial Weather | Could not find item to delete with ID: " + itemId);
+      }
     });
 
     html.on("click", ".cw-roll", ev => this._onRoll(ev));
