@@ -75,30 +75,31 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
 
   activateListeners(html) {
     super.activateListeners(html);
+    const $html = $(html); // Wrap html in jQuery
 
     // Roller handlers
-    html.find(".cw-roll").on("click", ev => this._onRoll(ev));
-    html.find(".cw-skill-roll").on("click", ev => {
+    $html.find(".cw-roll").on("click", ev => this._onRoll(ev));
+    $html.find(".cw-skill-roll").on("click", ev => {
       const skill = ev.currentTarget.dataset.skill;
-      const attr = html.find("select[name='cw-attr']").val() || "dex";
+      const attr = $html.find("select[name='cw-attr']").val() || "dex";
       this._rollStandard(attr, skill);
     });
-    html.find(".cw-roll-init").on("click", ev => this._onInitRoll(ev));
-    html.find(".cw-roll-save").on("click", ev => this._onSaveRoll(ev));
+    $html.find(".cw-roll-init").on("click", ev => this._onInitRoll(ev));
+    $html.find(".cw-roll-save").on("click", ev => this._onSaveRoll(ev));
 
     // Health & Attributes
-    html.on("change", "input[name^='system.attributes.']", ev => this._updateDerivedData(ev));
-    html.find("input[name='cw-health']").on("change", ev => {
+    $html.on("change", "input[name^='system.attributes.']", ev => this._updateDerivedData(ev));
+    $html.find("input[name='cw-health']").on("change", ev => {
       const idx = Number(ev.currentTarget.dataset.index || 0);
       this.actor.update({ "system.vitals.health.damage": idx }).then(() => this._updateWoundPenalty());
     });
-    html.find(".cw-dmg-minus").on("click", () => this._applyDamage(-1));
-    html.find(".cw-dmg-plus").on("click",  () => this._applyDamage(+1));
+    $html.find(".cw-dmg-minus").on("click", () => this._applyDamage(-1));
+    $html.find(".cw-dmg-plus").on("click",  () => this._applyDamage(+1));
 
     // ITEM HANDLERS
-    html.find(".item-create").on("click", this._onItemCreate.bind(this));
+    $html.find(".item-create").on("click", this._onItemCreate.bind(this));
 
-    html.find(".item-edit").on("click", ev => {
+    $html.find(".item-edit").on("click", ev => {
       const li = $(ev.currentTarget).closest(".item");
       // .attr("data-item-id") is safer than .data("itemId") for dynamic lists
       const itemId = li.attr("data-item-id");
@@ -106,7 +107,7 @@ class CWActorSheet extends foundry.appv1.sheets.ActorSheet {
       if (item) return item.sheet.render(true);
     });
 
-    html.find(".item-delete").on("click", ev => {
+    $html.find(".item-delete").on("click", ev => {
       const li = $(ev.currentTarget).closest(".item");
       const itemId = li.attr("data-item-id");
       const item = this.actor.items.get(itemId);

@@ -42,18 +42,19 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
 
   activateListeners(html) {
     super.activateListeners(html);
+    const $html = $(html); // Wrap html in jQuery
 
     // Add / Remove Effect
-    html.on("click", ".add-effect", this._onAddEffect.bind(this));
-    html.on("click", ".effect-remove", this._onRemoveEffect.bind(this));
+    $html.on("click", ".add-effect", this._onAddEffect.bind(this));
+    $html.on("click", ".effect-remove", this._onRemoveEffect.bind(this));
 
     // Add / Remove Modifier
-    html.on("click", ".mod-add", this._onAddMod.bind(this));
-    html.on("click", ".mod-remove", this._onRemoveMod.bind(this));
+    $html.on("click", ".mod-add", this._onAddMod.bind(this));
+    $html.on("click", ".mod-remove", this._onRemoveMod.bind(this));
 
-    // Save-on-change for inputs inside effects/mods without rebuilding arrays
-    html.on("change", "input[name^='system.effects'], select[name^='system.effects']", async (ev) => {
-      await this._saveEffectsFromForm(html);
+    // Save-on-change...
+    $html.on("change", "input[name^='system.effects'], select[name^='system.effects']", async (ev) => {
+      await this._saveEffectsFromForm($html); // Pass the jQuery object
     });
   }
 

@@ -65,21 +65,21 @@ export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
 
   activateListeners(html) {
     super.activateListeners(html);
+    const $html = $(html); // Wrap html in jQuery
 
     // Add / remove whole effect blocks
-    html.on("click", ".add-effect", this._onAddEffect.bind(this));
-    html.on("click", ".effect-remove", this._onRemoveEffect.bind(this));
+    $html.on("click", ".add-effect", this._onAddEffect.bind(this));
+    $html.on("click", ".effect-remove", this._onRemoveEffect.bind(this));
 
-    // Add / remove individual modifiers inside an effect
-    html.on("click", ".mod-add", this._onAddMod.bind(this));
-    html.on("click", ".mod-remove", this._onRemoveMod.bind(this));
+    // Add / remove individual modifiers...
+    $html.on("click", ".mod-add", this._onAddMod.bind(this));
+    $html.on("click", ".mod-remove", this._onRemoveMod.bind(this));
 
-    // Persist changes in any input/select under system.effects.* without
-    // rebuilding the rest of the item data.
-    html.on(
+    // Persist changes...
+    $html.on(
       "change",
       "input[name^='system.effects'], select[name^='system.effects'], textarea[name^='system.effects']",
-      async () => { await this._saveEffectsFromForm(html); }
+      async () => { await this._saveEffectsFromForm($html); } // Pass the jQuery object
     );
   }
 
