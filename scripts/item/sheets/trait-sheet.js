@@ -43,8 +43,8 @@ export class CWTraitSheet extends foundry.appv1.sheets.ItemSheet {
   }
 
   /** Supply data to Handlebars without rebuilding arrays each render. */
-  getData(options) {
-    const data = super.getData(options);
+  async getData(options) {
+    const data = await super.getData(options);
 
     const sys = data.system ?? {};
     const effects = Array.isArray(sys.effects) ? clone(sys.effects) : [];
