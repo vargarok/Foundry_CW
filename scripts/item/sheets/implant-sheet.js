@@ -43,19 +43,19 @@ export class CWImplantSheet extends foundry.appv1.sheets.ItemSheet {
 
   activateListeners(html) {
     super.activateListeners(html);
-    const $html = $(html); // Wrap html in jQuery
+    // 'html' is already a jQuery object in appv1 sheets, no need for $(html)
 
-    // Add / Remove Effect
-    $html.on("click", ".add-effect", this._onAddEffect.bind(this));
-    $html.on("click", ".effect-remove", this._onRemoveEffect.bind(this));
+    // Add / Remove Effect (Use direct binding like the WOD20 sheet)
+    html.find(".add-effect").on("click", this._onAddEffect.bind(this));
+    html.find(".effect-remove").on("click", this._onRemoveEffect.bind(this));
 
-    // Add / Remove Modifier
-    $html.on("click", ".mod-add", this._onAddMod.bind(this));
-    $html.on("click", ".mod-remove", this._onRemoveMod.bind(this));
+    // Add / Remove Modifier (Use direct binding)
+    html.find(".mod-add").on("click", this._onAddMod.bind(this));
+    html.find(".mod-remove").on("click", this._onRemoveMod.bind(this));
 
-    // Save-on-change...
-    $html.on("change", "input[name^='system.effects'], select[name^='system.effects']", async (ev) => {
-      await this._saveEffectsFromForm($html); // Pass the jQuery object
+    // Save-on-change... (this delegated listener is fine)
+    html.on("change", "input[name^='system.effects'], select[name^='system.effects']", async (ev) => {
+      await this._saveEffectsFromForm(html); // Pass the jQuery object 'html'
     });
   }
 
