@@ -2,22 +2,26 @@
   <header class="sheet-header flexrow">
     <img class="profile" src="{{item.img}}" data-edit="img"/>
     <div class="header-fields">
-      <h1><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
+      <h1>
+        <input name="name" type="text" value="{{item.name}}" placeholder="Name"/>
+      </h1>
       <div class="grid-3">
         <label>Category</label>
         <select name="system.category">
-          {{#each categories as |c|}}<option {{#if (eq ../system.category c)}}selected{{/if}}>{{c}}</option>{{/each}}
+          {{#each categories as |c|}}
+            <option value="{{c}}" {{#if (eq ../system.category c)}}selected{{/if}}>{{c}}</option>
+          {{/each}}
         </select>
-        <label>TL</label><input name="system.techLevel" type="number" value="{{system.techLevel}}"/>
+
+        <label>TL</label>
+        <input name="system.techLevel" type="number" value="{{system.techLevel}}"/>
+
         <label>Legality</label>
         <select name="system.legal">
-          {{#each legality as |l|}}<option {{#if (eq ../system.legal l)}}selected{{/if}}>{{l}}</option>{{/each}}
+          {{#each legality as |l|}}
+            <option value="{{l}}" {{#if (eq ../system.legal l)}}selected{{/if}}>{{l}}</option>
+          {{/each}}
         </select>
-      </div>
-      <div class="grid-2">
-        <label>Cost</label><input name="system.cost" type="number" value="{{system.cost}}"/>
-        <!-- Added Immune Load field here as requested by previous plan, good to have early -->
-        <label>Immune Load</label><input name="system.immuneLoadCost" type="number" value="{{system.immuneLoadCost}}" placeholder="0"/>
       </div>
     </div>
   </header>
@@ -29,65 +33,115 @@
     </nav>
 
     <div class="tab" data-group="primary" data-tab="details">
-      <textarea name="system.description" rows="6" placeholder="Description...">{{system.description}}</textarea>
+      <div class="grid-2">
+        <div>
+          <label>Cost</label>
+          <input name="system.cost" type="number" value="{{system.cost}}"/>
+        </div>
+        <div>
+          <label>Immune Load</label>
+          <input name="system.immuneLoadCost" type="number" value="{{system.immuneLoadCost}}"/>
+        </div>
+      </div>
+
+      <h3>Description</h3>
+      <textarea name="system.description" rows="8">{{system.description}}</textarea>
     </div>
 
     <div class="tab" data-group="primary" data-tab="effects">
-  {{#each effectsArray as |eff i|}}
-    <fieldset class="cw-effect">
-      <legend class="cw-flex">
-        <input name="system.effects.{{i}}.label" value="{{eff.label}}" placeholder="Effect label"/>
-        <button type="button" class="effect-remove" data-index="{{i}}" title="Remove effect" aria-label="Remove effect">🗑️</button>
-      </legend>
+      {{#each effects as |eff i|}}
+        <fieldset class="cw-effect">
+          <legend class="cw-flex">
+            <input
+              type="text"
+              name="system.effects.{{i}}.label"
+              value="{{eff.label}}"
+              placeholder="Effect label"
+            />
+            <button type="button" class="effect-remove" data-index="{{i}}">🗑</button>
+          </legend>
 
-      <div class="cw-grid-3">
-        <label>Tags</label>
-        <input name="system.effects.{{i}}.tags" list="cw-tags-list" value="{{eff.tags}}"/>
+          <div class="cw-grid-3">
+            <div class="cw-field">
+              <label>Tags (comma separated)</label>
+              <input
+                type="text"
+                name="system.effects.{{i}}.when.tagsCsv"
+                value="{{eff.when.tagsCsv}}"
+                list="cw-tags-list"
+              />
+            </div>
+            <div class="cw-field">
+              <label>Roll Type</label>
+              <select name="system.effects.{{i}}.when.rollType">
+                <option value=""           {{#if (eq eff.when.rollType "")}}selected{{/if}}>(any)</option>
+                <option value="standard"   {{#if (eq eff.when.rollType "standard")}}selected{{/if}}>Standard</option>
+                <option value="initiative" {{#if (eq eff.when.rollType "initiative")}}selected{{/if}}>Initiative</option>
+                <option value="save"       {{#if (eq eff.when.rollType "save")}}selected{{/if}}>Save</option>
+              </select>
+            </div>
+          </div>
 
-        <label>Roll Type</label>
-        <select name="system.effects.{{i}}.rollType">
-        {{#select eff.rollType}}
-        <option value="(any)">(any)</option>
-        <option value="initiative">initiative</option>
-        {{/select}}
-        </select>
-      </div>
+          <h4>Modifiers</h4>
+          <div class="mods">
+            {{#each eff.mods as |m j|}}
+              <div class="mod-row cw-grid-4">
+                <div class="cw-field">
+                  <label>Target</label>
+                  <select name="system.effects.{{../i}}.mods.{{j}}.path">
+                    <option value="dicePool"   {{#if (eq m.path "dicePool")}}selected{{/if}}>Dice Pool</option>
+                    <option value="initiative" {{#if (eq m.path "initiative")}}selected{{/if}}>Initiative</option>
+                    <option value="difficulty" {{#if (eq m.path "difficulty")}}selected{{/if}}>Difficulty (TN)</option>
+                    <option value="successes"  {{#if (eq m.path "successes")}}selected{{/if}}>Auto Successes</option>
+                  </select>
+                </div>
 
-      {{#each eff.mods as |m j|}}
-        <div class="cw-grid-4">
-          <select name="system.effects.{{i}}.mods.{{j}}.path">
-            <option value="dicePool"   {{#if (eq m.path "dicePool")}}selected{{/if}}>dice pool</option>
-            <option value="initiative" {{#if (eq m.path "initiative")}}selected{{/if}}>initiative</option>
-            <option value="difficulty" {{#if (eq m.path "difficulty")}}selected{{/if}}>difficulty</option>
-            <option value="successes"  {{#if (eq m.path "successes")}}selected{{/if}}>auto-successes</option>
-          </select>
+                <div class="cw-field">
+                  <label>Op</label>
+                  <input
+                    type="text"
+                    name="system.effects.{{../i}}.mods.{{j}}.op"
+                    value="{{m.op}}"
+                    readonly
+                  />
+                </div>
 
-          <select name="system.effects.{{i}}.mods.{{j}}.op">
-            <option value="add" {{#if (eq m.op "add")}}selected{{/if}}>add</option>
-          </select>
+                <div class="cw-field">
+                  <label>Value</label>
+                  <input
+                    type="number"
+                    name="system.effects.{{../i}}.mods.{{j}}.value"
+                    value="{{m.value}}"
+                  />
+                </div>
 
-          <input type="number" name="system.effects.{{i}}.mods.{{j}}.value" value="{{m.value}}"/>
+                <div class="cw-field cw-actions">
+                  <button
+                    type="button"
+                    class="mod-remove"
+                    data-eff-index="{{../i}}"
+                    data-mod-index="{{j}}"
+                  >
+                    🗑
+                  </button>
+                </div>
+              </div>
+            {{/each}}
 
-          <button type="button" class="mod-remove" data-eff="{{i}}" data-mod="{{j}}">🗑️</button>
-        </div>
+            <button type="button" class="mod-add" data-index="{{i}}">+ Add Modifier</button>
+          </div>
+        </fieldset>
       {{/each}}
 
-      <div>
-        <button type="button" class="mod-add" data-index="{{i}}">+ Add Modifier</button>
-      </div>
-    </fieldset>
-  {{/each}}
+      <button type="button" class="add-effect">Add Effect</button>
 
-  <button type="button" class="add-effect">Add Effect</button>
-
-  <datalist id="cw-tags-list">
-    <option value="cold"/>
-    <option value="survival"/>
-    <option value="melee"/>
-    <option value="ranged"/>
-    <option value="fear"/>
-  </datalist>
-</div>
-
+      <datalist id="cw-tags-list">
+        <option value="cold"/>
+        <option value="survival"/>
+        <option value="melee"/>
+        <option value="ranged"/>
+        <option value="fear"/>
+      </datalist>
+    </div>
   </section>
 </form>
