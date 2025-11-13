@@ -1,0 +1,97 @@
+
+<form class="cw {{cssClass}}" autocomplete="off">
+  <section class="header-row">
+    <div class="section" style="flex:1">
+      <div class="grid2">
+        <div>
+          <label>Name</label>
+          <input type="text" name="name" value="{{actor.name}}"/>
+        </div>
+        <div>
+          <label>Player</label>
+          <input type="text" name="system.bio.player" value="{{system.bio.player}}"/>
+        </div>
+        <div>
+          <label>Nature</label>
+          <input type="text" name="system.bio.nature" value="{{system.bio.nature}}"/>
+        </div>
+        <div>
+          <label>Homeworld/Gravity</label>
+          <input type="text" name="system.bio.homeworld" value="{{system.bio.homeworld}}"/>
+          <div class="grid2" style="margin-top:0.3rem">
+            <label>Home</label>
+            <select name="system.bio.gravityHome">
+              {{selectOptions gravities selected=system.bio.gravityHome}}
+            </select>
+            <label>Here</label>
+            <select name="system.bio.gravityCurrent">
+              {{selectOptions gravities selected=system.bio.gravityCurrent}}
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="section" style="width: 300px">
+      <h2>{{localize "CW.DicePool"}}</h2>
+      <div class="grid3">
+        <div class="attr"><span>{{system.attributes.str.label}}</span><input type="number" name="system.attributes.str.value" value="{{system.attributes.str.value}}" /></div>
+        <div class="attr"><span>{{system.attributes.dex.label}}</span><input type="number" name="system.attributes.dex.value" value="{{system.attributes.dex.value}}" /></div>
+        <div class="attr"><span>{{system.attributes.sta.label}}</span><input type="number" name="system.attributes.sta.value" value="{{system.attributes.sta.value}}" /></div>
+        <div class="attr"><span>{{system.attributes.cha.label}}</span><input type="number" name="system.attributes.cha.value" value="{{system.attributes.cha.value}}" /></div>
+        <div class="attr"><span>{{system.attributes.soc.label}}</span><input type="number" name="system.attributes.soc.value" value="{{system.attributes.soc.value}}" /></div>
+        <div class="attr"><span>{{system.attributes.app.label}}</span><input type="number" name="system.attributes.app.value" value="{{system.attributes.app.value}}" /></div>
+        <div class="attr"><span>{{system.attributes.int.label}}</span><input type="number" name="system.attributes.int.value" value="{{system.attributes.int.value}}" /></div>
+        <div class="attr"><span>{{system.attributes.edu.label}}</span><input type="number" name="system.attributes.edu.value" value="{{system.attributes.edu.value}}" /></div>
+        <div class="attr"><span>{{system.attributes.wit.label}}</span><input type="number" name="system.attributes.wit.value" value="{{system.attributes.wit.value}}" /></div>
+      </div>
+      <hr/>
+      <div class="grid2">
+        <div><strong>{{localize "CW.Initiative"}}:</strong> {{system.derived.initiative}}</div>
+        <div><strong>Move (walk/run/sprint):</strong> {{system.derived.moveWalk}} / {{system.derived.moveRun}} / {{system.derived.moveSprint}} m</div>
+        <div><strong>Throw:</strong> {{system.derived.throwRange}} m</div>
+        <div class="willpower"><label>{{localize "CW.Willpower"}}</label> <input type="number" name="system.willpower.value" value="{{system.willpower.value}}" /> / <input type="number" name="system.willpower.max" value="{{system.willpower.max}}" /></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section skills">
+    <h2>{{localize "CW.Skills"}} (click to roll)</h2>
+    <div class="grid3">
+      {{#each system.skills as |sk key|}}
+      <div class="skill">
+        <button type="button" data-skill="{{key}}">{{sk.label}}</button>
+        <input type="number" name="system.skills.{{key}}.value" value="{{sk.value}}" />
+        <label title="Specialized">★</label>
+        <input type="checkbox" name="system.skills.{{key}}.specialized" {{checked sk.specialized}}/>
+        <input type="number" name="tmp" style="display:none"/>
+      </div>
+      {{/each}}
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>{{localize "CW.Backgrounds"}}</h2>
+    <div class="grid3">
+      {{#each system.backgrounds as |bg key|}}
+      <div class="attr"><span>{{bg.label}}</span><input type="number" name="system.backgrounds.{{key}}.value" value="{{bg.value}}"/></div>
+      {{/each}}
+    </div>
+  </section>
+
+  <section class="section health">
+    <h2>{{localize "CW.Health"}}</h2>
+    <div class="levels">
+      {{#each system.health.levels as |lvl i|}}
+        <div class="lvl">
+          <div>{{lvl.label}}</div>
+          <input type="number" name="system.health.levels.{{i}}.marked" value="{{lvl.marked}}" min="0" max="1"/>
+          <div class="pill">{{#if lvl.penalty}}{{lvl.penalty}}{{else}}—{{/if}}</div>
+        </div>
+      {{/each}}
+    </div>
+    <div style="margin-top:0.5rem">
+      <button type="button" class="hitloc">{{localize "CW.HitLocation"}}</button>
+      <span class="pill">Last: {{system.health.location}}</span>
+    </div>
+  </section>
+</form>

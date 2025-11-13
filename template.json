@@ -1,0 +1,417 @@
+{
+  "Actor": {
+    "types": [
+      "character",
+      "npc"
+    ],
+    "templates": {
+      "base": {
+        "bio": {
+          "name": "",
+          "player": "",
+          "nature": "",
+          "homeworld": "Normal",
+          "gravityHome": "Normal",
+          "gravityCurrent": "Normal",
+          "age": 18,
+          "gender": "",
+          "nationality": "",
+          "mass": "",
+          "height": "",
+          "hair": "",
+          "eyes": "",
+          "bloodGroup": "",
+          "handedness": "Right",
+          "reputation": 0,
+          "allegiances": []
+        },
+        "attributes": {
+          "str": {
+            "label": "STR",
+            "value": 1
+          },
+          "dex": {
+            "label": "DEX",
+            "value": 1
+          },
+          "sta": {
+            "label": "STA",
+            "value": 1
+          },
+          "cha": {
+            "label": "CHA",
+            "value": 1
+          },
+          "soc": {
+            "label": "SOC",
+            "value": 1
+          },
+          "app": {
+            "label": "APP",
+            "value": 1
+          },
+          "int": {
+            "label": "INT",
+            "value": 1
+          },
+          "edu": {
+            "label": "EDU",
+            "value": 1
+          },
+          "wit": {
+            "label": "WIT",
+            "value": 1
+          }
+        },
+        "skills": {
+          "athletics": {
+            "label": "Athletics",
+            "value": 0,
+            "specialized": false
+          },
+          "awareness": {
+            "label": "Awareness",
+            "value": 0,
+            "specialized": false
+          },
+          "brawl": {
+            "label": "Brawl",
+            "value": 0,
+            "specialized": false
+          },
+          "business": {
+            "label": "Business",
+            "value": 0,
+            "specialized": false
+          },
+          "computerUse": {
+            "label": "Computer Use",
+            "value": 0,
+            "specialized": false
+          },
+          "demolitions": {
+            "label": "Demolitions",
+            "value": 0,
+            "specialized": false
+          },
+          "disguise": {
+            "label": "Disguise",
+            "value": 0,
+            "specialized": false
+          },
+          "drive": {
+            "label": "Drive",
+            "value": 0,
+            "specialized": false
+          },
+          "empathy": {
+            "label": "Empathy",
+            "value": 0,
+            "specialized": false
+          },
+          "engineering": {
+            "label": "Engineering",
+            "value": 0,
+            "specialized": false
+          },
+          "etiquette": {
+            "label": "Etiquette",
+            "value": 0,
+            "specialized": false
+          },
+          "firearms": {
+            "label": "Firearms",
+            "value": 0,
+            "specialized": false
+          },
+          "forgery": {
+            "label": "Forgery",
+            "value": 0,
+            "specialized": false
+          },
+          "gambling": {
+            "label": "Gambling",
+            "value": 0,
+            "specialized": false
+          },
+          "gatherInformation": {
+            "label": "Gather Information",
+            "value": 0,
+            "specialized": false
+          },
+          "heavyWeapons": {
+            "label": "Heavy Weapons",
+            "value": 0,
+            "specialized": false
+          },
+          "intimidate": {
+            "label": "Intimidate",
+            "value": 0,
+            "specialized": false
+          },
+          "leadership": {
+            "label": "Leadership",
+            "value": 0,
+            "specialized": false
+          },
+          "linguistics": {
+            "label": "Linguistics",
+            "value": 0,
+            "specialized": false
+          },
+          "martialArts": {
+            "label": "Martial Arts",
+            "value": 0,
+            "specialized": false
+          },
+          "medicine": {
+            "label": "Medicine",
+            "value": 0,
+            "specialized": false
+          },
+          "melee": {
+            "label": "Melee",
+            "value": 0,
+            "specialized": false
+          },
+          "navigation": {
+            "label": "Navigation",
+            "value": 0,
+            "specialized": false
+          },
+          "perform": {
+            "label": "Perform",
+            "value": 0,
+            "specialized": false
+          },
+          "pilot": {
+            "label": "Pilot",
+            "value": 0,
+            "specialized": false
+          },
+          "repair": {
+            "label": "Repair",
+            "value": 0,
+            "specialized": false
+          },
+          "security": {
+            "label": "Security",
+            "value": 0,
+            "specialized": false
+          },
+          "stealth": {
+            "label": "Stealth",
+            "value": 0,
+            "specialized": false
+          },
+          "streetwise": {
+            "label": "Streetwise",
+            "value": 0,
+            "specialized": false
+          },
+          "subterfuge": {
+            "label": "Subterfuge",
+            "value": 0,
+            "specialized": false
+          },
+          "survival": {
+            "label": "Survival",
+            "value": 0,
+            "specialized": false
+          },
+          "technology": {
+            "label": "Technology",
+            "value": 0,
+            "specialized": false
+          }
+        },
+        "backgrounds": {
+          "allies": {
+            "label": "Allies",
+            "value": 0
+          },
+          "armoury": {
+            "label": "Armoury",
+            "value": 0
+          },
+          "alternateID": {
+            "label": "Alternateid",
+            "value": 0
+          },
+          "backing": {
+            "label": "Backing",
+            "value": 0
+          },
+          "cipher": {
+            "label": "Cipher",
+            "value": 0
+          },
+          "contacts": {
+            "label": "Contacts",
+            "value": 0
+          },
+          "cybernetics": {
+            "label": "Cybernetics",
+            "value": 0
+          },
+          "enemies": {
+            "label": "Enemies",
+            "value": 0
+          },
+          "equipment": {
+            "label": "Equipment",
+            "value": 0
+          },
+          "favours": {
+            "label": "Favours",
+            "value": 0
+          },
+          "fame": {
+            "label": "Fame",
+            "value": 0
+          },
+          "followers": {
+            "label": "Followers",
+            "value": 0
+          },
+          "influence": {
+            "label": "Influence",
+            "value": 0
+          },
+          "mentor": {
+            "label": "Mentor",
+            "value": 0
+          },
+          "network": {
+            "label": "Network",
+            "value": 0
+          },
+          "resources": {
+            "label": "Resources",
+            "value": 0
+          },
+          "sanctum": {
+            "label": "Sanctum",
+            "value": 0
+          },
+          "security": {
+            "label": "Security",
+            "value": 0
+          },
+          "soldiers": {
+            "label": "Soldiers",
+            "value": 0
+          },
+          "spies": {
+            "label": "Spies",
+            "value": 0
+          },
+          "staff": {
+            "label": "Staff",
+            "value": 0
+          },
+          "status": {
+            "label": "Status",
+            "value": 0
+          }
+        },
+        "derived": {
+          "initiative": 0,
+          "moveWalk": 7,
+          "moveRun": 12,
+          "moveSprint": 20,
+          "throwRange": 12
+        },
+        "willpower": {
+          "value": 3,
+          "max": 10
+        },
+        "health": {
+          "levels": [
+            {
+              "id": "bruised",
+              "label": "Bruised",
+              "penalty": 0,
+              "marked": 0
+            },
+            {
+              "id": "hurt",
+              "label": "Hurt",
+              "penalty": -1,
+              "marked": 0
+            },
+            {
+              "id": "injured",
+              "label": "Injured",
+              "penalty": -1,
+              "marked": 0
+            },
+            {
+              "id": "wounded",
+              "label": "Wounded",
+              "penalty": -2,
+              "marked": 0
+            },
+            {
+              "id": "mauled",
+              "label": "Mauled",
+              "penalty": -2,
+              "marked": 0
+            },
+            {
+              "id": "crippled",
+              "label": "Crippled",
+              "penalty": -5,
+              "marked": 0
+            },
+            {
+              "id": "incapacitated",
+              "label": "Incapacitated",
+              "penalty": null,
+              "marked": 0
+            }
+          ],
+          "location": 0
+        },
+        "settings": {
+          "useGravityModifiers": true
+        }
+      }
+    },
+    "character": {
+      "templates": [
+        "base"
+      ]
+    },
+    "npc": {
+      "templates": [
+        "base"
+      ]
+    }
+  },
+  "Item": {
+    "types": [
+      "gear",
+      "weapon",
+      "armor",
+      "talent",
+      "cybernetic",
+      "background"
+    ],
+    "templates": {
+      "base": {
+        "description": "",
+        "rating": 0
+      },
+      "weapon": {
+        "damage": "1d10",
+        "range": "melee",
+        "special": ""
+      },
+      "armor": {
+        "soak": 0,
+        "locations": "torso"
+      }
+    }
+  }
+}

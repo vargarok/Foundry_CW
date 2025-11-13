@@ -1,0 +1,30 @@
+{
+  "id": "colonial-weather",
+  "title": "Colonial Weather (Storyteller Sci\u2011Fi)",
+  "description": "A lightweight Foundry VTT v13 system implementing the Colonial Weather/Storyteller-inspired sci\u2011fi rules: attributes + skills (d10), successes on 7\u201110, specialization re\u2011rolls 10s, willpower, health by locations, backgrounds, merits/flaws, and optional gravity/homeworld modifiers.",
+  "version": "0.1.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "scripts": [],
+  "esmodules": [
+    "module/system.mjs"
+  ],
+  "styles": [
+    "styles/cw.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "packs": [],
+  "author": "",
+  "url": "https://github.com/vargarok/Foundry_CW",
+  "license": "MIT",
+  "manifest": "https://raw.githubusercontent.com/vargarok/Foundry_CW/main/system.json",
+  "download": "https://github.com/vargarok/Foundry_CW/releases/download/release/Foundry_CW.zip"
+}

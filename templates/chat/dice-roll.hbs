@@ -1,0 +1,7 @@
+
+<div class="cw-roll">
+  <header><strong>{{title}}</strong></header>
+  <div>{{dicePool}}d10 vs 7+ {{#if specialized}}(10s re-roll){{/if}} {{#if willpower}} +1 auto success{{/if}}</div>
+  <div>Results: {{results}}</div>
+  <div><strong>{{successes}}</strong> {{localize "CW.Successes"}} {{#if botch}} <span class="pill">{{localize "CW.Botch"}}</span>{{/if}}</div>
+</div>
