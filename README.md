@@ -12,5 +12,8 @@ Includes: attributes (STR/DEX/STA, CHA/SOC/APP, INT/EDU/WIT), abilities from the
 
 **Notes**
 
+- All naming is generalized; no World of Darkness terms remain.
 - The math and tables are based on the attached Colonial Weather docs.
 - Willpower is a simple track; the roller optionally adds +1 auto success if you wire it via a macro (see `game.cw.rollPool`).
+
+(c) Hampus Barck (setting & rules). Code MIT-licensed.

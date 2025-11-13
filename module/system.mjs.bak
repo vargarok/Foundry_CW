@@ -46,25 +46,6 @@ CW.SKILLS = {
 
 Handlebars.registerHelper('eq', (a,b)=>a===b);
 
-
-// Minimal item sheet to avoid undefined errors in v13
-class CWItemSheet extends ItemSheet {
-  static get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
-      classes: ['colonial-weather', 'cw', 'sheet', 'item'],
-      template: 'systems/colonial-weather/templates/item/item-sheet.hbs',
-      width: 560,
-      height: 'auto',
-      resizable: true
-    });
-  }
-
-  /** v1 sheets still use jQuery html in activateListeners; keep it simple */
-  activateListeners(html) {
-    super.activateListeners(html);
-  }
-}
-
 Hooks.once("init", function() {
   console.log("Colonial Weather | Initializing");
   CONFIG.Actor.documentClass = CWActor;
@@ -94,7 +75,7 @@ export async function rollPool({actor, pool=1, title="", specialized=false, will
   let resultsStr = [];
   let toRoll = pool;
   while (toRoll > 0) {
-    const r = new Roll("1d10").evaluateSync();
+    const r = new Roll("1d10").roll({async:false});
     const v = r.total;
     rolls.push(v);
     resultsStr.push(v);
@@ -111,7 +92,7 @@ export async function rollPool({actor, pool=1, title="", specialized=false, will
   }
   const botch = successes === 0 && ones > 0;
   const templ = "systems/colonial-weather/templates/chat/dice-roll.hbs";
-  const html = await foundry.applications.handlebars.renderTemplate(templ, {
+  const html = await renderTemplate(templ, {
     title: title || game.i18n.localize("CW.Roll"),
     dicePool: pool,
     specialized,
@@ -120,13 +101,13 @@ export async function rollPool({actor, pool=1, title="", specialized=false, will
     successes,
     botch
   });
-  ChatMessage.create({content: html, style: CONST.CHAT_MESSAGE_STYLES.OTHER, speaker: ChatMessage.getSpeaker({actor}), flags: {cw: {successes, botch, rolls}}});
+  ChatMessage.create({content: html, type: CONST.CHAT_MESSAGE_TYPES.OTHER, speaker: ChatMessage.getSpeaker({actor}), flags: {cw: {successes, botch, rolls}}});
   return {successes, botch, rolls};
 }
 
 // Simple hit location (1-10): 1 head, 2 chest, 3-4 stomach, 5,7 right leg, 6,8 left leg, 9 right arm, 10 left arm
 export function rollHitLocation() {
-  const r = new Roll("1d10").evaluateSync().total;
+  const r = new Roll("1d10").roll({async:false}).total;
   const map = {1: "Head", 2:"Chest", 3:"Stomach", 4:"Stomach", 5:"Right leg", 6:"Left leg", 7:"Right leg", 8:"Left leg", 9:"Right arm", 10:"Left arm"};
   return {value: r, label: map[r] || r};
 }
