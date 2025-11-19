@@ -1,0 +1,20 @@
+<div class="cw-chat-roll {{#if isBotch}}botch{{/if}}">
+  <div class="roll-header">{{label}}</div>
+  <div class="roll-formula">{{roll.formula}}</div>
+  <div class="roll-result">
+    {{#each roll.terms as |term|}}
+      {{#if term.faces}}
+        {{#each term.results as |res|}}
+          <span class="die {{#if (gte res.result 7)}}success{{/if}} {{#if (eq res.result 1)}}one{{/if}} {{#if (eq res.result 10)}}ten{{/if}}">{{res.result}}</span>
+        {{/each}}
+      {{/if}}
+    {{/each}}
+  </div>
+  <div class="roll-total">
+    {{#if isBotch}}
+      <span style="color:red; font-weight:bold;">BOTCH!</span>
+    {{else}}
+      {{roll.total}} Successes
+    {{/if}}
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<header class="sheet-header">
+  <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+  <div class="header-fields">
+    <div class="row">
+      <label>Name</label>
+      <input name="name" type="text" value="{{actor.name}}"/>
+    </div>
+    <div class="row">
+      <label>Nature</label>
+      <input name="system.bio.nature" type="text" value="{{system.bio.nature}}"/>
+    </div>
+    <div class="row">
+      <label>Gravity (Home/Current)</label>
+      <div class="flexrow">
+        <select name="system.bio.gravityHome" value="{{system.bio.gravityHome}}">
+          {{selectOptions (array "Zero" "Low" "Normal" "High") selected=system.bio.gravityHome}}
+        </select>
+        <span>/</span>
+        <select name="system.bio.gravityCurrent" value="{{system.bio.gravityCurrent}}">
+           {{selectOptions (array "Zero" "Low" "Normal" "High") selected=system.bio.gravityCurrent}}
+        </select>
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,60 @@
+{
+  "Actor": {
+    "types": ["character", "npc"],
+    "templates": {
+      "base": {
+        "bio": {
+          "player": "",
+          "nature": "",
+          "homeworld": "Normal",
+          "gravityHome": "Normal",
+          "gravityCurrent": "Normal"
+        },
+        "attributes": {
+          "str": { "value": 1, "label": "CW.AttrStr" },
+          "dex": { "value": 1, "label": "CW.AttrDex" },
+          "sta": { "value": 1, "label": "CW.AttrSta" },
+          "cha": { "value": 1, "label": "CW.AttrCha" },
+          "soc": { "value": 1, "label": "CW.AttrSoc" },
+          "app": { "value": 1, "label": "CW.AttrApp" },
+          "int": { "value": 1, "label": "CW.AttrInt" },
+          "edu": { "value": 1, "label": "CW.AttrEdu" },
+          "wit": { "value": 1, "label": "CW.AttrWit" }
+        },
+        "skills": {},
+        "health": {
+          "value": 0,
+          "max": 7,
+          "penalties": {},
+          "location": "None"
+        },
+        "willpower": { "value": 3, "max": 10 },
+        "derived": {
+          "initiative": 0
+        }
+      }
+    },
+    "character": { "templates": ["base"] },
+    "npc": { "templates": ["base"] }
+  },
+  "Item": {
+    "types": ["gear", "weapon", "armor", "trait"],
+    "templates": {
+      "base": {
+        "description": "",
+        "quantity": 1,
+        "weight": 0
+      }
+    },
+    "weapon": {
+      "templates": ["base"],
+      "damage": 0,
+      "range": "Melee"
+    },
+    "gear": { "templates": ["base"] },
+    "trait": {
+      "templates": ["base"],
+      "value": 0
+    }
+  }
+}

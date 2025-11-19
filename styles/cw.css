@@ -1,0 +1,120 @@
+/* Variables */
+:root {
+  --cw-bg: #0b1015;
+  --cw-panel: #131b23;
+  --cw-border: #2d3a46;
+  --cw-accent: #4a9eff;
+  --cw-text: #e0e0e0;
+  --cw-success: #50e3c2;
+  --cw-fail: #ff4a4a;
+}
+
+.cw.sheet.actor .window-content {
+  background: var(--cw-bg);
+  color: var(--cw-text);
+  font-family: "Roboto", sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.sheet-header {
+  display: flex;
+  gap: 10px;
+  background: var(--cw-panel);
+  padding: 10px;
+  border: 1px solid var(--cw-border);
+  margin-bottom: 10px;
+}
+
+.header-fields {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+}
+
+.header-fields input, .header-fields select {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--cw-border);
+  color: var(--cw-text);
+}
+
+/* Grid Layouts */
+.attributes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.attr-column {
+  background: var(--cw-panel);
+  border: 1px solid var(--cw-border);
+  padding: 10px;
+}
+
+.attr-column h3 {
+  text-align: center;
+  border-bottom: 1px solid var(--cw-accent);
+  color: var(--cw-accent);
+}
+
+.attr-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0;
+}
+
+.attr-row input {
+  width: 30px;
+  text-align: center;
+}
+
+/* Skills */
+.skills-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+  padding: 10px;
+}
+
+.skill-item {
+  background: var(--cw-panel);
+  border: 1px solid var(--cw-border);
+  padding: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.specialized-toggle {
+  color: #444;
+  cursor: pointer;
+  margin-left: 5px;
+}
+.specialized-toggle.active {
+  color: #ffd700;
+  text-shadow: 0 0 5px #ffd700;
+}
+
+/* Chat Rolls */
+.cw-chat-roll {
+  background: var(--cw-panel);
+  border: 1px solid var(--cw-border);
+  padding: 5px;
+  text-align: center;
+}
+.cw-chat-roll .die {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  background: #333;
+  margin: 1px;
+  border-radius: 4px;
+}
+.cw-chat-roll .die.success { background: var(--cw-success); color: black; }
+.cw-chat-roll .die.one { background: var(--cw-fail); }
+.cw-chat-roll .die.ten { border: 2px solid var(--cw-accent); }

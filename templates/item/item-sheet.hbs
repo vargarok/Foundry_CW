@@ -1,0 +1,15 @@
+<form class="cw-item-sheet">
+  <header>
+    <img src="{{item.img}}" data-edit="img"/>
+    <input name="name" type="text" value="{{item.name}}"/>
+  </header>
+  <div class="fields">
+    {{#if (eq item.type "weapon")}}
+      <label>Damage</label> <input type="number" name="system.damage" value="{{system.damage}}"/>
+    {{/if}}
+    <label>Quantity</label> <input type="number" name="system.quantity" value="{{system.quantity}}"/>
+  </div>
+  <div class="editor-container">
+    {{editor system.description target="system.description" button=true editable=editable engine="prosemirror"}}
+  </div>
+</form>

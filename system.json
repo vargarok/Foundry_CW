@@ -1,0 +1,23 @@
+{
+  "id": "colonial-weather",
+  "title": "Colonial Weather",
+  "description": "A Sci-Fi Storyteller system. Attributes + Abilities vs TN 7.",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "esmodules": ["module/cw.mjs"],
+  "styles": ["styles/cw.css"],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "documentTypes": {
+    "Actor": ["character", "npc"],
+    "Item": ["gear", "weapon", "armor", "trait"]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "CW.AttrStr": "Strength",
+  "CW.AttrDex": "Dexterity",
+  "CW.AttrSta": "Stamina",
+  "CW.AttrCha": "Charisma",
+  "CW.AttrSoc": "Social",
+  "CW.AttrApp": "Appearance",
+  "CW.AttrInt": "Intelligence",
+  "CW.AttrEdu": "Education",
+  "CW.AttrWit": "Wits",
+  "CW.PHYSICAL": "Physical",
+  "CW.SOCIAL": "Social",
+  "CW.MENTAL": "Mental",
+  "CW.Skills": "Skills",
+  "CW.Roll": "Roll",
+  "CW.Successes": "Successes",
+  "CW.Botch": "Botch",
+  "CW.Specialized": "Specialized",
+  "CW.Willpower": "Willpower",
+  "CW.Health": "Health"
+}

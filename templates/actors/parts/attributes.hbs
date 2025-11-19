@@ -1,0 +1,56 @@
+<div class="tab-content" data-group="sheet" data-tab="attributes">
+  <div class="attributes-grid">
+    {{!-- Physical --}}
+    <div class="attr-column">
+      <h3>Physical</h3>
+      {{#each config.attributes.physical as |key|}}
+        {{#with (lookup ../system.attributes key) as |attr|}}
+        <div class="attr-row">
+          <a data-action="rollAttribute" data-attr="{{key}}">{{localize attr.label}}</a>
+          <input type="number" name="system.attributes.{{key}}.value" value="{{attr.value}}"/>
+        </div>
+        {{/with}}
+      {{/each}}
+    </div>
+    
+    {{!-- Social --}}
+    <div class="attr-column">
+      <h3>Social</h3>
+      {{#each config.attributes.social as |key|}}
+        {{#with (lookup ../system.attributes key) as |attr|}}
+        <div class="attr-row">
+          <a data-action="rollAttribute" data-attr="{{key}}">{{localize attr.label}}</a>
+          <input type="number" name="system.attributes.{{key}}.value" value="{{attr.value}}"/>
+        </div>
+        {{/with}}
+      {{/each}}
+    </div>
+
+    {{!-- Mental --}}
+    <div class="attr-column">
+      <h3>Mental</h3>
+      {{#each config.attributes.mental as |key|}}
+        {{#with (lookup ../system.attributes key) as |attr|}}
+        <div class="attr-row">
+          <a data-action="rollAttribute" data-attr="{{key}}">{{localize attr.label}}</a>
+          <input type="number" name="system.attributes.{{key}}.value" value="{{attr.value}}"/>
+        </div>
+        {{/with}}
+      {{/each}}
+    </div>
+  </div>
+
+  {{!-- Derived Stats --}}
+  <div class="derived-stats">
+    <div class="stat">
+      <label>Willpower</label>
+      <input type="number" name="system.willpower.value" value="{{system.willpower.value}}"/>
+      <span>/</span>
+      <input type="number" name="system.willpower.max" value="{{system.willpower.max}}"/>
+    </div>
+    <div class="stat">
+      <button type="button" data-action="rollHitLocation">Roll Hit Location</button>
+      <span>{{system.health.location}}</span>
+    </div>
+  </div>
+</div>
