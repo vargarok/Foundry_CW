@@ -17,8 +17,15 @@ Hooks.once("init", function() {
   CONFIG.Actor.documentClass = CWActor;
   CONFIG.Item.documentClass = CWItem;
 
+  // --- ADD THIS BLOCK ---
+  Handlebars.registerHelper('array', function() {
+    // The arguments object contains all parameters passed to the helper
+    // We slice off the last argument which is the Handlebars options object
+    return Array.prototype.slice.call(arguments, 0, -1);
+  });
+  // ----------------------
+
   // Register Sheets (V13 Strict Mode)
-  // Unregister the default Core sheets (which are now Legacy AppV1 sheets)
   foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
   
   foundry.documents.collections.Actors.registerSheet("colonial-weather", CWActorSheet, {
