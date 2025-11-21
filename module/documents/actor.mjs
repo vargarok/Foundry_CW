@@ -3,17 +3,28 @@ export class CWActor extends Actor {
   prepareDerivedData() {
     const system = this.system;
     
-    // --- 1. Initialize Skills if missing ---
+    // --- 1. Initialize Skills ---
     system.skills = system.skills || {};
-    for (const [key, label] of Object.entries(CONFIG.CW.skills)) {
+
+    for (const [key, data] of Object.entries(CONFIG.CW.skills)) {
+      // If skill doesn't exist, create it
       if (!system.skills[key]) {
-        system.skills[key] = { value: 0, label: label, specialized: false, attr: "dex" }; 
+        system.skills[key] = { 
+            value: 0, 
+            label: data.label, 
+            specialized: false, 
+            attr: data.attr // Use default from config
+        }; 
       } else {
-        system.skills[key].label = label; 
+        // If it exists, update label and ensure attr exists
+        system.skills[key].label = data.label; 
+        if (!system.skills[key].attr) {
+            system.skills[key].attr = data.attr;
+        }
       }
     }
 
-    // --- 2. Initialize Backgrounds if missing ---
+    // --- 2. Initialize Backgrounds ---
     system.backgrounds = system.backgrounds || {};
     for (const [key, label] of Object.entries(CONFIG.CW.backgrounds)) {
       if (!system.backgrounds[key]) {
@@ -43,22 +54,16 @@ export class CWActor extends Actor {
 
     // --- 4. Derived Stats ---
     system.derived.initiative = effDex + effWit;
-    
     system.derived.moveWalk = 7;
     system.derived.moveRun = effDex + 12;
     system.derived.moveSprint = (effDex * 3) + 20;
-
     system.derived.throwRange = effStr * 12;
 
     // --- 5. Health Penalties ---
     let penalty = 0;
+    if (!system.health.levels) system.health.levels = [0,0,0,0,0,0,0];
     
-    // FIX: Assign default array to the system object if missing
-    if (!system.health.levels) {
-        system.health.levels = [0, 0, 0, 0, 0, 0, 0];
-    }
     const levels = system.health.levels;
-    
     for (let i = 6; i >= 0; i--) {
       if (levels[i] > 0) { 
         penalty = CONFIG.CW.healthLevels[i].penalty;
@@ -94,7 +99,6 @@ export class CWActor extends Actor {
       isSpecialized = sk.specialized;
     }
 
-    // Apply Wound Penalty
     let pool = attrVal + skillVal + bonus;
     const woundPen = system.health.penalty;
     

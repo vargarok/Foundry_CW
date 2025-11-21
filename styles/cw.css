@@ -23,19 +23,19 @@
 .cw.sheet.actor form {
   display: flex;
   flex-direction: column;
-  height: 100%;       /* Fill the window */
-  overflow-y: auto;   /* Allow scrolling */
+  height: 100%;
+  overflow: hidden; /* Prevent double scrollbars */
 }
 
 /* Header */
 .sheet-header {
+  flex: 0 0 auto; 
   display: flex;
   gap: 10px;
   background: var(--cw-panel);
   padding: 10px;
   border: 1px solid var(--cw-border);
-  margin-bottom: 10px;
-  flex: 0 0 auto; /* Prevent header from shrinking */
+  margin-bottom: 5px;
 }
 
 .header-fields {
@@ -51,9 +51,9 @@
   color: var(--cw-text);
 }
 
-/* Tabs */
+/* Tabs stay fixed under header */
 .tabs {
-  flex: 0 0 auto; /* Keep tabs at natural height */
+  flex: 0 0 auto;
   margin-bottom: 10px;
   border-bottom: 1px solid var(--cw-border);
 }
@@ -68,11 +68,17 @@
 
 /* Tab Content */
 .tab-content {
-  flex: 1; /* Allow this to grow */
-  display: flex;
+  display: none; 
+  flex: 1; /* Grow to fill remaining space */
   flex-direction: column;
   gap: 10px;
-  padding-bottom: 10px; /* Space at bottom for scrolling */
+  padding-bottom: 10px;
+  overflow-y: auto; /* Scrollbar appears here */
+  padding-right: 5px; /* Avoid scrollbar covering content */
+}
+
+.tab-content.active {
+  display: flex; 
 }
 
 /* Grid Layouts */
@@ -183,17 +189,12 @@
   text-shadow: 0 0 5px #ffd700;
 }
 
-/* Tab Content Visibility */
-.tab-content {
-  display: none; /* Hide by default */
-  flex: 1;
-  flex-direction: column;
-  gap: 10px;
-  padding-bottom: 10px;
-}
-
-.tab-content.active {
-  display: flex; /* Show only when active */
+/* Editor Areas */
+.editor-container {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--cw-border);
+    padding: 5px;
+    min-height: 100px;
 }
 
 /* Chat Rolls */

@@ -37,9 +37,23 @@
         <input type="text" name="system.bio.handedness" value="{{system.bio.handedness}}">
     </div>
   </div>
+  
   <hr>
-  <div class="editor-area">
-      <p><strong>Notes</strong></p>
-      {{editor system.bio.notes target="system.bio.notes" button=true editable=true engine="prosemirror"}}
+  
+  <div class="bio-text-area">
+      <h3>Merits</h3>
+      <div class="editor-container">
+        {{editor system.bio.merits target="system.bio.merits" button=true editable=true engine="prosemirror"}}
+      </div>
+      
+      <h3>Flaws</h3>
+      <div class="editor-container">
+        {{editor system.bio.flaws target="system.bio.flaws" button=true editable=true engine="prosemirror"}}
+      </div>
+
+      <h3>Notes</h3>
+      <div class="editor-container">
+        {{editor system.bio.notes target="system.bio.notes" button=true editable=true engine="prosemirror"}}
+      </div>
   </div>
 </div>

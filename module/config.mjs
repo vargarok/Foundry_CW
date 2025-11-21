@@ -6,44 +6,43 @@ CW.attributes = {
   mental: ["int", "edu", "wit"]
 };
 
-// From Character Creation PDF
+// Expanded skill definitions with default attributes
 CW.skills = {
-  athletics: "Athletics",
-  awareness: "Awareness",
-  brawl: "Brawl",
-  business: "Business",
-  computer: "Computer Use",
-  demolitions: "Demolitions",
-  disguise: "Disguise",
-  drive: "Drive",
-  empathy: "Empathy",
-  engineering: "Engineering",
-  etiquette: "Etiquette",
-  firearms: "Firearms",
-  forgery: "Forgery",
-  gambling: "Gambling",
-  gatherInfo: "Gather Information",
-  heavyWeapons: "Heavy Weapons",
-  intimidate: "Intimidate",
-  leadership: "Leadership",
-  linguistics: "Linguistics",
-  martialArts: "Martial Arts",
-  medicine: "Medicine",
-  melee: "Melee",
-  navigation: "Navigation",
-  perform: "Perform",
-  pilot: "Pilot",
-  politics: "Politics",
-  repair: "Repair",
-  security: "Security",
-  stealth: "Stealth",
-  streetwise: "Streetwise",
-  subterfuge: "Subterfuge",
-  survival: "Survival",
-  technology: "Technology"
+  athletics: { label: "Athletics", attr: "str" },
+  awareness: { label: "Awareness", attr: "wit" },
+  brawl: { label: "Brawl", attr: "str" },
+  business: { label: "Business", attr: "soc" },
+  computer: { label: "Computer Use", attr: "int" },
+  demolitions: { label: "Demolitions", attr: "int" },
+  disguise: { label: "Disguise", attr: "app" },
+  drive: { label: "Drive", attr: "dex" },
+  empathy: { label: "Empathy", attr: "cha" },
+  engineering: { label: "Engineering", attr: "int" },
+  etiquette: { label: "Etiquette", attr: "soc" },
+  firearms: { label: "Firearms", attr: "dex" },
+  forgery: { label: "Forgery", attr: "int" },
+  gambling: { label: "Gambling", attr: "wit" },
+  gatherInfo: { label: "Gather Information", attr: "cha" },
+  heavyWeapons: { label: "Heavy Weapons", attr: "dex" },
+  intimidate: { label: "Intimidate", attr: "str" },
+  leadership: { label: "Leadership", attr: "cha" },
+  linguistics: { label: "Linguistics", attr: "edu" },
+  martialArts: { label: "Martial Arts", attr: "dex" },
+  medicine: { label: "Medicine", attr: "edu" },
+  melee: { label: "Melee", attr: "dex" },
+  navigation: { label: "Navigation", attr: "int" },
+  perform: { label: "Perform", attr: "app" },
+  pilot: { label: "Pilot", attr: "dex" },
+  politics: { label: "Politics", attr: "soc" },
+  repair: { label: "Repair", attr: "dex" },
+  security: { label: "Security", attr: "wit" },
+  stealth: { label: "Stealth", attr: "dex" },
+  streetwise: { label: "Streetwise", attr: "wit" },
+  subterfuge: { label: "Subterfuge", attr: "cha" },
+  survival: { label: "Survival", attr: "sta" },
+  technology: { label: "Technology", attr: "edu" }
 };
 
-// From Character Creation PDF
 CW.backgrounds = {
   allies: "Allies",
   armoury: "Armoury",
@@ -69,7 +68,6 @@ CW.backgrounds = {
   status: "Status"
 };
 
-// Health Levels with Penalties
 CW.healthLevels = [
   { label: "Bruised", penalty: 0 },
   { label: "Hurt", penalty: -1 },

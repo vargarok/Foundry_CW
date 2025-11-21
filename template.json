@@ -17,7 +17,10 @@
           "mass": "",
           "hair": "",
           "eyes": "",
-          "handedness": ""
+          "handedness": "",
+          "merits": "",
+          "flaws": "",
+          "notes": ""
         },
         "attributes": {
           "str": { "value": 1, "label": "CW.AttrStr" },
