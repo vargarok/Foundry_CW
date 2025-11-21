@@ -1,7 +1,7 @@
 const { HandlebarsApplicationMixin } = foundry.applications.api;
-const { ItemSheetV2 } = foundry.applications.sheets;
+const { DocumentSheetV2 } = foundry.applications.api;
 
-export class CWItemSheet extends HandlebarsApplicationMixin(ItemSheetV2) {
+export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   static DEFAULT_OPTIONS = {
     tag: "form",
     classes: ["cw", "sheet", "item"],
