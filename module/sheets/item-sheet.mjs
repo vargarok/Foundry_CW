@@ -1,4 +1,3 @@
-// Imports - Update to pull from .api
 const { HandlebarsApplicationMixin, DocumentSheetV2 } = foundry.applications.api;
 
 export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
@@ -6,10 +5,7 @@ export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     tag: "form",
     classes: ["cw", "sheet", "item"],
     position: { width: 550, height: 600 },
-    form: { submitOnChange: true, closeOnSubmit: false },
-    actions: {
-        // Define any sheet-specific actions here if needed
-    }
+    form: { submitOnChange: true, closeOnSubmit: false }
   };
 
   static PARTS = {
@@ -22,22 +18,15 @@ export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     context.item = this.document;
     context.system = this.document.system;
     context.config = CONFIG.CW;
-    
-    // Force editable to true for the owner
-    context.editable = this.document.isOwner; 
+    context.editable = this.isEditable; // We are hardcoding it in HBS, but keeping this logic is good
 
-    console.log("CW | Preparing Item Sheet", {
-        description: this.document.system.description,
-        editable: context.editable
-    });
-
-    // Enrich HTML
-    const rawDesc = this.document.system.description || "";
+    // ENRICHMENT
     context.enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(
-        rawDesc, 
+        this.document.system.description, 
         {
             async: true,
             secrets: this.document.isOwner,
+            rollData: this.document.getRollData(), // Added per documentation
             relativeTo: this.document
         }
     );
