@@ -1,11 +1,11 @@
-const { HandlebarsApplicationMixin } = foundry.applications.api;
-const { DocumentSheetV2 } = foundry.applications.sheets; // Correct V13 Path
+// Imports - Update to pull from .api
+const { HandlebarsApplicationMixin, DocumentSheetV2 } = foundry.applications.api;
 
 export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   static DEFAULT_OPTIONS = {
     tag: "form",
     classes: ["cw", "sheet", "item"],
-    position: { width: 550, height: 600 }, // Increased height slightly
+    position: { width: 550, height: 600 },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
         // Define any sheet-specific actions here if needed
@@ -23,16 +23,15 @@ export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     context.system = this.document.system;
     context.config = CONFIG.CW;
     
-    // Force editable to true for the owner (fixes issues if isEditable is undefined)
+    // Force editable to true for the owner
     context.editable = this.document.isOwner; 
 
-    // Debugging: Log this to your Console (F12) to ensure data exists
     console.log("CW | Preparing Item Sheet", {
         description: this.document.system.description,
         editable: context.editable
     });
 
-    // Enrich HTML - Ensure we fallback to an empty string if null
+    // Enrich HTML
     const rawDesc = this.document.system.description || "";
     context.enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(
         rawDesc, 
