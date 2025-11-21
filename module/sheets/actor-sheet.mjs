@@ -5,7 +5,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   static DEFAULT_OPTIONS = {
     tag: "form",
     classes: ["cw", "sheet", "actor"],
-    position: { width: 750, height: 800 },
+    position: { width: 800, height: 900 },
     window: { resizable: true },
     form: { submitOnChange: true, closeOnSubmit: false },
     actions: {
@@ -13,17 +13,16 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       rollSkill: this._onRollSkill,
       toggleSpecialized: this._onToggleSpecialized,
       rollHitLocation: this._onRollHitLocation,
-      // Add the tab switching action
       changeTab: this._onChangeTab
     }
   };
 
   static PARTS = {
     header: { template: "systems/colonial-weather/templates/actor/parts/header.hbs" },
-    // Point to our new custom tab template
-    tabs: { template: "systems/colonial-weather/templates/actor/parts/tabs.hbs" }, 
+    tabs: { template: "systems/colonial-weather/templates/actor/parts/tabs.hbs" },
     attributes: { template: "systems/colonial-weather/templates/actor/parts/attributes.hbs" },
     skills: { template: "systems/colonial-weather/templates/actor/parts/skills.hbs" },
+    backgrounds: { template: "systems/colonial-weather/templates/actor/parts/backgrounds.hbs" },
     bio: { template: "systems/colonial-weather/templates/actor/parts/bio.hbs" }
   };
 
@@ -37,10 +36,21 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
     context.actor = this.document;
     context.activeTab = this.tabGroups.sheet;
+    
+    // Health Configuration for the Template
+    context.healthConfig = CONFIG.CW.healthLevels.map((l, i) => {
+        return {
+            label: l.label,
+            penalty: l.penalty,
+            index: i,
+            checked: system.health.levels[i] > 0 // Simple check for now
+        };
+    });
 
     context.tabs = [
       { id: "attributes", group: "sheet", icon: "fa-solid fa-user", label: "Attributes" },
       { id: "skills", group: "sheet", icon: "fa-solid fa-dice-d20", label: "Skills" },
+      { id: "backgrounds", group: "sheet", icon: "fa-solid fa-briefcase", label: "Backgrounds" },
       { id: "bio", group: "sheet", icon: "fa-solid fa-book", label: "Bio" }
     ];
 
@@ -49,16 +59,10 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     return context;
   }
 
-  // --- Actions ---
-
   static async _onChangeTab(event, target) {
     const group = target.dataset.group;
     const tab = target.dataset.tab;
-    
-    // Update the internal state
     this.tabGroups[group] = tab;
-    
-    // Force a re-render so the UI updates immediately
     this.render();
   }
 

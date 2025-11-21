@@ -8,7 +8,16 @@
           "nature": "",
           "homeworld": "Normal",
           "gravityHome": "Normal",
-          "gravityCurrent": "Normal"
+          "gravityCurrent": "Normal",
+          "gender": "",
+          "age": "",
+          "nationality": "",
+          "birthdate": "",
+          "height": "",
+          "mass": "",
+          "hair": "",
+          "eyes": "",
+          "handedness": ""
         },
         "attributes": {
           "str": { "value": 1, "label": "CW.AttrStr" },
@@ -22,15 +31,19 @@
           "wit": { "value": 1, "label": "CW.AttrWit" }
         },
         "skills": {},
+        "backgrounds": {},
         "health": {
-          "value": 0,
-          "max": 7,
-          "penalties": {},
+          "levels": [0, 0, 0, 0, 0, 0, 0],
+          "penalty": 0,
           "location": "None"
         },
         "willpower": { "value": 3, "max": 10 },
         "derived": {
-          "initiative": 0
+          "initiative": 0,
+          "moveWalk": 0,
+          "moveRun": 0,
+          "moveSprint": 0,
+          "throwRange": 0
         }
       }
     },

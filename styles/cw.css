@@ -107,6 +107,55 @@
   text-align: center;
 }
 
+/* Bio Grid */
+.bio-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+.form-group label {
+    font-size: 0.8em;
+    color: var(--cw-accent);
+}
+
+/* Derived Stats & Health */
+.derived-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+}
+.panel {
+    background: var(--cw-panel);
+    padding: 10px;
+    border: 1px solid var(--cw-border);
+}
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+}
+.health-track {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.health-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px;
+    background: rgba(0,0,0,0.2);
+}
+.health-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
 /* Skills */
 .skills-list {
   display: grid;

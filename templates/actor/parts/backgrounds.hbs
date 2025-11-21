@@ -1,0 +1,14 @@
+<div class="tab-content {{#if (eq activeTab 'backgrounds')}}active{{/if}}">
+  <div class="skills-list">
+    {{#each system.backgrounds as |bg key|}}
+    <div class="skill-item">
+      <div class="skill-name">
+        <span>{{bg.label}}</span>
+      </div>
+      <div class="skill-controls">
+        <input type="number" name="system.backgrounds.{{key}}.value" value="{{bg.value}}" min="0" max="5"/>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>

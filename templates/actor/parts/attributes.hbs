@@ -1,4 +1,4 @@
-<div class="tab-content {{#if (eq activeTab 'attributes')}}active{{/if}}" data-group="sheet" data-tab="attributes">
+<div class="tab-content {{#if (eq activeTab 'attributes')}}active{{/if}}">
   <div class="attributes-grid">
     {{!-- Physical --}}
     <div class="attr-column">
@@ -40,17 +40,28 @@
     </div>
   </div>
 
-  {{!-- Derived Stats --}}
-  <div class="derived-stats">
-    <div class="stat">
-      <label>Willpower</label>
-      <input type="number" name="system.willpower.value" value="{{system.willpower.value}}"/>
-      <span>/</span>
-      <input type="number" name="system.willpower.max" value="{{system.willpower.max}}"/>
+  <div class="derived-row">
+    <div class="panel">
+        <h3>Derived Stats</h3>
+        <div class="grid-2">
+            <div><strong>Initiative:</strong> {{system.derived.initiative}}</div>
+            <div><strong>Throw Range:</strong> {{system.derived.throwRange}} m</div>
+            <div><strong>Walk:</strong> {{system.derived.moveWalk}} m</div>
+            <div><strong>Run:</strong> {{system.derived.moveRun}} m</div>
+            <div><strong>Sprint:</strong> {{system.derived.moveSprint}} m</div>
+        </div>
     </div>
-    <div class="stat">
-      <button type="button" data-action="rollHitLocation">Roll Hit Location</button>
-      <span>{{system.health.location}}</span>
+
+    <div class="panel">
+        <h3>Health</h3>
+        <div class="health-track">
+            {{#each healthConfig as |level|}}
+            <div class="health-row">
+                <label>{{level.label}} ({{level.penalty}})</label>
+                <input type="checkbox" name="system.health.levels.{{level.index}}" {{checked level.checked}} value="1">
+            </div>
+            {{/each}}
+        </div>
     </div>
   </div>
 </div>
