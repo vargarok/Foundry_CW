@@ -54,23 +54,43 @@
     "npc": { "templates": ["base"] }
   },
   "Item": {
-    "types": ["gear", "weapon", "armor", "trait"],
+    "types": ["gear", "weapon", "armor", "trait", "cybernetic"],
     "templates": {
       "base": {
         "description": "",
         "quantity": 1,
-        "weight": 0
+        "weight": 0,
+        "price": 0,
+        "legality": "Legal"
       }
     },
     "weapon": {
       "templates": ["base"],
-      "damage": 0,
-      "range": "Melee"
+      "damage": "1d10",
+      "range": 0,
+      "rof": "1",
+      "ammo": 0,
+      "skill": "firearms",
+      "attribute": "dex"
+    },
+    "armor": {
+      "templates": ["base"],
+      "soak": 0,
+      "penalty": 0,
+      "equipped": false
+    },
+    "cybernetic": {
+      "templates": ["base"],
+      "immuneLoad": 0,
+      "surgeryCost": 0,
+      "surgeryDC": 12,
+      "active": true
     },
     "gear": { "templates": ["base"] },
     "trait": {
       "templates": ["base"],
-      "value": 0
+      "type": "merit",
+      "cost": 1
     }
   }
 }

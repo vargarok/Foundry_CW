@@ -13,7 +13,11 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       rollSkill: this._onRollSkill,
       toggleSpecialized: this._onToggleSpecialized,
       rollHitLocation: this._onRollHitLocation,
-      changeTab: this._onChangeTab
+      changeTab: this._onChangeTab,
+      createItem: this._onCreateItem,
+      editItem: this._onEditItem,
+      deleteItem: this._onDeleteItem,
+      rollWeapon: this._onRollWeapon
     }
   };
 
@@ -23,7 +27,8 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     attributes: { template: "systems/colonial-weather/templates/actor/parts/attributes.hbs" },
     skills: { template: "systems/colonial-weather/templates/actor/parts/skills.hbs" },
     backgrounds: { template: "systems/colonial-weather/templates/actor/parts/backgrounds.hbs" },
-    bio: { template: "systems/colonial-weather/templates/actor/parts/bio.hbs" }
+    bio: { template: "systems/colonial-weather/templates/actor/parts/bio.hbs" },
+    inventory: { template: "systems/colonial-weather/templates/actor/parts/inventory.hbs" }
   };
 
   tabGroups = {
@@ -55,6 +60,27 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         };
     });
 
+    const inventory = {
+    weapons: [],
+    armor: [],
+    gear: [],
+    cybernetics: [],
+    traits: []
+  };
+
+  for (const i of this.document.items) {
+    if (i.type === "weapon") inventory.weapons.push(i);
+    else if (i.type === "armor") inventory.armor.push(i);
+    else if (i.type === "cybernetic") inventory.cybernetics.push(i);
+    else if (i.type === "trait") inventory.traits.push(i);
+    else inventory.gear.push(i);
+  }
+
+  context.inventory = inventory;
+
+  // Add inventory tab definition
+  context.tabs.push({ id: "inventory", group: "sheet", icon: "fa-solid fa-backpack", label: "Inventory" });
+
     context.tabs = [
       { id: "attributes", group: "sheet", icon: "fa-solid fa-user", label: "Attributes" },
       { id: "skills", group: "sheet", icon: "fa-solid fa-dice-d20", label: "Skills" },
@@ -65,6 +91,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     context.config = CONFIG.CW;
     context.system = system;
     return context;
+
   }
 
   static async _onChangeTab(event, target) {
@@ -98,4 +125,25 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     await r.toMessage({ flavor: `Hit Location: ${loc}` });
     await this.document.update({"system.health.location": loc});
   }
+  static async _onCreateItem(event, target) {
+    const type = target.dataset.type;
+    await Item.create({name: `New ${type}`, type: type}, {parent: this.document});
+}
+
+  static async _onEditItem(event, target) {
+    const item = this.document.items.get(target.dataset.id);
+    item.sheet.render(true);
+}
+
+  static async _onDeleteItem(event, target) {
+    const item = this.document.items.get(target.dataset.id);
+    await item.delete();
+}
+
+  static async _onRollWeapon(event, target) {
+    const item = this.document.items.get(target.dataset.id);
+    // Use the weapon's defined attribute and skill
+    // Pass the weapon damage as a label or extra info
+    this.document.rollDicePool(item.system.attribute, item.system.skill);
+}
 }
