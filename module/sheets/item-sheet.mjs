@@ -16,23 +16,21 @@ export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     
-    // 1. Context references
     context.item = this.document;
     context.system = this.document.system;
     context.config = CONFIG.CW;
-    
-    // 2. Explicitly pass the editable state (Important for the editor!)
     context.editable = this.isEditable;
 
-    // 3. Enrich the description (CRITICAL FIX)
-    // This converts the raw text into HTML the editor can display
-    context.enrichedDescription = await TextEditor.enrichHTML(this.document.system.description, {
-        async: true,
-        secrets: this.document.isOwner,
-        relativeTo: this.document
-    });
+    // FIX: Use the correct V13 namespace for TextEditor
+    context.enrichedDescription = await foundry.applications.ux.TextEditor.enrichHTML(
+        this.document.system.description, 
+        {
+            async: true,
+            secrets: this.document.isOwner,
+            relativeTo: this.document
+        }
+    );
     
-    // 4. Helper data
     context.traitTypes = { "merit": "Merit", "flaw": "Flaw" };
     
     return context;
