@@ -37,14 +37,16 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     context.actor = this.document;
     context.activeTab = this.tabGroups.sheet;
     
-    // --- FIX: Enrich Editors ---
+    // FIX 1: Pass the editable state explicitly so the template can use 'editable=editable'
+    context.editable = this.isEditable;
+
+    // FIX 2: V13 TextEditor Namespace & Safety Checks
     context.enriched = {
-        merits: await TextEditor.enrichHTML(system.bio.merits, {async: true}),
-        flaws: await TextEditor.enrichHTML(system.bio.flaws, {async: true}),
-        notes: await TextEditor.enrichHTML(system.bio.notes, {async: true})
+        merits: await foundry.applications.ux.TextEditor.enrichHTML(system.bio.merits || "", {async: true}),
+        flaws: await foundry.applications.ux.TextEditor.enrichHTML(system.bio.flaws || "", {async: true}),
+        notes: await foundry.applications.ux.TextEditor.enrichHTML(system.bio.notes || "", {async: true})
     };
 
-    // --- Attribute List for Select ---
     context.attrOptions = CONFIG.CW.attributes.physical
         .concat(CONFIG.CW.attributes.social)
         .concat(CONFIG.CW.attributes.mental)
@@ -53,7 +55,6 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
             return acc;
         }, {});
 
-    // Health Logic
     const healthLevels = system.health.levels || [0,0,0,0,0,0,0];
     context.healthConfig = CONFIG.CW.healthLevels.map((l, i) => {
         return {
@@ -91,7 +92,6 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   static async _onRollSkill(event, target) {
     const key = target.dataset.key;
     const skill = this.document.system.skills[key];
-    // The attribute is now pulled dynamically from the skill object
     this.document.rollDicePool(skill.attr, key);
   }
 

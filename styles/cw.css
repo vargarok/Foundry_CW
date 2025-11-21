@@ -165,7 +165,7 @@
 /* Skills */
 .skills-list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, 1fr); /* Two main columns */
   gap: 5px;
   padding: 10px;
 }
@@ -174,9 +174,24 @@
   background: var(--cw-panel);
   border: 1px solid var(--cw-border);
   padding: 5px;
-  display: flex;
-  justify-content: space-between;
+  /* Use Grid inside the item to force alignment */
+  display: grid;
+  grid-template-columns: 1fr 60px 70px; /* Name | Attr | Input+Star */
+  gap: 5px;
   align-items: center;
+}
+
+.skill-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.skill-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 5px;
 }
 
 .specialized-toggle {
@@ -215,12 +230,8 @@
   border-radius: 4px;
   color: white; /* Ensure die numbers are visible */
 }
-.cw-chat-roll .roll-header {
-  font-weight: bold;
-  margin-bottom: 5px;
-  border-bottom: 1px solid var(--cw-border);
-  padding-bottom: 3px;
-}
+
 .cw-chat-roll .die.success { background: var(--cw-success); color: black; }
 .cw-chat-roll .die.one { background: var(--cw-fail); }
 .cw-chat-roll .die.ten { border: 2px solid var(--cw-accent); }
+.cw-chat-roll .roll-header { font-weight: bold; border-bottom: 1px solid #333; margin-bottom: 5px; }
