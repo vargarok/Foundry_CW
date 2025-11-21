@@ -4,15 +4,21 @@ export class CWActor extends Actor {
     const system = this.system;
     
     // --- 1. Initialize Skills if missing ---
+    // SAFETY CHECK: Ensure system.skills exists
+    system.skills = system.skills || {};
+
     for (const [key, label] of Object.entries(CONFIG.CW.skills)) {
       if (!system.skills[key]) {
-        system.skills[key] = { value: 0, label: label, specialized: false, attr: "dex" }; // Default attr, can be changed
+        system.skills[key] = { value: 0, label: label, specialized: false, attr: "dex" }; 
       } else {
-        system.skills[key].label = label; // Ensure label matches config
+        system.skills[key].label = label; 
       }
     }
 
     // --- 2. Initialize Backgrounds if missing ---
+    // SAFETY CHECK: Ensure system.backgrounds exists
+    system.backgrounds = system.backgrounds || {};
+
     for (const [key, label] of Object.entries(CONFIG.CW.backgrounds)) {
       if (!system.backgrounds[key]) {
         system.backgrounds[key] = { value: 0, label: label };
@@ -21,7 +27,7 @@ export class CWActor extends Actor {
       }
     }
 
-    // --- 3. Gravity Mods (Table from Character Creation PDF pg 6) ---
+    // --- 3. Gravity Mods ---
     const home = (system.bio.gravityHome || "Normal").toLowerCase();
     const current = (system.bio.gravityCurrent || "Normal").toLowerCase();
     const gMods = this._getGravityMods(home, current);
@@ -39,7 +45,7 @@ export class CWActor extends Actor {
     const effDex = system.derived.attributes.dex;
     const effWit = system.derived.attributes.wit;
 
-    // --- 4. Derived Stats (Page 6) ---
+    // --- 4. Derived Stats ---
     // Initiative: DEX + WIT
     system.derived.initiative = effDex + effWit;
 
@@ -53,15 +59,12 @@ export class CWActor extends Actor {
     system.derived.throwRange = effStr * 12;
 
     // --- 5. Health Penalties ---
-    // Calculate penalty based on the lowest filled health box
     let penalty = 0;
+    // Ensure health levels array exists
     const levels = system.health.levels || [0,0,0,0,0,0,0];
     
-    // Check levels from Incapacitated (bottom) up to Bruised
-    // If a severe level is marked (1), apply that penalty
-    // We map index 0..6 to the CONFIG penalties
     for (let i = 6; i >= 0; i--) {
-      if (levels[i] > 0) { // If box is marked
+      if (levels[i] > 0) { 
         penalty = CONFIG.CW.healthLevels[i].penalty;
         break; 
       }
@@ -70,14 +73,12 @@ export class CWActor extends Actor {
   }
 
   _getGravityMods(home, here) {
-    // Matrix derived from PDF Page 6
     const map = {
       "zero":   {"zero":[0,0,0], "low":[+1,-1,0], "normal":[+2,-1,0], "high":[+3,-2,+2]},
       "low":    {"zero":[-1,0,-1], "low":[0,0,0], "normal":[+1,0,0], "high":[+2,-1,+2]},
       "normal": {"zero":[-2,+1,-2], "low":[-1,0,-1], "normal":[0,0,0], "high":[+1,0,+1]},
       "high":   {"zero":[-3,+2,-3], "low":[-2,+1,-2], "normal":[-1,0,-1], "high":[0,0,0]}
     };
-    // Default to 0 if not found
     const res = (map[home]?.[here]) || [0,0,0];
     return {str: res[0], dex: res[1], sta: res[2]};
   }
@@ -100,29 +101,25 @@ export class CWActor extends Actor {
     // Apply Wound Penalty
     let pool = attrVal + skillVal + bonus;
     const woundPen = system.health.penalty;
-    if (woundPen !== 99) { // 99 is incapacitated
-        pool += woundPen; 
+    
+    // 99 indicates Incapacitated (set in config)
+    if (woundPen === 99) {
+       pool = 0;
     } else {
-        pool = 0; // Can't act
+       pool += woundPen;
     }
 
     pool = Math.max(0, pool);
     
     if (pool === 0) {
-        // Optional: Handle chance die or automatic fail
-        ChatMessage.create({content: "Pool reduced to 0. Cannot roll."});
+        ChatMessage.create({ content: `<strong>${this.name}</strong> cannot act (Dice pool 0 or Incapacitated).` });
         return;
     }
 
-    // Rule: Success on 7+. If specialized, 10s explode.
     const formula = isSpecialized ? `${pool}d10x10cs>=7` : `${pool}d10cs>=7`;
-    
     const roll = await new Roll(formula).evaluate();
-    
-    // Botch Rule: 0 successes AND at least one '1'
     const isBotch = (roll.total === 0 && roll.dice[0].results.some(d => d.result === 1));
 
-    // Chat Message
     const label = skillName ? `${skillName} (${attributeKey.toUpperCase()})` : attributeKey.toUpperCase();
     const content = await renderTemplate("systems/colonial-weather/templates/chat/roll.hbs", {
       roll,
