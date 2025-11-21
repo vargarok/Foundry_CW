@@ -1,4 +1,5 @@
-<form class="cw-item-sheet">
+{{!-- CHANGED: Use DIV instead of FORM because the Window itself is already a Form --}}
+<div class="cw-item-sheet">
   <header class="sheet-header">
     <img src="{{item.img}}" data-edit="img" width="64" height="64"/>
     <div class="header-fields">
@@ -81,18 +82,17 @@
       </div>
       {{/if}}
 
-{{!-- DEBUGGING: Standard Textarea --}}
-<div class="editor-container" style="border: 1px solid blue; min-height: 150px;">
-    <label>Debug: Raw Textarea</label>
-    <textarea name="system.description" style="color: white; background: rgba(0,0,0,0.5); height: 100%;">{{system.description}}</textarea>
-</div>
-
-{{!-- 
-<div class="editor-container">
-  <label>Description</label>
-  {{editor enrichedDescription target="system.description" button=false editable=editable engine="prosemirror" collaborate=false}}
-</div>
---}}
+      <div class="editor-container">
+        <label>Description</label>
+        {{!-- 
+            V13 Native Editor Element
+            name: The field to update in the DB
+            value: The raw data (Handlebars escapes quotes automatically, so this is safe)
+        --}}
+        <prose-mirror name="system.description" value="{{system.description}}">
+            {{{enrichedDescription}}}
+        </prose-mirror>
+      </div>
 
   </div>
-</form>
+</div>
