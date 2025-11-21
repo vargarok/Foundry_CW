@@ -1,14 +1,25 @@
-<div class="tab-content {{#if (eq activeTab 'skills')}}active{{/if}}" data-group="sheet" data-tab="skills">
+<div class="tab-content {{#if (eq activeTab 'skills')}}active{{/if}}">
   <div class="skills-list">
     {{#each system.skills as |skill key|}}
     <div class="skill-item">
+      
       <div class="skill-name">
         <a data-action="rollSkill" data-key="{{key}}">{{skill.label}}</a>
-        <span class="skill-attr">({{skill.attr}})</span>
       </div>
+
+      <div class="skill-attr">
+        <select name="system.skills.{{key}}.attr" style="width: 60px; font-size: 0.8em;">
+            {{selectOptions ../attrOptions selected=skill.attr}}
+        </select>
+      </div>
+
       <div class="skill-controls">
         <input type="number" name="system.skills.{{key}}.value" value="{{skill.value}}"/>
-        <a class="specialized-toggle {{#if skill.specialized}}active{{/if}}" data-action="toggleSpecialized" data-key="{{key}}" title="Specialized (Exploding 10s)">
+        
+        <a class="specialized-toggle {{#if skill.specialized}}active{{/if}}" 
+           data-action="toggleSpecialized" 
+           data-key="{{key}}" 
+           title="Toggle Specialization (Exploding 10s)">
           <i class="fa-solid fa-star"></i>
         </a>
       </div>

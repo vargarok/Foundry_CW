@@ -203,6 +203,7 @@
   border: 1px solid var(--cw-border);
   padding: 5px;
   text-align: center;
+  color: var(--cw-text); /* FIX: Ensures text is visible */
 }
 .cw-chat-roll .die {
   display: inline-block;
@@ -212,6 +213,13 @@
   background: #333;
   margin: 1px;
   border-radius: 4px;
+  color: white; /* Ensure die numbers are visible */
+}
+.cw-chat-roll .roll-header {
+  font-weight: bold;
+  margin-bottom: 5px;
+  border-bottom: 1px solid var(--cw-border);
+  padding-bottom: 3px;
 }
 .cw-chat-roll .die.success { background: var(--cw-success); color: black; }
 .cw-chat-roll .die.one { background: var(--cw-fail); }

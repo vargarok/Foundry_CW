@@ -37,9 +37,24 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     context.actor = this.document;
     context.activeTab = this.tabGroups.sheet;
     
-    // FIX: Add safety check for health levels here as well
-    const healthLevels = system.health.levels || [0,0,0,0,0,0,0];
+    // --- FIX: Enrich Editors ---
+    context.enriched = {
+        merits: await TextEditor.enrichHTML(system.bio.merits, {async: true}),
+        flaws: await TextEditor.enrichHTML(system.bio.flaws, {async: true}),
+        notes: await TextEditor.enrichHTML(system.bio.notes, {async: true})
+    };
 
+    // --- Attribute List for Select ---
+    context.attrOptions = CONFIG.CW.attributes.physical
+        .concat(CONFIG.CW.attributes.social)
+        .concat(CONFIG.CW.attributes.mental)
+        .reduce((acc, key) => {
+            acc[key] = key.toUpperCase();
+            return acc;
+        }, {});
+
+    // Health Logic
+    const healthLevels = system.health.levels || [0,0,0,0,0,0,0];
     context.healthConfig = CONFIG.CW.healthLevels.map((l, i) => {
         return {
             label: l.label,
@@ -76,6 +91,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   static async _onRollSkill(event, target) {
     const key = target.dataset.key;
     const skill = this.document.system.skills[key];
+    // The attribute is now pulled dynamically from the skill object
     this.document.rollDicePool(skill.attr, key);
   }
 
