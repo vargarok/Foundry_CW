@@ -37,10 +37,10 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     context.actor = this.document;
     context.activeTab = this.tabGroups.sheet;
     
-    // FIX 1: Pass the editable state explicitly so the template can use 'editable=editable'
-    context.editable = this.isEditable;
+    // FIX: Use a distinct name for the editable state
+    context.isEditable = this.isEditable;
 
-    // FIX 2: V13 TextEditor Namespace & Safety Checks
+    // FIX: TextEditor Namespace & Safety Checks
     context.enriched = {
         merits: await foundry.applications.ux.TextEditor.enrichHTML(system.bio.merits || "", {async: true}),
         flaws: await foundry.applications.ux.TextEditor.enrichHTML(system.bio.flaws || "", {async: true}),

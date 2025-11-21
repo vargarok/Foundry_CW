@@ -3,15 +3,30 @@ export class CWActor extends Actor {
   prepareDerivedData() {
     const system = this.system;
     
+    // --- 1. Initialize Skills ---
     system.skills = system.skills || {};
-    for (const [key, label] of Object.entries(CONFIG.CW.skills)) {
+
+    for (const [key, data] of Object.entries(CONFIG.CW.skills)) {
+      // If skill doesn't exist, create it
       if (!system.skills[key]) {
-        system.skills[key] = { value: 0, label: label, specialized: false, attr: "dex" }; 
+        system.skills[key] = { 
+            value: 0, 
+            label: data.label, 
+            specialized: false, 
+            attr: data.attr 
+        }; 
       } else {
-        system.skills[key].label = label; 
+        // FIX: Ensure we only assign the string label, not the object
+        system.skills[key].label = data.label; 
+        
+        // Ensure attribute is set
+        if (!system.skills[key].attr) {
+            system.skills[key].attr = data.attr;
+        }
       }
     }
 
+    // --- 2. Initialize Backgrounds ---
     system.backgrounds = system.backgrounds || {};
     for (const [key, label] of Object.entries(CONFIG.CW.backgrounds)) {
       if (!system.backgrounds[key]) {
@@ -21,11 +36,13 @@ export class CWActor extends Actor {
       }
     }
 
+    // --- 3. Gravity Mods ---
     const home = (system.bio.gravityHome || "Normal").toLowerCase();
     const current = (system.bio.gravityCurrent || "Normal").toLowerCase();
     const gMods = this._getGravityMods(home, current);
     system.derived.gravityMod = gMods;
 
+    // Effective Attributes
     system.derived.attributes = {};
     for (let [key, attr] of Object.entries(system.attributes)) {
       let mod = 0;
@@ -37,12 +54,14 @@ export class CWActor extends Actor {
     const effDex = system.derived.attributes.dex;
     const effWit = system.derived.attributes.wit;
 
+    // --- 4. Derived Stats ---
     system.derived.initiative = effDex + effWit;
     system.derived.moveWalk = 7;
     system.derived.moveRun = effDex + 12;
     system.derived.moveSprint = (effDex * 3) + 20;
     system.derived.throwRange = effStr * 12;
 
+    // --- 5. Health Penalties ---
     let penalty = 0;
     if (!system.health.levels) system.health.levels = [0,0,0,0,0,0,0];
     const levels = system.health.levels;
@@ -104,7 +123,7 @@ export class CWActor extends Actor {
 
     const label = skillName ? `${skillName} (${attributeKey.toUpperCase()})` : attributeKey.toUpperCase();
     
-    // FIX: Use V13 Namespace for renderTemplate
+    // Using correct V13 namespace for renderTemplate
     const content = await foundry.applications.handlebars.renderTemplate("systems/colonial-weather/templates/chat/roll.hbs", {
       roll,
       isBotch,
