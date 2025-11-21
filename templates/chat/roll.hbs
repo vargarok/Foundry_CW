@@ -1,6 +1,12 @@
 <div class="cw-chat-roll {{#if isBotch}}botch{{/if}}">
   <div class="roll-header">{{label}}</div>
-  <div class="roll-formula">{{roll.formula}}</div>
+  
+  <div class="roll-meta">
+    <span title="Target Number">TN 7</span>
+    {{#if specialized}}<span title="Specialized: 10s Re-roll"> | Spec. <i class="fa-solid fa-star"></i></span>{{/if}}
+    {{#if (ne woundPen 0)}}<span style="color:#ff4a4a"> | Penalty: {{woundPen}}</span>{{/if}}
+  </div>
+
   <div class="roll-result">
     {{#each roll.terms as |term|}}
       {{#if term.faces}}
@@ -10,11 +16,12 @@
       {{/if}}
     {{/each}}
   </div>
+
   <div class="roll-total">
     {{#if isBotch}}
-      <span style="color:red; font-weight:bold;">BOTCH!</span>
+      <span style="color:red; font-weight:bold; font-size: 1.2em;">BOTCH!</span>
     {{else}}
-      {{roll.total}} Successes
+      <span style="font-size: 1.2em; font-weight:bold; color: #50e3c2;">{{roll.total}} Successes</span>
     {{/if}}
   </div>
 </div>

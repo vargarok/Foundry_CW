@@ -24,7 +24,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden; /* Prevent double scrollbars */
+  overflow: hidden;
 }
 
 /* Header */
@@ -165,7 +165,7 @@
 /* Skills */
 .skills-list {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Two main columns */
+  grid-template-columns: repeat(2, 1fr);
   gap: 5px;
   padding: 10px;
 }
@@ -174,9 +174,8 @@
   background: var(--cw-panel);
   border: 1px solid var(--cw-border);
   padding: 5px;
-  /* Use Grid inside the item to force alignment */
   display: grid;
-  grid-template-columns: 1fr 60px 70px; /* Name | Attr | Input+Star */
+  grid-template-columns: 1fr 60px 70px; /* Forces alignment */
   gap: 5px;
   align-items: center;
 }
@@ -185,7 +184,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 0; /* FIX: Allows truncation for long names like 'Gather Information' */
+  min-width: 0; /* Allows truncation for long names */
 }
 
 .skill-controls {
@@ -219,20 +218,33 @@
   border: 1px solid var(--cw-border);
   padding: 5px;
   text-align: center;
-  color: var(--cw-text); /* FIX: Ensures text is visible */
+  color: var(--cw-text);
+}
+.cw-chat-roll .roll-header {
+  font-weight: bold;
+  border-bottom: 1px solid var(--cw-border);
+  margin-bottom: 5px;
+  padding-bottom: 3px;
+}
+.cw-chat-roll .roll-meta {
+  font-size: 0.8em;
+  color: #888;
+  margin-bottom: 5px;
+}
+.cw-chat-roll .roll-result {
+  margin-bottom: 5px;
 }
 .cw-chat-roll .die {
   display: inline-block;
-  width: 24px;
-  height: 24px;
-  line-height: 24px;
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
   background: #333;
-  margin: 1px;
+  margin: 2px;
   border-radius: 4px;
-  color: white; /* Ensure die numbers are visible */
+  color: white;
+  font-weight: bold;
 }
-
-.cw-chat-roll .die.success { background: var(--cw-success); color: black; }
+.cw-chat-roll .die.success { background: var(--cw-success); color: black; box-shadow: 0 0 3px var(--cw-success); }
 .cw-chat-roll .die.one { background: var(--cw-fail); }
 .cw-chat-roll .die.ten { border: 2px solid var(--cw-accent); }
-.cw-chat-roll .roll-header { font-weight: bold; border-bottom: 1px solid #333; margin-bottom: 5px; }
