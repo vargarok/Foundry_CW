@@ -2,90 +2,95 @@
   <header class="sheet-header">
     <img src="{{item.img}}" data-edit="img" width="64" height="64"/>
     <div class="header-fields">
-        <div class="row">
+        <div class="form-group">
             <label>Name</label>
             <input name="name" type="text" value="{{item.name}}"/>
         </div>
     </div>
   </header>
 
-  {{!-- Common Fields --}}
-  <div class="grid-2">
-      <div class="form-group">
-          <label>Quantity</label>
-          <input type="number" name="system.quantity" value="{{system.quantity}}"/>
-      </div>
-      <div class="form-group">
-          <label>Weight</label>
-          <input type="number" name="system.weight" value="{{system.weight}}"/>
-      </div>
-  </div>
+  {{!-- Scrollable Area --}}
+  <div class="scrollable-content">
 
-  <hr>
+      {{!-- Common Fields --}}
+      <div class="grid-2">
+          <div class="form-group">
+              <label>Quantity</label>
+              <input type="number" name="system.quantity" value="{{system.quantity}}"/>
+          </div>
+          <div class="form-group">
+              <label>Weight</label>
+              <input type="number" name="system.weight" value="{{system.weight}}"/>
+          </div>
+      </div>
 
-  {{!-- WEAPON FIELDS --}}
-  {{#if (eq item.type "weapon")}}
-  <div class="grid-2">
-      <div class="form-group">
-          <label>Damage</label>
-          <input type="text" name="system.damage" value="{{system.damage}}"/>
-      </div>
-      <div class="form-group">
-          <label>Range</label>
-          <input type="text" name="system.range" value="{{system.range}}"/>
-      </div>
-      <div class="form-group">
-          <label>Skill</label>
-          <select name="system.skill">
-              {{selectOptions config.skills selected=system.skill labelAttr="label"}}
-          </select>
-      </div>
-      <div class="form-group">
-          <label>Attribute</label>
-          <select name="system.attribute">
-              {{selectOptions config.attributes.physical selected=system.attribute}}
-          </select>
-      </div>
-  </div>
-  {{/if}}
+      <hr>
 
-  {{!-- CYBERNETIC FIELDS --}}
-  {{#if (eq item.type "cybernetic")}}
-  <div class="grid-2">
-      <div class="form-group">
-          <label>Immune Load</label>
-          <input type="number" name="system.immuneLoad" value="{{system.immuneLoad}}"/>
+      {{!-- WEAPON --}}
+      {{#if (eq item.type "weapon")}}
+      <div class="grid-2">
+          <div class="form-group">
+              <label>Damage</label>
+              <input type="text" name="system.damage" value="{{system.damage}}"/>
+          </div>
+          <div class="form-group">
+              <label>Range</label>
+              <input type="text" name="system.range" value="{{system.range}}"/>
+          </div>
+          <div class="form-group">
+              <label>Skill</label>
+              <select name="system.skill">
+                  {{selectOptions config.skills selected=system.skill labelAttr="label"}}
+              </select>
+          </div>
+          <div class="form-group">
+              <label>Attribute</label>
+              <select name="system.attribute">
+                  {{selectOptions config.attributes.physical selected=system.attribute}}
+              </select>
+          </div>
       </div>
-      <div class="form-group">
-          <label>Surgery DC</label>
-          <input type="number" name="system.surgeryDC" value="{{system.surgeryDC}}"/>
-      </div>
-      <div class="form-group">
-          <label>Installed?</label>
-          <input type="checkbox" name="system.active" {{checked system.active}}/>
-      </div>
-  </div>
-  {{/if}}
+      {{/if}}
 
-  {{!-- TRAIT FIELDS --}}
-  {{#if (eq item.type "trait")}}
-  <div class="grid-2">
-      <div class="form-group">
-          <label>Type</label>
-          <select name="system.type">
-              {{selectOptions traitTypes selected=system.type}}
-          </select>
+      {{!-- CYBERNETIC --}}
+      {{#if (eq item.type "cybernetic")}}
+      <div class="grid-2">
+          <div class="form-group">
+              <label>Immune Load</label>
+              <input type="number" name="system.immuneLoad" value="{{system.immuneLoad}}"/>
+          </div>
+          <div class="form-group">
+              <label>Surgery DC</label>
+              <input type="number" name="system.surgeryDC" value="{{system.surgeryDC}}"/>
+          </div>
+          <div class="form-group">
+              <label>Installed?</label>
+              <input type="checkbox" name="system.active" {{checked system.active}}/>
+          </div>
       </div>
-      <div class="form-group">
-          <label>Cost (Freebies)</label>
-          <input type="number" name="system.cost" value="{{system.cost}}"/>
-      </div>
-  </div>
-  {{/if}}
+      {{/if}}
 
-  {{!-- DESCRIPTION EDITOR --}}
-  <div class="editor-container" style="border: 1px solid red; min-height: 300px;">
-    <label>Description</label>
-    {{editor enrichedDescription target="system.description" button=false editable=editable engine="prosemirror" collaborate=false}}
+      {{!-- TRAIT --}}
+      {{#if (eq item.type "trait")}}
+      <div class="grid-2">
+          <div class="form-group">
+              <label>Type</label>
+              <select name="system.type">
+                  {{selectOptions traitTypes selected=system.type}}
+              </select>
+          </div>
+          <div class="form-group">
+              <label>Cost</label>
+              <input type="number" name="system.cost" value="{{system.cost}}"/>
+          </div>
+      </div>
+      {{/if}}
+
+      {{!-- DESCRIPTION EDITOR --}}
+      <div class="editor-container">
+        <label>Description</label>
+        {{editor enrichedDescription target="system.description" button=false editable=editable engine="prosemirror" collaborate=false}}
+      </div>
+
   </div>
 </form>
