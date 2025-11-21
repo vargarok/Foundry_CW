@@ -36,12 +36,17 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   };
 
   async _prepareContext(options) {
+    // 1. Get the base context
     const context = await super._prepareContext(options);
     const system = this.document.system;
 
+    // 2. Prepare basic Actor data
     context.actor = this.document;
     context.activeTab = this.tabGroups.sheet;
+    context.config = CONFIG.CW;
+    context.system = system;
     
+    // 3. Dropdown Options for Attributes
     context.attrOptions = CONFIG.CW.attributes.physical
         .concat(CONFIG.CW.attributes.social)
         .concat(CONFIG.CW.attributes.mental)
@@ -50,6 +55,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
             return acc;
         }, {});
 
+    // 4. Health Config
     const healthLevels = system.health.levels || [0,0,0,0,0,0,0];
     context.healthConfig = CONFIG.CW.healthLevels.map((l, i) => {
         return {
@@ -60,38 +66,36 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         };
     });
 
+    // 5. Prepare Inventory (Categorize Items)
     const inventory = {
-    weapons: [],
-    armor: [],
-    gear: [],
-    cybernetics: [],
-    traits: []
-  };
+      weapons: [],
+      armor: [],
+      gear: [],
+      cybernetics: [],
+      traits: []
+    };
 
-  for (const i of this.document.items) {
-    if (i.type === "weapon") inventory.weapons.push(i);
-    else if (i.type === "armor") inventory.armor.push(i);
-    else if (i.type === "cybernetic") inventory.cybernetics.push(i);
-    else if (i.type === "trait") inventory.traits.push(i);
-    else inventory.gear.push(i);
-  }
+    // Loop through all items on the actor and sort them
+    for (const i of this.document.items) {
+      if (i.type === "weapon") inventory.weapons.push(i);
+      else if (i.type === "armor") inventory.armor.push(i);
+      else if (i.type === "cybernetic") inventory.cybernetics.push(i);
+      else if (i.type === "trait") inventory.traits.push(i);
+      else inventory.gear.push(i); // Fallback for any other type
+    }
+    
+    context.inventory = inventory;
 
-  context.inventory = inventory;
-
-  // Add inventory tab definition
-  context.tabs.push({ id: "inventory", group: "sheet", icon: "fa-solid fa-backpack", label: "Inventory" });
-
+    // 6. Define Tabs (Included Inventory directly here to avoid the error)
     context.tabs = [
       { id: "attributes", group: "sheet", icon: "fa-solid fa-user", label: "Attributes" },
       { id: "skills", group: "sheet", icon: "fa-solid fa-dice-d20", label: "Skills" },
+      { id: "inventory", group: "sheet", icon: "fa-solid fa-backpack", label: "Inventory" },
       { id: "backgrounds", group: "sheet", icon: "fa-solid fa-briefcase", label: "Backgrounds" },
       { id: "bio", group: "sheet", icon: "fa-solid fa-book", label: "Bio" }
     ];
 
-    context.config = CONFIG.CW;
-    context.system = system;
     return context;
-
   }
 
   static async _onChangeTab(event, target) {
