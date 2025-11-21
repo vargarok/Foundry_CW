@@ -81,16 +81,18 @@
       </div>
       {{/if}}
 
-      {{!-- 
-         DEBUGGING EDITOR:
-         1. editable=true (Forces edit mode)
-         2. button=false (Hides the toggle button, always show editor)
-         3. toggled=true (Ensures it starts active)
-      --}}
-      <div class="editor-container">
-        <label>Description</label>
-        {{editor enrichedDescription target="system.description" button=false editable=true engine="prosemirror" collaborate=false toggled=true}}
-      </div>
+{{!-- DEBUGGING: Standard Textarea --}}
+<div class="editor-container" style="border: 1px solid blue; min-height: 150px;">
+    <label>Debug: Raw Textarea</label>
+    <textarea name="system.description" style="color: white; background: rgba(0,0,0,0.5); height: 100%;">{{system.description}}</textarea>
+</div>
+
+{{!-- 
+<div class="editor-container">
+  <label>Description</label>
+  {{editor enrichedDescription target="system.description" button=false editable=editable engine="prosemirror" collaborate=false}}
+</div>
+--}}
 
   </div>
 </form>
