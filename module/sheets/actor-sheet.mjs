@@ -30,28 +30,13 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     sheet: "attributes"
   };
 
-  // --- FIX: Activate Editors on Render ---
-  _onRender(context, options) {
-    super._onRender(context, options);
-    // This line tells Foundry to attach the click listeners to the editor buttons
-    foundry.applications.ux.TextEditor.activateListeners(this.element);
-  }
-
   async _prepareContext(options) {
     const context = await super._prepareContext(options);
     const system = this.document.system;
 
     context.actor = this.document;
     context.activeTab = this.tabGroups.sheet;
-    context.isEditable = this.isEditable;
-
-    // Enrich HTML for editors
-    context.enriched = {
-        merits: await foundry.applications.ux.TextEditor.enrichHTML(system.bio.merits || "", {async: true}),
-        flaws: await foundry.applications.ux.TextEditor.enrichHTML(system.bio.flaws || "", {async: true}),
-        notes: await foundry.applications.ux.TextEditor.enrichHTML(system.bio.notes || "", {async: true})
-    };
-
+    
     context.attrOptions = CONFIG.CW.attributes.physical
         .concat(CONFIG.CW.attributes.social)
         .concat(CONFIG.CW.attributes.mental)

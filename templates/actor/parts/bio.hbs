@@ -42,18 +42,12 @@
   
   <div class="bio-text-area">
       <h3>Merits</h3>
-      <div class="editor-container">
-        {{editor enriched.merits target="system.bio.merits" button=true editable=isEditable engine="prosemirror"}}
-      </div>
+      <textarea name="system.bio.merits">{{system.bio.merits}}</textarea>
       
       <h3>Flaws</h3>
-      <div class="editor-container">
-        {{editor enriched.flaws target="system.bio.flaws" button=true editable=isEditable engine="prosemirror"}}
-      </div>
+      <textarea name="system.bio.flaws">{{system.bio.flaws}}</textarea>
 
       <h3>Notes</h3>
-      <div class="editor-container">
-        {{editor enriched.notes target="system.bio.notes" button=true editable=isEditable engine="prosemirror"}}
-      </div>
+      <textarea name="system.bio.notes">{{system.bio.notes}}</textarea>
   </div>
 </div>

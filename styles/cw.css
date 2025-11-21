@@ -211,6 +211,28 @@
     padding: 5px;
     min-height: 100px;
 }
+/* Bio Text Areas */
+.bio-text-area h3 {
+    margin-top: 10px;
+    border-bottom: 1px solid var(--cw-border);
+    color: var(--cw-accent);
+}
+.bio-text-area textarea {
+    width: 100%;
+    min-height: 100px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--cw-border);
+    color: var(--cw-text);
+    font-family: inherit;
+    padding: 5px;
+    resize: vertical; /* Allows user to resize height */
+    border-radius: 4px;
+}
+.bio-text-area textarea:focus {
+    border-color: var(--cw-accent);
+    outline: none;
+    background: rgba(0, 0, 0, 0.4);
+}
 
 /* Chat Rolls */
 .cw-chat-roll {
