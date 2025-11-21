@@ -12,13 +12,16 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       rollAttribute: this._onRollAttribute,
       rollSkill: this._onRollSkill,
       toggleSpecialized: this._onToggleSpecialized,
-      rollHitLocation: this._onRollHitLocation
+      rollHitLocation: this._onRollHitLocation,
+      // Add the tab switching action
+      changeTab: this._onChangeTab
     }
   };
 
   static PARTS = {
     header: { template: "systems/colonial-weather/templates/actor/parts/header.hbs" },
-    tabs: { template: "templates/generic/tab-navigation.hbs" },
+    // Point to our new custom tab template
+    tabs: { template: "systems/colonial-weather/templates/actor/parts/tabs.hbs" }, 
     attributes: { template: "systems/colonial-weather/templates/actor/parts/attributes.hbs" },
     skills: { template: "systems/colonial-weather/templates/actor/parts/skills.hbs" },
     bio: { template: "systems/colonial-weather/templates/actor/parts/bio.hbs" }
@@ -32,10 +35,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     const context = await super._prepareContext(options);
     const system = this.document.system;
 
-    // Fix 1: Explicitly provide 'actor' for templates expecting {{actor.name}}
     context.actor = this.document;
-    
-    // Fix 2: Provide the currently active tab so templates can toggle visibility
     context.activeTab = this.tabGroups.sheet;
 
     context.tabs = [
@@ -47,6 +47,19 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     context.config = CONFIG.CW;
     context.system = system;
     return context;
+  }
+
+  // --- Actions ---
+
+  static async _onChangeTab(event, target) {
+    const group = target.dataset.group;
+    const tab = target.dataset.tab;
+    
+    // Update the internal state
+    this.tabGroups[group] = tab;
+    
+    // Force a re-render so the UI updates immediately
+    this.render();
   }
 
   static async _onRollAttribute(event, target) {
