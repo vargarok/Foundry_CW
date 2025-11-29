@@ -68,6 +68,7 @@
       "templates": ["base"],
       "damage": "1d10",
       "type": "lethal",
+      "attackBonus": 0,
       "range": 0,
       "rof": "1",
       "ammo": { "value": 0, "max": 0 },

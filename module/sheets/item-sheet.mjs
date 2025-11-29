@@ -60,4 +60,14 @@ export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
       
       return super._onSubmit(event, form, formData);
   }
+  static async _onRollWeapon(event, target) {
+    const item = this.document.items.get(target.dataset.id);
+    
+    // 1. Get the bonus from the item (default to 0 if undefined)
+    const bonus = item.system.attackBonus || 0;
+    
+    // 2. Pass it as the 3rd argument to rollDicePool
+    // Your rollDicePool function in actor.mjs is already set up to accept (attr, skill, bonus)
+    this.document.rollDicePool(item.system.attribute, item.system.skill, bonus);
+  }
 }
