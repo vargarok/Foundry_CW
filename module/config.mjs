@@ -6,6 +6,19 @@ CW.attributes = {
   mental: ["int", "edu", "wit"]
 };
 
+// Define specific labels for physical attributes
+CW.attributeLabels = {
+  str: "Strength",
+  dex: "Dexterity",
+  sta: "Stamina",
+  cha: "Charisma",
+  soc: "Social",
+  app: "Appearance",
+  int: "Intelligence",
+  edu: "Education",
+  wit: "Wits"
+};
+
 // Expanded skill definitions with default attributes
 CW.skills = {
   athletics: { label: "Athletics", attr: "str" },

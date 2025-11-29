@@ -24,7 +24,10 @@ export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     );
     
     context.traitTypes = { "merit": "Merit", "flaw": "Flaw" };
-    
+    context.attributeOptions = Object.entries(CONFIG.CW.attributeLabels).reduce((acc, [key, label]) => {
+    acc[key] = label;
+    return acc;
+    }, {});
     // Added logic for Armor Coverage
     // We need to flag which locations are checked
     if (this.document.type === "armor") {

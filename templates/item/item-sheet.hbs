@@ -64,11 +64,12 @@
               </select>
           </div>
           <div class="form-group">
-              <label>Attribute</label>
-              <select name="system.attribute">
-                  {{selectOptions config.attributes.physical selected=system.attribute}}
-              </select>
-          </div>
+            <label>Attribute</label>
+            <select name="system.attribute">
+            {{!-- Use the new attributeOptions list --}}
+                {{selectOptions attributeOptions selected=system.attribute}}
+            </select>
+        </div>
       </div>
       {{/if}}
 
