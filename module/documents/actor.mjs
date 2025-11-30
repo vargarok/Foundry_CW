@@ -125,7 +125,7 @@ export class CWActor extends Actor {
     return {str: res[0], dex: res[1], sta: res[2]};
   }
 
-  async rollDicePool(attributeKey, skillKey=null, bonus=0) {
+  async rollDicePool(attributeKey, skillKey=null, bonus=0, item=null) {
     const system = this.system;
     
     let attrVal = system.derived.attributes[attributeKey] || 0;
@@ -143,6 +143,13 @@ export class CWActor extends Actor {
     let pool = attrVal + skillVal + bonus;
     const woundPen = system.health.penalty;
     
+    // --- Formula Generation for Chat ---
+    let formula = `${CONFIG.CW.attributeLabels[attributeKey] || attributeKey.toUpperCase()}`;
+    if (skillName) formula += ` + ${skillName}`;
+    if (bonus !== 0) formula += ` + ${bonus} (Bonus)`;
+    if (woundPen !== 0) formula += ` - ${Math.abs(woundPen)} (Pain)`;
+    // -----------------------------------
+
     if (woundPen === 99) {
        pool = 0;
     } else {
@@ -156,17 +163,20 @@ export class CWActor extends Actor {
         return;
     }
 
-    const formula = isSpecialized ? `${pool}d10x10cs>=7` : `${pool}d10cs>=7`;
-    const roll = await new Roll(formula).evaluate();
+    const rollExpression = isSpecialized ? `${pool}d10x10cs>=7` : `${pool}d10cs>=7`;
+    const roll = await new Roll(rollExpression).evaluate();
     const isBotch = (roll.total === 0 && roll.dice[0].results.some(d => d.result === 1));
 
-    const label = skillName ? `${skillName} (${attributeKey.toUpperCase()})` : attributeKey.toUpperCase();
-    
-    // Using correct V13 namespace for renderTemplate
+    // Determine the Main Label (Item Name OR Skill Name)
+    const label = item ? item.name : (skillName ? `${skillName} Roll` : `${attributeKey.toUpperCase()} Roll`);
+    const img = item ? item.img : null; // Get icon if available
+
     const content = await foundry.applications.handlebars.renderTemplate("systems/colonial-weather/templates/chat/roll.hbs", {
       roll,
       isBotch,
       label,
+      formula, // Pass the formula string
+      img,     // Pass the icon
       isSpecialized,
       woundPen
     });

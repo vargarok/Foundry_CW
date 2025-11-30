@@ -234,42 +234,64 @@
     background: rgba(0, 0, 0, 0.4);
 }
 
-/* Chat Rolls */
-.cw-chat-roll {
-  background: var(--cw-panel);
-  border: 1px solid var(--cw-border);
-  padding: 5px;
-  text-align: center;
-  color: var(--cw-text);
-}
+/* ... existing styles ... */
+
+/* Chat Roll Styling */
 .cw-chat-roll .roll-header {
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border-bottom: 1px solid var(--cw-border);
-  margin-bottom: 5px;
-  padding-bottom: 3px;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
 }
+
+.cw-chat-roll .roll-icon {
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 2px;
+  background: black; /* Fallback for transparency */
+}
+
+.cw-chat-roll .roll-title {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
 .cw-chat-roll .roll-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.cw-chat-roll .formula {
+  font-size: 0.9em;
+  color: var(--cw-accent); /* Makes the math stand out */
+}
+
+.cw-chat-roll .tags {
   font-size: 0.8em;
   color: #888;
-  margin-bottom: 5px;
 }
-.cw-chat-roll .roll-result {
-  margin-bottom: 5px;
+
+.cw-chat-roll .tag.pain { color: var(--cw-fail); }
+.cw-chat-roll .tag.spec { color: #ffd700; }
+
+.cw-chat-roll .botch-text {
+    color: var(--cw-fail);
+    font-weight: bold;
+    font-size: 1.4em;
+    text-transform: uppercase;
 }
-.cw-chat-roll .die {
-  display: inline-block;
-  width: 26px;
-  height: 26px;
-  line-height: 26px;
-  background: #333;
-  margin: 2px;
-  border-radius: 4px;
-  color: white;
-  font-weight: bold;
+
+.cw-chat-roll .success-text {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: var(--cw-success);
 }
-.cw-chat-roll .die.success { background: var(--cw-success); color: black; box-shadow: 0 0 3px var(--cw-success); }
-.cw-chat-roll .die.one { background: var(--cw-fail); }
-.cw-chat-roll .die.ten { border: 2px solid var(--cw-accent); }
 
 /* Force the editor to take up space */
 .editor-container {

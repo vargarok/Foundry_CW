@@ -150,7 +150,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     // Force the bonus to be a Number
     const bonus = Number(item.system.attackBonus) || 0;
     
-    // Pass it to the roll function
-    this.document.rollDicePool(item.system.attribute, item.system.skill, bonus);
-}
+    // Pass the Item object as a 4th argument
+    this.document.rollDicePool(item.system.attribute, item.system.skill, bonus, item);
+  }
 }
