@@ -7,6 +7,11 @@
         <div class="item-row">
             <img src="{{item.img}}" width="30" height="30"/>
             <a class="item-name" data-action="rollWeapon" data-id="{{item.id}}">{{item.name}}</a>
+            {{#if item.system.ammo.max}}
+            <span style="font-size: 0.8em; color: #aaa;">
+                {{item.system.ammo.value}} / {{item.system.ammo.max}}
+            </span>
+            {{/if}}
             <span>{{item.system.damage}}</span>
             <div class="item-controls">
                 <a data-action="editItem" data-id="{{item.id}}"><i class="fa-solid fa-edit"></i></a>

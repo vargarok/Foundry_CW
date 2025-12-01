@@ -1,0 +1,25 @@
+<form>
+    <div class="form-group">
+        <label>Firing Mode:</label>
+        <select name="mode">
+            {{#each modes as |count index|}}
+            <option value="{{index}}">
+                {{#if (eq count 1)}}Single Shot (1){{else}}Burst ({{count}}){{/if}}
+            </option>
+            {{/each}}
+        </select>
+    </div>
+    
+    {{#if hasAmmo}}
+    <div class="form-group">
+        <label>Ammo Remaining:</label>
+        <div style="text-align: right; {{#if (eq ammo 0)}}color:red;{{/if}}">
+            {{ammo}}
+        </div>
+    </div>
+    {{/if}}
+    
+    <p style="font-size: 0.9em; margin-top: 5px;">
+        Select your rate of fire. This will automatically deduct ammo.
+    </p>
+</form>

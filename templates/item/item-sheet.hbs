@@ -55,7 +55,15 @@
           </div>
           <div class="form-group">
               <label>ROF</label>
-              <input type="text" name="system.rof" value="{{system.rof}}"/>
+              <input type="text" name="system.rof" value="{{system.rof}}" placeholder="1"/>
+          </div>
+          <div class="form-group">
+              <label>Ammo (Cur / Max)</label>
+              <div class="flexrow">
+                  <input type="number" name="system.ammo.value" value="{{system.ammo.value}}" placeholder="0" data-dtype="Number"/>
+                  <span> / </span>
+                  <input type="number" name="system.ammo.max" value="{{system.ammo.max}}" placeholder="0" data-dtype="Number"/>
+              </div>
           </div>
           <div class="form-group">
               <label>Skill</label>

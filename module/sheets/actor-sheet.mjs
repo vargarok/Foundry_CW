@@ -151,12 +151,66 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 }
 
   static async _onRollWeapon(event, target) {
+    event.preventDefault();
     const item = this.document.items.get(target.dataset.id);
+    const system = item.system;
+
+    // 1. Determine Attack Modes from ROF
+    // If ROF is "1/3", this creates [1, 3]
+    let rofString = String(system.rof || "1");
+    let modes = rofString.split('/').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+    if (modes.length === 0) modes = [1];
+
+    // 2. Check if weapon uses ammo
+    const useAmmo = system.ammo.max > 0;
     
-    // Force the bonus to be a Number
-    const bonus = Number(item.system.attackBonus) || 0;
-    
-    // Pass the Item object as a 4th argument
-    this.document.rollDicePool(item.system.attribute, item.system.skill, bonus, item);
+    // If we have options OR need to confirm ammo usage, show a Dialog
+    if (useAmmo || modes.length > 1) {
+        
+        const content = await renderTemplate("systems/colonial-weather/templates/chat/attack-dialog.hbs", {
+            modes: modes,
+            hasAmmo: useAmmo,
+            ammo: system.ammo.value
+        });
+
+        new Dialog({
+            title: `Attack: ${item.name}`,
+            content: content,
+            buttons: {
+                attack: {
+                    label: "Attack",
+                    icon: '<i class="fas fa-crosshairs"></i>',
+                    callback: async (html) => {
+                        const form = html[0].querySelector("form");
+                        const selectedModeIndex = form.mode ? form.mode.value : 0;
+                        const shotCount = modes[selectedModeIndex];
+                        
+                        // Ammo Check
+                        if (useAmmo) {
+                            if (system.ammo.value < shotCount) {
+                                ui.notifications.warn("Not enough ammo!");
+                                return;
+                            }
+                            // Deduct Ammo
+                            await item.update({"system.ammo.value": system.ammo.value - shotCount});
+                        }
+
+                        // Determine Bonus
+                        // (You can add logic here: e.g., if shotCount > 1, add +1 dice per extra bullet)
+                        const bonus = Number(system.attackBonus) || 0; 
+
+                        // Perform Roll
+                        this.document.rollDicePool(system.attribute, system.skill, bonus, item);
+                    }
+                }
+            },
+            default: "attack"
+        }).render(true);
+
+    } else {
+        // Simple Roll (Melee or No-Ammo Weapon)
+        const bonus = Number(system.attackBonus) || 0;
+        this.document.rollDicePool(system.attribute, system.skill, bonus, item);
+    }
   }
 }
