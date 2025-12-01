@@ -18,7 +18,11 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       editItem: this._onEditItem,
       rollInitiative: this._onRollInitiative,
       deleteItem: this._onDeleteItem,
-      rollWeapon: this._onRollWeapon
+      rollWeapon: this._onRollWeapon,
+      createEffect: this._onCreateEffect,
+      editEffect: this._onEditEffect,
+      deleteEffect: this._onDeleteEffect,
+      toggleEffect: this._onToggleEffect
     }
   };
 
@@ -29,7 +33,8 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     skills: { template: "systems/colonial-weather/templates/actor/parts/skills.hbs" },
     backgrounds: { template: "systems/colonial-weather/templates/actor/parts/backgrounds.hbs" },
     bio: { template: "systems/colonial-weather/templates/actor/parts/bio.hbs" },
-    inventory: { template: "systems/colonial-weather/templates/actor/parts/inventory.hbs" }
+    inventory: { template: "systems/colonial-weather/templates/actor/parts/inventory.hbs" },
+    effects: { template: "systems/colonial-weather/templates/parts/active-effects.hbs" }
   };
 
   tabGroups = {
@@ -92,9 +97,21 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       { id: "attributes", group: "sheet", icon: "fa-solid fa-user", label: "Attributes" },
       { id: "skills", group: "sheet", icon: "fa-solid fa-dice-d20", label: "Skills" },
       { id: "inventory", group: "sheet", icon: "fa-solid fa-backpack", label: "Inventory" },
+      { id: "effects", group: "sheet", icon: "fa-solid fa-bolt", label: "Effects" },
       { id: "backgrounds", group: "sheet", icon: "fa-solid fa-briefcase", label: "Backgrounds" },
       { id: "bio", group: "sheet", icon: "fa-solid fa-book", label: "Bio" }
     ];
+
+    // 7. Prepare Active Effects
+    context.effects = this.document.effects.map(e => {
+    return {
+        id: e.id,
+        name: e.name,
+        img: e.img,
+        disabled: e.disabled,
+        sourceName: e.sourceName ?? "Unknown"
+    };
+    });
 
     return context;
   }
@@ -213,4 +230,28 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         this.document.rollDicePool(system.attribute, system.skill, bonus, item);
     }
   }
+
+  static async _onCreateEffect(event, target) {
+    return ActiveEffect.create({
+        name: "New Effect",
+        icon: "icons/svg/aura.svg",
+        origin: this.document.uuid,
+        disabled: false
+    }, { parent: this.document });
+}
+
+  static async _onEditEffect(event, target) {
+    const effect = this.document.effects.get(target.closest(".item-row").dataset.effectId);
+    return effect.sheet.render(true);
+}
+
+  static async _onDeleteEffect(event, target) {
+    const effect = this.document.effects.get(target.closest(".item-row").dataset.effectId);
+    return effect.delete();
+}
+
+  static async _onToggleEffect(event, target) {
+    const effect = this.document.effects.get(target.closest(".item-row").dataset.effectId);
+    return effect.update({ disabled: !effect.disabled });
+}
 }

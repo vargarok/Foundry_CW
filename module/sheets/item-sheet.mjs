@@ -5,11 +5,23 @@ export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     tag: "form",
     classes: ["cw", "sheet", "item"],
     position: { width: 550, height: 600 },
-    form: { submitOnChange: true, closeOnSubmit: false }
+    form: { submitOnChange: true, closeOnSubmit: false },
+    actions: {
+        changeTab: this._onChangeTab,
+        createEffect: this._onCreateEffect,
+        editEffect: this._onEditEffect,
+        deleteEffect: this._onDeleteEffect,
+        toggleEffect: this._onToggleEffect
+    }
   };
 
   static PARTS = {
-    form: { template: "systems/colonial-weather/templates/item/item-sheet.hbs" }
+    form: { template: "systems/colonial-weather/templates/item/item-sheet.hbs" },
+    effects: { template: "systems/colonial-weather/templates/parts/active-effects.hbs" }
+  };
+
+  tabGroups = {
+    sheet: "details" // Default to the main details tab
   };
 
   async _prepareContext(options) {
@@ -22,6 +34,20 @@ export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
         this.document.system.description, 
         { async: true, secrets: this.document.isOwner, rollData: this.document.getRollData() }
     );
+    context.tabs = [
+        { id: "details", group: "sheet", icon: "fa-solid fa-file-lines", label: "Details" },
+        { id: "effects", group: "sheet", icon: "fa-solid fa-bolt", label: "Effects" }
+    ];
+    context.activeTab = this.tabGroups.sheet;
+
+// Prepare Effects List
+    context.effects = this.document.effects.map(e => ({
+      id: e.id,
+      name: e.name,
+      img: e.img,
+      disabled: e.disabled,
+      sourceName: "This Item"
+}));
     
     context.traitTypes = { "merit": "Merit", "flaw": "Flaw" };
     context.attributeOptions = Object.entries(CONFIG.CW.attributeLabels).reduce((acc, [key, label]) => {
@@ -72,5 +98,39 @@ export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
     // 2. Pass it as the 3rd argument to rollDicePool
     // Your rollDicePool function in actor.mjs is already set up to accept (attr, skill, bonus)
     this.document.rollDicePool(item.system.attribute, item.system.skill, bonus);
+  }
+
+  // --- TAB HANDLING METHOD ---
+  static async _onChangeTab(event, target) {
+    const group = target.dataset.group;
+    const tab = target.dataset.tab;
+    this.tabGroups[group] = tab;
+    this.render();
+  }
+
+  // --- EFFECT METHODS  ---
+  static async _onCreateEffect(event, target) {
+      return ActiveEffect.create({
+          name: "New Effect",
+          icon: "icons/svg/aura.svg",
+          origin: this.document.uuid,
+          disabled: false,
+          transfer: true // Important for Items! Means "Give this effect to the Actor"
+      }, { parent: this.document });
+  }
+
+  static async _onEditEffect(event, target) {
+      const effect = this.document.effects.get(target.closest(".item-row").dataset.effectId);
+      return effect.sheet.render(true);
+  }
+
+  static async _onDeleteEffect(event, target) {
+      const effect = this.document.effects.get(target.closest(".item-row").dataset.effectId);
+      return effect.delete();
+  }
+
+  static async _onToggleEffect(event, target) {
+      const effect = this.document.effects.get(target.closest(".item-row").dataset.effectId);
+      return effect.update({ disabled: !effect.disabled });
   }
 }

@@ -9,6 +9,14 @@
     </div>
   </header>
 
+  <nav class="tabs">
+      {{#each tabs as |tab|}}
+      <a class="{{#if (eq ../activeTab tab.id)}}active{{/if}} item" data-action="changeTab" data-group="{{tab.group}}" data-tab="{{tab.id}}">
+        <i class="{{tab.icon}}"></i> {{tab.label}}
+      </a>
+      {{/each}}
+  </nav>
+
   <div class="scrollable-content">
       {{!-- Generic Header --}}
       <div class="grid-2">
@@ -155,4 +163,6 @@
         </prose-mirror>
       </div>
   </div>
+  {{> "systems/colonial-weather/templates/parts/active-effects.hbs"}}
 </div>
+

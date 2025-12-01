@@ -1,0 +1,29 @@
+<div class="tab-content {{#if (eq activeTab 'effects')}}active{{/if}}">
+    <div class="item-list">
+        <div class="header-row">
+            <span>Effect Name</span>
+            <span>Source</span>
+            <div class="item-controls">
+                <a data-action="createEffect" title="Create Effect"><i class="fas fa-plus"></i> Add</a>
+            </div>
+        </div>
+
+        {{#each effects as |effect|}}
+        <div class="item-row" data-effect-id="{{effect.id}}">
+            <div class="item-image">
+                <img src="{{effect.img}}" width="24" height="24"/>
+            </div>
+            <div class="item-name">{{effect.name}}</div>
+            <div class="item-source">{{effect.sourceName}}</div>
+            
+            <div class="item-controls">
+                <a data-action="toggleEffect" title="Toggle Effect">
+                    <i class="fas {{#if effect.disabled}}fa-toggle-off{{else}}fa-toggle-on{{/if}}"></i>
+                </a>
+                <a data-action="editEffect" title="Edit Effect"><i class="fas fa-edit"></i></a>
+                <a data-action="deleteEffect" title="Delete Effect"><i class="fas fa-trash"></i></a>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>
