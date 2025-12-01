@@ -47,32 +47,41 @@ Hooks.once("init", function() {
   });
 
   Hooks.on("renderActiveEffectConfig", (app, html, data) => {
+    // Robustly get the raw DOM element whether it's jQuery or HTMLElement
+    const root = html instanceof HTMLElement ? html : (html[0] || html);
+    
     // 1. Create the Datalist
     const datalistId = "cw-effect-keys";
-    let datalist = html[0].querySelector(`#${datalistId}`);
+    let datalist = root.querySelector(`#${datalistId}`);
     
     if (!datalist) {
         datalist = document.createElement("datalist");
         datalist.id = datalistId;
         
         // Populate options from CONFIG.CW.effectOptions
-        for (const [key, label] of Object.entries(CONFIG.CW.effectOptions)) {
-            const option = document.createElement("option");
-            option.value = key;
-            option.label = label;
-            datalist.appendChild(option);
+        // Ensure CW.effectOptions exists in your config.mjs!
+        if (CONFIG.CW.effectOptions) {
+            for (const [key, label] of Object.entries(CONFIG.CW.effectOptions)) {
+                const option = document.createElement("option");
+                option.value = key;
+                option.label = label;
+                datalist.appendChild(option);
+            }
         }
-        html[0].append(datalist);
+        root.append(datalist);
     }
 
     // 2. Attach to all "Change Key" inputs
-    // The inputs usually have name="changes.0.key", "changes.1.key", etc.
-    const inputs = html[0].querySelectorAll('input[name^="changes"][name$="key"]');
+    // Looks for inputs named "changes.0.key", "changes.1.key", etc.
+    const inputs = root.querySelectorAll('input[name^="changes"][name$="key"]');
+    
     inputs.forEach(input => {
         input.setAttribute("list", datalistId);
         input.placeholder = "Select or Type...";
+        // Optional: Force it to autocomplete off so the browser doesn't hide our datalist
+        input.setAttribute("autocomplete", "off");
     });
-  });
+});
 
   preloadHandlebarsTemplates();
 });

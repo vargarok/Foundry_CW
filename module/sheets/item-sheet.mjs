@@ -18,7 +18,6 @@ export class CWItemSheet extends HandlebarsApplicationMixin(DocumentSheetV2) {
 
   static PARTS = {
     form: { template: "systems/colonial-weather/templates/item/item-sheet.hbs" },
-    effects: { template: "systems/colonial-weather/templates/parts/active-effects.hbs" }
   };
 
   tabGroups = {
