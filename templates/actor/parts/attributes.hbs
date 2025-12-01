@@ -51,6 +51,13 @@
                 {{system.derived.initiative}}
             </a>
         </div>
+            <div>
+            <strong>Cyberload:</strong>
+                {{system.derived.immuneLoad}} / {{system.attributes.sta.value}}
+                {{#if (lt system.derived.immunePenalty 0)}}
+                    <span style="color: var(--cw-fail); font-size: 0.9em;">({{system.derived.immunePenalty}})</span>
+                {{/if}}
+            </div>
         <div><strong>Throw Range:</strong> {{system.derived.throwRange}} m</div>
         <div><strong>Walk:</strong> {{system.derived.moveWalk}} m</div>
         <div><strong>Run:</strong> {{system.derived.moveRun}} m</div>

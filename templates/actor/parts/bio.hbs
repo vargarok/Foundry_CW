@@ -37,17 +37,6 @@
         <input type="text" name="system.bio.handedness" value="{{system.bio.handedness}}">
     </div>
 
-    {{!-- NEW BLOCK ADDED INSIDE THE GRID --}}
-    <div class="form-group">
-        <label>Cybernetic Load</label>
-        <div class="flexrow">
-            <span>{{system.derived.immuneLoad}} / {{system.attributes.sta.value}}</span>
-            {{#if (lt system.derived.immunePenalty 0)}}
-            <span style="color: var(--cw-fail);"> (Penalty: {{system.derived.immunePenalty}})</span>
-            {{/if}}
-        </div>
-    </div>
-    {{!-- END NEW BLOCK --}}
 
   </div>
   
