@@ -38,8 +38,17 @@
         "health": {
           "levels": [0, 0, 0, 0, 0, 0, 0],
           "penalty": 0,
-          "location": "None"
+          "locations": {
+            "head": { "value": 10, "max": 10, "label": "Head" },
+            "chest": { "value": 20, "max": 20, "label": "Chest" },
+            "stomach": { "value": 20, "max": 20, "label": "Stomach" },
+            "rArm": { "value": 10, "max": 10, "label": "Right Arm" },
+            "lArm": { "value": 10, "max": 10, "label": "Left Arm" },
+            "rLeg": { "value": 18, "max": 18, "label": "Right Leg" },
+            "lLeg": { "value": 18, "max": 18, "label": "Left Leg" }
+          }
         },
+        
         "willpower": { "value": 3, "max": 10 },
         "derived": {
           "initiative": 0,

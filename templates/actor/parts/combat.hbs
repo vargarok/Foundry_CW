@@ -1,0 +1,77 @@
+<div class="tab-content {{#if (eq activeTab 'combat')}}active{{/if}}">
+    <div class="combat-grid">
+        
+        {{!-- LEFT COLUMN: Health Tracks --}}
+        <div class="combat-col">
+            {{!-- Global Health --}}
+            <div class="panel">
+                <h3>Global Health</h3>
+                <div class="health-track">
+                    {{#each healthConfig as |level|}}
+                    <div class="health-row">
+                        <label class="{{#if level.checked}}active{{/if}}">
+                            {{level.label}} ({{level.penalty}})
+                        </label>
+                        <input type="checkbox" name="system.health.levels.{{level.index}}" {{checked level.checked}} value="1">
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+
+            {{!-- Body Locations (New System) --}}
+            <div class="panel" style="margin-top: 10px;">
+                <h3>Body Locations</h3>
+                <div class="locations-list">
+                    {{#each system.health.locations as |loc key|}}
+                    <div class="location-row" style="display: flex; justify-content: space-between; align-items: center; padding: 2px; border-bottom: 1px solid var(--cw-border);">
+                        <div style="flex: 1; font-weight: bold;">{{loc.label}}</div>
+                        
+                        {{!-- Armor Soak Display --}}
+                        <div style="margin-right: 10px;" title="Armor Soak">
+                            <i class="fas fa-shield-alt"></i> {{loc.armor}}
+                        </div>
+
+                        {{!-- HP Input --}}
+                        <div style="display: flex; align-items: center; gap: 2px;">
+                            <input type="number" name="system.health.locations.{{key}}.value" value="{{loc.value}}" style="width: 30px; text-align: center;"/>
+                            <span>/ {{loc.max}}</span>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+
+        {{!-- RIGHT COLUMN: Equipped Gear --}}
+        <div class="combat-col" style="margin-left: 10px;">
+            
+            {{!-- Equipped Weapons --}}
+            <h3>Equipped Weapons</h3>
+            <div class="item-list">
+                {{#each inventory.weapons as |item|}}
+                {{!-- We can filter for 'equipped' if you add that field to weapons later. For now, show all. --}}
+                <div class="item-row">
+                    <div class="item-image"><img src="{{item.img}}" width="24" height="24"/></div>
+                    <a class="item-name" data-action="rollWeapon" data-id="{{item.id}}">{{item.name}}</a>
+                    <div class="center-text">{{item.system.damage}}</div>
+                </div>
+                {{/each}}
+            </div>
+
+            {{!-- Equipped Armor --}}
+            <h3 style="margin-top: 10px;">Equipped Armor</h3>
+            <div class="item-list">
+                {{#each inventory.armor as |item|}}
+                {{#if item.system.equipped}}
+                <div class="item-row">
+                    <div class="item-image"><img src="{{item.img}}" width="24" height="24"/></div>
+                    <span class="item-name">{{item.name}}</span>
+                    <div class="center-text"><i class="fas fa-shield-alt"></i> {{item.system.soak}}</div>
+                </div>
+                {{/if}}
+                {{/each}}
+            </div>
+
+        </div>
+    </div>
+</div>

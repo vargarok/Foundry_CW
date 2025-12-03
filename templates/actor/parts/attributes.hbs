@@ -85,17 +85,5 @@
             <div><strong>Sprint:</strong> {{system.derived.moveSprint}} m</div>
         </div>
     </div>
-
-    <div class="panel">
-        <h3>Health</h3>
-        <div class="health-track">
-            {{#each healthConfig as |level|}}
-            <div class="health-row">
-                <label>{{level.label}} ({{level.penalty}})</label>
-                <input type="checkbox" name="system.health.levels.{{level.index}}" {{checked level.checked}} value="1">
-            </div>
-            {{/each}}
-        </div>
-    </div>
   </div>
 </div>

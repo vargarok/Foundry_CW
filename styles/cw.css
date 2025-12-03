@@ -418,3 +418,23 @@
 .item-list .center-text { text-align: center; }
 .item-list .right-text { text-align: right; }
 .item-list small { color: #888; font-size: 0.8em; }
+
+/* Combat Tab Grid */
+.combat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.combat-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.location-row input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--cw-border);
+    color: var(--cw-text);
+}

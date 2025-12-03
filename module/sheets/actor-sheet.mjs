@@ -31,6 +31,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     header: { template: "systems/colonial-weather/templates/actor/parts/header.hbs" },
     tabs: { template: "systems/colonial-weather/templates/actor/parts/tabs.hbs" },
     attributes: { template: "systems/colonial-weather/templates/actor/parts/attributes.hbs" },
+    combat: { template: "systems/colonial-weather/templates/actor/parts/combat.hbs" },
     skills: { template: "systems/colonial-weather/templates/actor/parts/skills.hbs" },
     backgrounds: { template: "systems/colonial-weather/templates/actor/parts/backgrounds.hbs" },
     bio: { template: "systems/colonial-weather/templates/actor/parts/bio.hbs" },
@@ -126,6 +127,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     // 6. Define Tabs (Included Inventory directly here to avoid the error)
     context.tabs = [
       { id: "attributes", group: "sheet", icon: "fa-solid fa-user", label: "Attributes" },
+      { id: "combat", group: "sheet", icon: "fa-solid fa-heart-pulse", label: "Combat" },
       { id: "skills", group: "sheet", icon: "fa-solid fa-dice-d20", label: "Skills" },
       { id: "inventory", group: "sheet", icon: "fa-solid fa-backpack", label: "Inventory" },
       { id: "effects", group: "sheet", icon: "fa-solid fa-bolt", label: "Effects" },
