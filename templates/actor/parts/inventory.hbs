@@ -32,6 +32,38 @@
         {{/each}}
     </div>
 
+    {{!-- ARMOR --}}
+    <h3>Armor <a data-action="createItem" data-type="armor"><i class="fa-solid fa-plus"></i></a></h3>
+    <div class="item-list armor-list">
+        <div class="header-row">
+            <span></span>
+            <span>Name</span>
+            <span class="center-text">Soak</span>
+            <span class="center-text">Equipped</span>
+            <span></span>
+        </div>
+        {{#each inventory.armor as |item|}}
+        <div class="item-row">
+            <div class="item-image"><img src="{{item.img}}" width="24" height="24"/></div>
+            
+            <span class="item-name">{{item.name}}</span>
+            
+            <div class="center-text">{{item.system.soak}}</div>
+            
+            <div class="center-text">
+                {{#if item.system.equipped}}
+                    <i class="fas fa-check" style="color: var(--cw-success);" title="Equipped"></i>
+                {{/if}}
+            </div>
+            
+            <div class="item-controls">
+                <a data-action="editItem" data-id="{{item.id}}"><i class="fa-solid fa-edit"></i></a>
+                <a data-action="deleteItem" data-id="{{item.id}}"><i class="fa-solid fa-trash"></i></a>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
     {{!-- CYBERNETICS --}}
     <h3>Cybernetics <a data-action="createItem" data-type="cybernetic"><i class="fa-solid fa-plus"></i></a></h3>
     <div class="item-list cyber-list">
