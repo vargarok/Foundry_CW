@@ -490,14 +490,14 @@
 }
 
 /* Center Column */
-.loc-head { top: 5%; left: 42%; }
-.loc-chest { top: 20%; left: 42%; }
-.loc-stomach { top: 35%; left: 42%; }
+.loc-head { top: 5%; left: 43%; }
+.loc-chest { top: 20%; left: 43%; }
+.loc-stomach { top: 35%; left: 43%; }
 
 /* Arms */
 .loc-rarm    { top: 30%; left: 22%; }
 .loc-larm    { top: 30%; right: 22%; }
 
 /* Legs */
-.loc-rleg    { top: 65%; left: 25%; }
-.loc-lleg    { top: 65%; right: 25%; }
+.loc-rleg    { top: 62%; left: 29%; }
+.loc-lleg    { top: 62%; right: 29%; }
