@@ -18,55 +18,53 @@
                 </div>
             </div>
 
+            {{!-- Body Status (Visual) --}}
             <div class="panel" style="margin-top: 10px;">
-            <h3>Body Status</h3>
-            
-            <div class="body-chart-container">
-                {{!-- Background Image --}}
-                {{!-- Replace path below with your actual image path --}}
-                <img src="systems/colonial-weather/assets/body.webp" class="body-silhouette" alt="Body Diagram"/>
+                <h3>Body Status</h3>
+                <div class="body-chart-container">
+                    {{!-- Make sure you have the image at this path, or update the src --}}
+                    <img src="systems/colonial-weather/assets/body.webp" class="body-silhouette" alt="Body Diagram"/>
 
-                {{!-- Locations --}}
-                {{!-- HEAD --}}
-                <div class="body-loc loc-head">
-                    <span class="armor-val" title="Armor"><i class="fas fa-shield-alt"></i> {{system.health.locations.head.armor}}</span>
-                    <input type="number" name="system.health.locations.head.value" value="{{system.health.locations.head.value}}" title="Current HP"/>
-                </div>
+                    {{!-- HEAD --}}
+                    <div class="body-loc loc-head">
+                        <span class="armor-val" title="Armor"><i class="fas fa-shield-alt"></i> {{system.health.locations.head.armor}}</span>
+                        <input type="number" name="system.health.locations.head.value" value="{{system.health.locations.head.value}}" title="Current HP"/>
+                    </div>
 
-                {{!-- CHEST --}}
-                <div class="body-loc loc-chest">
-                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.chest.armor}}</span>
-                    <input type="number" name="system.health.locations.chest.value" value="{{system.health.locations.chest.value}}"/>
-                </div>
+                    {{!-- CHEST --}}
+                    <div class="body-loc loc-chest">
+                        <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.chest.armor}}</span>
+                        <input type="number" name="system.health.locations.chest.value" value="{{system.health.locations.chest.value}}"/>
+                    </div>
 
-                {{!-- STOMACH --}}
-                <div class="body-loc loc-stomach">
-                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.stomach.armor}}</span>
-                    <input type="number" name="system.health.locations.stomach.value" value="{{system.health.locations.stomach.value}}"/>
-                </div>
+                    {{!-- STOMACH --}}
+                    <div class="body-loc loc-stomach">
+                        <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.stomach.armor}}</span>
+                        <input type="number" name="system.health.locations.stomach.value" value="{{system.health.locations.stomach.value}}"/>
+                    </div>
 
-                {{!-- ARMS --}}
-                <div class="body-loc loc-rarm">
-                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.rArm.armor}}</span>
-                    <input type="number" name="system.health.locations.rArm.value" value="{{system.health.locations.rArm.value}}"/>
-                </div>
-                <div class="body-loc loc-larm">
-                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.lArm.armor}}</span>
-                    <input type="number" name="system.health.locations.lArm.value" value="{{system.health.locations.lArm.value}}"/>
-                </div>
+                    {{!-- ARMS --}}
+                    <div class="body-loc loc-rarm">
+                        <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.rArm.armor}}</span>
+                        <input type="number" name="system.health.locations.rArm.value" value="{{system.health.locations.rArm.value}}"/>
+                    </div>
+                    <div class="body-loc loc-larm">
+                        <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.lArm.armor}}</span>
+                        <input type="number" name="system.health.locations.lArm.value" value="{{system.health.locations.lArm.value}}"/>
+                    </div>
 
-                {{!-- LEGS --}}
-                <div class="body-loc loc-rleg">
-                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.rLeg.armor}}</span>
-                    <input type="number" name="system.health.locations.rLeg.value" value="{{system.health.locations.rLeg.value}}"/>
-                </div>
-                <div class="body-loc loc-lleg">
-                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.lLeg.armor}}</span>
-                    <input type="number" name="system.health.locations.lLeg.value" value="{{system.health.locations.lLeg.value}}"/>
+                    {{!-- LEGS --}}
+                    <div class="body-loc loc-rleg">
+                        <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.rLeg.armor}}</span>
+                        <input type="number" name="system.health.locations.rLeg.value" value="{{system.health.locations.rLeg.value}}"/>
+                    </div>
+                    <div class="body-loc loc-lleg">
+                        <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.lLeg.armor}}</span>
+                        <input type="number" name="system.health.locations.lLeg.value" value="{{system.health.locations.lLeg.value}}"/>
+                    </div>
                 </div>
             </div>
         </div>
-    
 
         {{!-- RIGHT COLUMN: Equipped Gear --}}
         <div class="combat-col" style="margin-left: 10px;">
@@ -75,12 +73,13 @@
             <h3>Equipped Weapons</h3>
             <div class="item-list">
                 {{#each inventory.weapons as |item|}}
-                {{#if item.system.equipped}}
-                <div class="item-row">
-                    <div class="item-image"><img src="{{item.img}}" width="24" height="24"/></div>
-                    <a class="item-name" data-action="rollWeapon" data-id="{{item.id}}">{{item.name}}</a>
-                    <div class="center-text">{{item.system.damage}}</div>
-                </div>
+                    {{#if item.system.equipped}}
+                    <div class="item-row">
+                        <div class="item-image"><img src="{{item.img}}" width="24" height="24"/></div>
+                        <a class="item-name" data-action="rollWeapon" data-id="{{item.id}}">{{item.name}}</a>
+                        <div class="center-text">{{item.system.damage}}</div>
+                    </div>
+                    {{/if}}
                 {{/each}}
             </div>
 
@@ -88,13 +87,13 @@
             <h3 style="margin-top: 10px;">Equipped Armor</h3>
             <div class="item-list">
                 {{#each inventory.armor as |item|}}
-                {{#if item.system.equipped}}
-                <div class="item-row">
-                    <div class="item-image"><img src="{{item.img}}" width="24" height="24"/></div>
-                    <span class="item-name">{{item.name}}</span>
-                    <div class="center-text"><i class="fas fa-shield-alt"></i> {{item.system.soak}}</div>
-                </div>
-                {{/if}}
+                    {{#if item.system.equipped}}
+                    <div class="item-row">
+                        <div class="item-image"><img src="{{item.img}}" width="24" height="24"/></div>
+                        <span class="item-name">{{item.name}}</span>
+                        <div class="center-text"><i class="fas fa-shield-alt"></i> {{item.system.soak}}</div>
+                    </div>
+                    {{/if}}
                 {{/each}}
             </div>
 
