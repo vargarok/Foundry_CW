@@ -82,7 +82,8 @@
       "rof": "1",
       "ammo": { "value": 0, "max": 0 },
       "skill": "firearms",
-      "attribute": "dex"
+      "attribute": "dex",
+      "equipped": false
     },
     "armor": {
       "templates": ["base"],

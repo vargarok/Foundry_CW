@@ -18,29 +18,55 @@
                 </div>
             </div>
 
-            {{!-- Body Locations (New System) --}}
             <div class="panel" style="margin-top: 10px;">
-                <h3>Body Locations</h3>
-                <div class="locations-list">
-                    {{#each system.health.locations as |loc key|}}
-                    <div class="location-row" style="display: flex; justify-content: space-between; align-items: center; padding: 2px; border-bottom: 1px solid var(--cw-border);">
-                        <div style="flex: 1; font-weight: bold;">{{loc.label}}</div>
-                        
-                        {{!-- Armor Soak Display --}}
-                        <div style="margin-right: 10px;" title="Armor Soak">
-                            <i class="fas fa-shield-alt"></i> {{loc.armor}}
-                        </div>
+            <h3>Body Status</h3>
+            
+            <div class="body-chart-container">
+                {{!-- Background Image --}}
+                {{!-- Replace path below with your actual image path --}}
+                <img src="systems/colonial-weather/assets/body.webp" class="body-silhouette" alt="Body Diagram"/>
 
-                        {{!-- HP Input --}}
-                        <div style="display: flex; align-items: center; gap: 2px;">
-                            <input type="number" name="system.health.locations.{{key}}.value" value="{{loc.value}}" style="width: 30px; text-align: center;"/>
-                            <span>/ {{loc.max}}</span>
-                        </div>
-                    </div>
-                    {{/each}}
+                {{!-- Locations --}}
+                {{!-- HEAD --}}
+                <div class="body-loc loc-head">
+                    <span class="armor-val" title="Armor"><i class="fas fa-shield-alt"></i> {{system.health.locations.head.armor}}</span>
+                    <input type="number" name="system.health.locations.head.value" value="{{system.health.locations.head.value}}" title="Current HP"/>
+                </div>
+
+                {{!-- CHEST --}}
+                <div class="body-loc loc-chest">
+                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.chest.armor}}</span>
+                    <input type="number" name="system.health.locations.chest.value" value="{{system.health.locations.chest.value}}"/>
+                </div>
+
+                {{!-- STOMACH --}}
+                <div class="body-loc loc-stomach">
+                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.stomach.armor}}</span>
+                    <input type="number" name="system.health.locations.stomach.value" value="{{system.health.locations.stomach.value}}"/>
+                </div>
+
+                {{!-- ARMS --}}
+                <div class="body-loc loc-rarm">
+                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.rArm.armor}}</span>
+                    <input type="number" name="system.health.locations.rArm.value" value="{{system.health.locations.rArm.value}}"/>
+                </div>
+                <div class="body-loc loc-larm">
+                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.lArm.armor}}</span>
+                    <input type="number" name="system.health.locations.lArm.value" value="{{system.health.locations.lArm.value}}"/>
+                </div>
+
+                {{!-- LEGS --}}
+                <div class="body-loc loc-rleg">
+                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.rLeg.armor}}</span>
+                    <input type="number" name="system.health.locations.rLeg.value" value="{{system.health.locations.rLeg.value}}"/>
+                </div>
+                <div class="body-loc loc-lleg">
+                    <span class="armor-val"><i class="fas fa-shield-alt"></i> {{system.health.locations.lLeg.armor}}</span>
+                    <input type="number" name="system.health.locations.lLeg.value" value="{{system.health.locations.lLeg.value}}"/>
                 </div>
             </div>
         </div>
+    
 
         {{!-- RIGHT COLUMN: Equipped Gear --}}
         <div class="combat-col" style="margin-left: 10px;">
@@ -49,7 +75,7 @@
             <h3>Equipped Weapons</h3>
             <div class="item-list">
                 {{#each inventory.weapons as |item|}}
-                {{!-- We can filter for 'equipped' if you add that field to weapons later. For now, show all. --}}
+                {{#if item.system.equipped}}
                 <div class="item-row">
                     <div class="item-image"><img src="{{item.img}}" width="24" height="24"/></div>
                     <a class="item-name" data-action="rollWeapon" data-id="{{item.id}}">{{item.name}}</a>
