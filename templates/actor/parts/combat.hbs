@@ -1,50 +1,12 @@
 <div class="tab-content {{#if (eq activeTab 'combat')}}active{{/if}}">
     <div class="combat-grid">
         
-        {{!-- LEFT COLUMN: Health Tracks --}}
+        {{!-- LEFT COLUMN: Body Chart --}}
         <div class="combat-col">
-            {{!-- Global Health --}}
             <div class="panel">
-                <h3>Global Health</h3>
-                <div class="health-track">
-                    {{#each healthConfig as |level|}}
-                    <div class="health-row">
-                        <label class="{{#if (gt level.state 0)}}active{{/if}}">
-                            {{level.label}} ({{level.penalty}})
-                        </label>
-                        
-                        {{!-- Custom Clickable Box --}}
-                        <a class="health-box {{level.cssClass}}" 
-                        data-action="toggleHealth" 
-                        data-index="{{level.index}}"
-                        title="Click to cycle damage type">
-                        {{{level.icon}}}
-                        </a>
-                    </div>
-                    {{/each}}
-                </div>
-            </div>
-            <div class="panel" style="margin-top: 10px; text-align: center;">
-                <h3>Total Hit Points</h3>
-                <div class="flexrow" style="align-items: center; justify-content: center; gap: 10px;">
-                    
-                    <input type="number" name="system.health.total.value" value="{{system.health.total.value}}" style="width: 50px; text-align: center; font-weight: bold; font-size: 1.2em;" />
-                    
-                    <span style="font-size: 1.2em;"> / </span>
-                    
-                    <span style="font-size: 1.2em; font-weight: bold;">{{system.health.total.max}}</span>
-                </div>
-                
-                {{!-- Optional: Show Death Threshold --}}
-                <div style="font-size: 0.8em; color: var(--cw-fail); margin-top: 5px;">
-                    Death at: -{{multiply system.health.total.max 3}}
-                </div>
-            </div>
-            {{!-- Body Status (Visual) --}}
-            <div class="panel" style="margin-top: 10px;">
                 <h3>Body Status</h3>
                 <div class="body-chart-container">
-                    {{!-- Make sure you have the image at this path, or update the src --}}
+                    {{!-- Make sure you have the image at this path --}}
                     <img src="assets/body.webp" class="body-silhouette" alt="Body Diagram"/>
 
                     {{!-- HEAD --}}
@@ -88,35 +50,93 @@
             </div>
         </div>
 
-        {{!-- RIGHT COLUMN: Equipped Gear --}}
+        {{!-- RIGHT COLUMN: Gear & Health Track --}}
         <div class="combat-col" style="margin-left: 10px;">
             
-            {{!-- Equipped Weapons --}}
+            {{!-- Equipped Weapons (Inventory Style) --}}
             <h3>Equipped Weapons</h3>
-            <div class="item-list">
+            <div class="item-list weapon-list">
+                <div class="header-row">
+                    <span></span>
+                    <span>Name</span>
+                    <span class="center-text">Ammo</span>
+                    <span class="center-text">Dmg</span>
+                    <span></span>
+                </div>
                 {{#each inventory.weapons as |item|}}
                     {{#if item.system.equipped}}
                     <div class="item-row">
                         <div class="item-image"><img src="{{item.img}}" width="24" height="24"/></div>
+                        
                         <a class="item-name" data-action="rollWeapon" data-id="{{item.id}}">{{item.name}}</a>
+                        
+                        <div class="center-text">
+                            {{#if item.system.ammo.max}}
+                            <small>{{item.system.ammo.value}} / {{item.system.ammo.max}}</small>
+                            {{else}}-{{/if}}
+                        </div>
+                        
                         <div class="center-text">{{item.system.damage}}</div>
+                        
+                        <div class="item-controls">
+                            <a data-action="editItem" data-id="{{item.id}}"><i class="fa-solid fa-edit"></i></a>
+                        </div>
                     </div>
                     {{/if}}
                 {{/each}}
             </div>
 
-            {{!-- Equipped Armor --}}
+            {{!-- Equipped Armor (Inventory Style) --}}
             <h3 style="margin-top: 10px;">Equipped Armor</h3>
-            <div class="item-list">
+            <div class="item-list armor-list">
+                <div class="header-row">
+                    <span></span>
+                    <span>Name</span>
+                    <span class="center-text">Soak</span>
+                    <span></span>
+                </div>
                 {{#each inventory.armor as |item|}}
                     {{#if item.system.equipped}}
                     <div class="item-row">
                         <div class="item-image"><img src="{{item.img}}" width="24" height="24"/></div>
                         <span class="item-name">{{item.name}}</span>
                         <div class="center-text"><i class="fas fa-shield-alt"></i> {{item.system.soak}}</div>
+                        <div class="item-controls">
+                            <a data-action="editItem" data-id="{{item.id}}"><i class="fa-solid fa-edit"></i></a>
+                        </div>
                     </div>
                     {{/if}}
                 {{/each}}
+            </div>
+
+            {{!-- Global Health (Moved Here) --}}
+            <div class="panel" style="margin-top: 10px;">
+                <h3>Global Health</h3>
+                
+                {{!-- Total HP Display --}}
+                <div class="flexrow" style="align-items: center; justify-content: center; gap: 10px; margin-bottom: 5px;">
+                    <label>Total Hit Points:</label>
+                    <input type="number" name="system.health.total.value" value="{{system.health.total.value}}" style="width: 50px; text-align: center; font-weight: bold;" />
+                    <span> / </span>
+                    <span style="font-weight: bold;">{{system.health.total.max}}</span>
+                </div>
+
+                {{!-- Checkboxes --}}
+                <div class="health-track">
+                    {{#each healthConfig as |level|}}
+                    <div class="health-row">
+                        <label class="{{#if (gt level.state 0)}}active{{/if}}">
+                            {{level.label}} ({{level.penalty}})
+                        </label>
+                        <a class="health-box {{level.cssClass}}" 
+                           data-action="toggleHealth" 
+                           data-index="{{level.index}}"
+                           title="Click to cycle damage type">
+                           {{{level.icon}}}
+                        </a>
+                    </div>
+                    {{/each}}
+                </div>
             </div>
 
         </div>

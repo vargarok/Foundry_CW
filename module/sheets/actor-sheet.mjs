@@ -94,56 +94,50 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
             return acc;
         }, {});
 
-// 4. Health Config (UPDATED)
+    // 4. Health Config (Updated for Top-Loading Bonus Levels)
     const healthLevels = system.health.levels || [];
-    const bonusLevels = system.health.bonusLevels || 0; // Get the bonus
+    const bonusLevels = system.health.bonusLevels || 0;
+    const standardConfig = CONFIG.CW.healthLevels;
+    
     const damageClasses = {
-        0: "",
-        1: "bashing",
-        2: "lethal",
-        3: "aggravated"
+        0: "", 1: "bashing", 2: "lethal", 3: "aggravated"
     };
     const damageIcons = {
-        0: "",
-        1: "/",
-        2: "X",
-        3: '<i class="fas fa-star"></i>' // or a filled box
+        0: "", 1: "/", 2: "X", 3: '<i class="fas fa-star"></i>'
     };
 
-    // Calculate total levels needed (7 base + bonus)
-    // We only cycle the label if we run out of standard names
-    context.healthConfig = [];
-    
-    const standardLevels = CONFIG.CW.healthLevels;
-    const totalCount = standardLevels.length + bonusLevels;
-
-    for (let i = 0; i < totalCount; i++) {
-        // If i is within standard range, use standard data. 
-        // If it's a bonus level, copy the "Bruised" (index 0) data or "Crippled"?
-        // Usually bonus levels are "Bruised" (0 penalty).
-        
-        let label, penalty;
-        
-        if (i < standardLevels.length) {
-            label = standardLevels[i].label;
-            penalty = standardLevels[i].penalty;
-        } else {
-            // It's a bonus level! Let's call it "Bruised+"
-            label = "Bruised (Bonus)";
-            penalty = 0;
-        }
-
+    // A. Generate Standard Levels (Indices 0 to 6)
+    const standardList = standardConfig.map((l, i) => {
         const state = healthLevels[i] || 0;
-        
-        context.healthConfig.push({
-            label: label,
-            penalty: penalty,
-            index: i,
+        return {
+            label: l.label,
+            penalty: l.penalty,
+            index: i, // Matches system.health.levels[0-6]
             state: state,
-            cssClass: damageClasses[state], // Ensure damageClasses is defined as before
-            icon: damageIcons[state]      // Ensure damageIcons is defined as before
+            cssClass: damageClasses[state],
+            icon: damageIcons[state]
+        };
+    });
+
+    // B. Generate Bonus Levels (Indices 7+)
+    // These will be "Bruised" levels with 0 penalty
+    const bonusList = [];
+    for (let i = 0; i < bonusLevels; i++) {
+        const dataIndex = standardConfig.length + i; // Starts at 7
+        const state = healthLevels[dataIndex] || 0;
+        
+        bonusList.push({
+            label: "Bruised", // Clean label
+            penalty: 0,
+            index: dataIndex, // Matches system.health.levels[7+]
+            state: state,
+            cssClass: damageClasses[state],
+            icon: damageIcons[state]
         });
-      }
+    }
+
+    // C. Combine: Bonus First, then Standard
+    context.healthConfig = [...bonusList, ...standardList];
 
     // 5. Prepare Inventory (Categorize Items)
     const inventory = {
