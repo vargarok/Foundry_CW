@@ -1,17 +1,23 @@
 <header class="sheet-header">
+  {{!-- Profile Image --}}
   <img class="profile-img" src="{{actor.img}}" data-edit="img" data-action="editImage" title="{{actor.name}}" height="100" width="100"/>
+  
   <div class="header-fields">
+    {{!-- Name Row --}}
     <div class="row">
       <label>Name</label>
       <input name="name" type="text" value="{{actor.name}}"/>
     </div>
+
+    {{!-- Nature Row --}}
     <div class="row">
       <label>Nature</label>
       <input name="system.bio.nature" type="text" value="{{system.bio.nature}}"/>
     </div>
+
+    {{!-- Gravity Row --}}
     <div class="row">
       <label>Gravity (Home/Current)</label>
-      {{!-- Added inline style to force items to the left with a small gap --}}
       <div class="flexrow" style="justify-content: flex-start; gap: 5px;">
         <select name="system.bio.gravityHome">
           {{selectOptions @root.config.gravityTypes selected=system.bio.gravityHome}}
@@ -22,21 +28,53 @@
         </select>
       </div>
     </div>
+
+    {{!-- NEW: Creation Mode Toggle --}}
+    <div class="row">
+        <label>Mode</label>
+        <div class="flexrow">
+            <label class="checkbox">
+                {{!-- We use 'name' here so it saves automatically to the database --}}
+                <input type="checkbox" name="system.development.isCreation" {{checked system.development.isCreation}}/> 
+                Character Creation
+            </label>
+        </div>
+    </div>
+
+    {{!-- NEW: Point Tracker (Only visible when Creation Mode is checked) --}}
+    {{#if system.development.isCreation}}
+    <div class="creation-budget" style="grid-column: span 2; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 4px; font-size: 0.8em; margin-bottom: 5px;">
+        <div class="flexrow" style="justify-content: space-between;">
+            <span class="{{#if (gt budget.physical.value 7)}}failure{{else}}success{{/if}}">
+                Phy: {{budget.physical.value}}/7
+            </span>
+            <span class="{{#if (gt budget.social.value 5)}}failure{{else}}success{{/if}}">
+                Soc: {{budget.social.value}}/5
+            </span>
+            <span class="{{#if (gt budget.mental.value 3)}}failure{{else}}success{{/if}}">
+                Men: {{budget.mental.value}}/3
+            </span>
+            <span class="{{#if (gt budget.skills.value 23)}}failure{{else}}success{{/if}}">
+                Skills: {{budget.skills.value}}/23
+            </span>
+            <span style="font-weight:bold; color: #ffd700;">
+                Freebies: {{budget.freebies.value}}
+            </span>
+        </div>
+    </div>
+    {{/if}}
+
+    {{!-- Existing XP Field (We keep this so you can see XP even in creation mode) --}}
     <div class="row">
       <label>XP (Total / Unspent)</label>
       <div class="flexrow" style="align-items: center; gap: 5px;">
-        
-        {{!-- Total XP (Editable by GM/Player) --}}
         <input name="system.experience.total" type="number" value="{{system.experience.total}}" placeholder="0" style="text-align: center;" title="Total Earned XP"/>
-        
         <span style="flex: 0 0 auto;">/</span>
-        
-        {{!-- Unspent XP (Calculated Read-Only) --}}
-        {{!-- We color it red if negative to warn the player they overspent --}}
         <span title="Unspent XP" style="font-weight: bold; font-size: 1.1em; {{#if (lt system.experience.unspent 0)}}color:var(--cw-fail);{{else}}color:var(--cw-success);{{/if}}">
             {{system.experience.unspent}}
         </span>
       </div>
     </div>
+
   </div>
 </header>
