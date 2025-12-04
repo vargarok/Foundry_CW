@@ -57,6 +57,7 @@
         "willpower": { "value": 3, "max": 10 },
         "derived": {
           "initiative": 0,
+          "initBonus": 0,
           "moveWalk": 0,
           "moveRun": 0,
           "moveSprint": 0,

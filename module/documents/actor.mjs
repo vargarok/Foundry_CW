@@ -85,7 +85,7 @@ export class CWActor extends Actor {
     const effDex = system.derived.attributes.dex;
     const effWit = system.derived.attributes.wit;
 
-    system.derived.initiative = effDex + effWit;
+    system.derived.initiative = effDex + effWit + (system.derived.initBonus || 0);
     system.derived.moveWalk = 7;
     system.derived.moveRun = effDex + 12;
     system.derived.moveSprint = (effDex * 3) + 20;
@@ -127,7 +127,7 @@ export class CWActor extends Actor {
             }
         }
       }
-      
+
     // --- 9. Calculate Total Hit Points ---
     // Summing max HP from all locations to get Total Max
     if (system.health.locations) {
