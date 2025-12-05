@@ -517,10 +517,13 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    font-weight: bold;
-    font-family: monospace; /* Helps the X and / align better */
-    color: var(--cw-text);
+    
+    /* CHANGED: Typography for B/L/A */
+    font-family: "Arial Black", "Roboto", sans-serif; /* "Fat" font */
+    font-weight: 900; 
+    font-size: 1.1em;
     user-select: none;
+    transition: all 0.1s;
 }
 
 .health-box:hover {
@@ -530,17 +533,20 @@
 
 /* Specific States */
 .health-box.bashing {
-    color: #ffff00; /* Yellow for Bashing */
+    color: #ffee00; /* Bright Yellow */
+    text-shadow: 0 0 2px #ffee00; /* Glow makes it look "fatter" */
 }
 
 .health-box.lethal {
-    color: #ff8800; /* Orange for Lethal */
+    color: #ff9900; /* Deep Orange */
+    text-shadow: 0 0 2px #ff9900;
 }
 
 .health-box.aggravated {
-    background: #550000; /* Dark red background */
-    color: #ff0000;      /* Red star/icon */
+    background: #4a0000; /* Dark Red Background */
+    color: #ff4444;      /* Red Text */
     border-color: #ff0000;
+    text-shadow: 0 0 3px #ff0000;
 }
 
 img[data-action="editImage"] {

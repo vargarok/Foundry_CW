@@ -107,7 +107,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         0: "", 1: "bashing", 2: "lethal", 3: "aggravated"
     };
     const damageIcons = {
-        0: "", 1: "/", 2: "X", 3: '<i class="fas fa-star"></i>'
+        0: "", 1: "B", 2: "L", 3: "A"
     };
 
     // A. Generate Standard Levels (Indices 0 to 6)
