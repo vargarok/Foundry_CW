@@ -1,7 +1,7 @@
 <div class="tab-content {{#if (eq activeTab 'attributes')}}active{{/if}}">
   <div class="attributes-grid">
     
-    {{!-- Physical --}}
+    {{!-- Physical Column --}}
     <div class="attr-column">
       <h3>Physical</h3>
       {{#each viewAttributes.physical as |attr|}}
@@ -9,59 +9,92 @@
           <a data-action="rollAttribute" data-attr="{{attr.key}}">{{localize attr.label}}</a>
           <div class="flexrow" style="align-items: center; justify-content: flex-end; gap: 5px;">
               
-              {{!-- MOVED: Show Effective Value to the LEFT of the input --}}
+              {{!-- Modified Value (e.g. Gravity/Cybernetics) --}}
               {{#if attr.isModified}}
                 <span style="font-weight: bold; {{attr.cssClass}}">
                     ({{attr.effective}})
                 </span>
               {{/if}}
 
-              {{!-- Edit the Base Value (Now consistently on the right) --}}
-              <input type="number" name="system.attributes.{{attr.key}}.value" value="{{attr.base}}" style="width: 30px; text-align: center;"/>
+              {{!-- Edit Mode / Play Mode Toggle --}}
+              {{#if @root.system.editMode}}
+                  {{!-- EDIT MODE: Input Field --}}
+                  <input type="number" name="system.attributes.{{attr.key}}.value" value="{{attr.base}}" style="width: 30px; text-align: center;"/>
+              {{else}}
+                  {{!-- PLAY MODE: Text + XP Button --}}
+                  <span style="font-weight: bold; font-size: 1.2em; margin-right: 2px;">{{attr.base}}</span>
+                  
+                  {{!-- Only show + if we have XP --}}
+                  {{#if (gt @root.system.experience.unspent 0)}}
+                      <a data-action="spendXP" data-type="attribute" data-key="{{attr.key}}" title="Raise Attribute">
+                          <i class="fas fa-plus-circle" style="color: var(--cw-success);"></i>
+                      </a>
+                  {{/if}}
+              {{/if}}
               
           </div>
         </div>
       {{/each}}
     </div>
     
-    {{!-- Social --}}
+    {{!-- Social Column --}}
     <div class="attr-column">
       <h3>Social</h3>
       {{#each viewAttributes.social as |attr|}}
         <div class="attr-row">
           <a data-action="rollAttribute" data-attr="{{attr.key}}">{{localize attr.label}}</a>
           <div class="flexrow" style="align-items: center; justify-content: flex-end; gap: 5px;">
-              {{!-- MOVED --}}
+              
               {{#if attr.isModified}}
                 <span style="font-weight: bold; {{attr.cssClass}}">({{attr.effective}})</span>
               {{/if}}
 
-              <input type="number" name="system.attributes.{{attr.key}}.value" value="{{attr.base}}" style="width: 30px; text-align: center;"/>
+              {{#if @root.system.editMode}}
+                  <input type="number" name="system.attributes.{{attr.key}}.value" value="{{attr.base}}" style="width: 30px; text-align: center;"/>
+              {{else}}
+                  <span style="font-weight: bold; font-size: 1.2em; margin-right: 2px;">{{attr.base}}</span>
+                  {{#if (gt @root.system.experience.unspent 0)}}
+                      <a data-action="spendXP" data-type="attribute" data-key="{{attr.key}}" title="Raise Attribute">
+                          <i class="fas fa-plus-circle" style="color: var(--cw-success);"></i>
+                      </a>
+                  {{/if}}
+              {{/if}}
+
           </div>
         </div>
       {{/each}}
     </div>
 
-    {{!-- Mental --}}
+    {{!-- Mental Column --}}
     <div class="attr-column">
       <h3>Mental</h3>
       {{#each viewAttributes.mental as |attr|}}
         <div class="attr-row">
           <a data-action="rollAttribute" data-attr="{{attr.key}}">{{localize attr.label}}</a>
           <div class="flexrow" style="align-items: center; justify-content: flex-end; gap: 5px;">
-              {{!-- MOVED --}}
+              
               {{#if attr.isModified}}
                 <span style="font-weight: bold; {{attr.cssClass}}">({{attr.effective}})</span>
               {{/if}}
 
-              <input type="number" name="system.attributes.{{attr.key}}.value" value="{{attr.base}}" style="width: 30px; text-align: center;"/>
+              {{#if @root.system.editMode}}
+                  <input type="number" name="system.attributes.{{attr.key}}.value" value="{{attr.base}}" style="width: 30px; text-align: center;"/>
+              {{else}}
+                  <span style="font-weight: bold; font-size: 1.2em; margin-right: 2px;">{{attr.base}}</span>
+                  {{#if (gt @root.system.experience.unspent 0)}}
+                      <a data-action="spendXP" data-type="attribute" data-key="{{attr.key}}" title="Raise Attribute">
+                          <i class="fas fa-plus-circle" style="color: var(--cw-success);"></i>
+                      </a>
+                  {{/if}}
+              {{/if}}
+
           </div>
         </div>
       {{/each}}
     </div>
   </div>
 
-  {{!-- Derived Stats & Health (Unchanged) --}}
+  {{!-- Derived Stats & Health --}}
   <div class="derived-row">
       <div class="panel">
         <h3>Derived Stats</h3>
