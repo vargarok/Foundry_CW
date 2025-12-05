@@ -4,8 +4,9 @@
         <select name="mode">
             {{#each modes as |val index|}}
             <option value="{{index}}">
-                {{#if (eq val "Auto")}}
-                    Full Auto (10)
+                {{!-- Logic: Auto string OR 10+ shots = Full Auto --}}
+                {{#if (or (eq val "Auto") (gte val 10))}}
+                    Full Auto ({{val}})
                 {{else}}
                     {{#if (eq val 1)}}Single Shot (1){{else}}Burst ({{val}}){{/if}}
                 {{/if}}
