@@ -28,7 +28,8 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       toggleHealth: this._onToggleHealth,
       toggleEditMode: this._onToggleEditMode,
       spendXP: this._onSpendXP,
-      resetXP: this._onResetXP
+      resetXP: this._onResetXP,
+      reloadWeapon: this._onReloadWeapon
     }
   };
 
@@ -299,18 +300,18 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     const item = this.document.items.get(target.dataset.id);
     const system = item.system;
 
-    // 1. Determine Attack Modes from ROF
-    // If ROF is "1/3", this creates [1, 3]
+    // 1. Parse ROF (Supports "1", "1/3", "1/3/10", "1/3/Auto")
     let rofString = String(system.rof || "1");
-    let modes = rofString.split('/').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
-    if (modes.length === 0) modes = [1];
+    let modes = rofString.split('/').map(s => {
+        const clean = s.trim().toLowerCase();
+        if (clean === "auto" || clean === "a") return "Auto";
+        return parseInt(clean) || 1;
+    });
 
-    // 2. Check if weapon uses ammo
+    // 2. Dialog
     const useAmmo = system.ammo.max > 0;
     
-    // If we have options OR need to confirm ammo usage, show a Dialog
     if (useAmmo || modes.length > 1) {
-        
         const content = await renderTemplate("systems/colonial-weather/templates/chat/attack-dialog.hbs", {
             modes: modes,
             hasAmmo: useAmmo,
@@ -326,36 +327,95 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
                     icon: '<i class="fas fa-crosshairs"></i>',
                     callback: async (html) => {
                         const form = html[0].querySelector("form");
-                        const selectedModeIndex = form.mode ? form.mode.value : 0;
-                        const shotCount = modes[selectedModeIndex];
+                        const selectedIdx = form.mode ? form.mode.value : 0;
+                        const modeVal = modes[selectedIdx];
                         
+                        // Determine Shot Count
+                        let shotCount = 1;
+                        if (modeVal === "Auto") shotCount = 10; // Standard Full Auto burst
+                        else shotCount = Number(modeVal);
+
                         // Ammo Check
                         if (useAmmo) {
                             if (system.ammo.value < shotCount) {
-                                ui.notifications.warn("Not enough ammo!");
+                                ui.notifications.warn(`Click-click! Not enough ammo. Need ${shotCount}, have ${system.ammo.value}.`);
                                 return;
                             }
-                            // Deduct Ammo
                             await item.update({"system.ammo.value": system.ammo.value - shotCount});
                         }
 
-                        // Determine Bonus
-                        // (You can add logic here: e.g., if shotCount > 1, add +1 dice per extra bullet)
-                        const bonus = Number(system.attackBonus) || 0; 
+                        // Determine Bonus (Storyteller Rules)
+                        // +1 die for 3-round burst? +3 dice for full auto? 
+                        // You can customize this math:
+                        let bonus = Number(system.attackBonus) || 0; 
+                        if (shotCount === 3) bonus += 1; 
+                        if (shotCount >= 10) bonus += 3;
 
-                        // Perform Roll
                         this.document.rollDicePool(system.attribute, system.skill, bonus, item);
                     }
                 }
             },
             default: "attack"
         }).render(true);
-
     } else {
-        // Simple Roll (Melee or No-Ammo Weapon)
+        // Melee or Single Shot default
         const bonus = Number(system.attackBonus) || 0;
         this.document.rollDicePool(system.attribute, system.skill, bonus, item);
     }
+  }
+
+  // --- NEW RELOAD LOGIC ---
+  static async _onReloadWeapon(event, target) {
+      event.preventDefault();
+      const item = this.document.items.get(target.dataset.id);
+      const needed = item.system.ammo.max - item.system.ammo.value;
+
+      if (needed <= 0) {
+          ui.notifications.info("Weapon is already full.");
+          return;
+      }
+
+      // 1. Find the Magazine (Gear)
+      const ammoType = item.system.ammoType;
+      if (!ammoType) {
+          ui.notifications.warn("No 'Ammo Type' defined for this weapon. Edit the Item to specify what magazine it uses.");
+          return;
+      }
+
+      // Case-insensitive search for gear with that name
+      const magItem = this.document.items.find(i => 
+          i.type === "gear" && 
+          i.name.toLowerCase() === ammoType.toLowerCase()
+      );
+
+      if (!magItem) {
+          ui.notifications.warn(`Reload failed: Could not find any Gear named "${ammoType}".`);
+          return;
+      }
+
+      // 2. Deduct Magazine
+      const currentQty = magItem.system.quantity || 0;
+      if (currentQty < 1) {
+          ui.notifications.warn(`You are out of ${magItem.name}!`);
+          return;
+      }
+
+      // 3. Update Data (Refill Weapon, Reduce Gear)
+      await item.update({"system.ammo.value": item.system.ammo.max});
+      
+      if (currentQty === 1) {
+          // Option A: Delete the item if it was the last one
+          // await magItem.delete(); 
+          // Option B: Set to 0 (Better so players don't lose the "slot")
+          await magItem.update({"system.quantity": 0});
+      } else {
+          await magItem.update({"system.quantity": currentQty - 1});
+      }
+
+      // Play a sound? (Optional)
+      // AudioHelper.play({src: "sounds/lock.wav", volume: 0.8, autoplay: true, loop: false}, true);
+      
+      ui.notifications.info(`Reloaded ${item.name} using ${magItem.name}.`);
   }
 
   static async _onCreateEffect(event, target) {

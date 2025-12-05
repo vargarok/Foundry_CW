@@ -73,6 +73,9 @@
                         <div class="center-text">
                             {{#if item.system.ammo.max}}
                             <small>{{item.system.ammo.value}} / {{item.system.ammo.max}}</small>
+                            <a data-action="reloadWeapon" data-id="{{item.id}}" title="Reload (Requires '{{item.system.ammoType}}')">
+                                <i class="fas fa-sync-alt {{#if (eq item.system.ammo.value 0)}}fa-spin{{/if}}" style="font-size: 0.8em;"></i>
+                            </a>
                             {{else}}-{{/if}}
                         </div>
                         

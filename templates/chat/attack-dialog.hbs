@@ -2,9 +2,13 @@
     <div class="form-group">
         <label>Firing Mode:</label>
         <select name="mode">
-            {{#each modes as |count index|}}
+            {{#each modes as |val index|}}
             <option value="{{index}}">
-                {{#if (eq count 1)}}Single Shot (1){{else}}Burst ({{count}}){{/if}}
+                {{#if (eq val "Auto")}}
+                    Full Auto (10)
+                {{else}}
+                    {{#if (eq val 1)}}Single Shot (1){{else}}Burst ({{val}}){{/if}}
+                {{/if}}
             </option>
             {{/each}}
         </select>

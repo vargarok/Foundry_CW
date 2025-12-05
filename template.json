@@ -95,6 +95,7 @@
       "range": 0,
       "rof": "1",
       "ammo": { "value": 0, "max": 0 },
+      "ammoType": "",
       "skill": "firearms",
       "attribute": "dex",
       "equipped": false
