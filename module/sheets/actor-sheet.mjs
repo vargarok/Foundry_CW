@@ -27,7 +27,8 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       editImage: this._onEditImage,
       toggleHealth: this._onToggleHealth,
       toggleEditMode: this._onToggleEditMode,
-      spendXP: this._onSpendXP
+      spendXP: this._onSpendXP,
+      resetXP: this._onResetXP
     }
   };
 
@@ -426,5 +427,17 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
     // Create the update path dynamically
     await this.document.update({[`system.health.levels.${index}`]: next});
+  }
+  static async _onResetXP(event, target) {
+      const confirmed = await Dialog.confirm({
+          title: "Reset XP History?",
+          content: "<p>This will set 'Spent XP' to 0. Use this if you want to recalculate costs or reset the character. This cannot be undone.</p>",
+          defaultYes: false
+      });
+
+      if (confirmed) {
+          await this.document.update({ "system.experience.spent": 0 });
+          ui.notifications.info("XP Spending History reset to 0.");
+      }
   }
 }

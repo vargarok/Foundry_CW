@@ -30,15 +30,24 @@
     <div class="row">
       <label>XP (Total / Unspent)</label>
       <div class="flexrow" style="align-items: center; gap: 5px;">
-        {{!-- Only GM or Edit Mode can change Total XP --}}
+        
+        {{!-- Total XP Input --}}
         <input name="system.experience.total" type="number" value="{{system.experience.total}}" placeholder="0" style="text-align: center;" title="Total Earned XP"/>
         
         <span style="flex: 0 0 auto;">/</span>
         
-        {{!-- Unspent is calculated automatically --}}
+        {{!-- Unspent Display --}}
         <span title="Unspent XP" style="font-weight: bold; font-size: 1.1em; {{#if (lt system.experience.unspent 0)}}color:var(--cw-fail);{{else}}color:var(--cw-success);{{/if}}">
             {{system.experience.unspent}}
         </span>
+
+        {{!-- NEW: Reset Button (Only in Edit Mode) --}}
+        {{#if system.editMode}}
+            <a data-action="resetXP" title="Reset 'Spent XP' to 0" style="margin-left: 5px; color: var(--cw-fail);">
+                <i class="fas fa-undo"></i>
+            </a>
+        {{/if}}
+
       </div>
     </div>
 
