@@ -1,5 +1,6 @@
 const { HandlebarsApplicationMixin } = foundry.applications.api;
 const { ActorSheetV2 } = foundry.applications.sheets;
+const { DialogV2 } = foundry.applications.api; // <--- V13 Requirement
 
 export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   static DEFAULT_OPTIONS = {
@@ -107,6 +108,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     const damageClasses = {
         0: "", 1: "bashing", 2: "lethal", 3: "aggravated"
     };
+    // UPDATED: Icons to Letters
     const damageIcons = {
         0: "", 1: "B", 2: "L", 3: "A"
     };
@@ -283,18 +285,19 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   static async _onCreateItem(event, target) {
     const type = target.dataset.type;
     await Item.create({name: `New ${type}`, type: type}, {parent: this.document});
-}
+  }
 
   static async _onEditItem(event, target) {
     const item = this.document.items.get(target.dataset.id);
     item.sheet.render(true);
-}
+  }
 
   static async _onDeleteItem(event, target) {
     const item = this.document.items.get(target.dataset.id);
     await item.delete();
-}
+  }
 
+  // --- UPDATED WEAPON ROLL (V13 COMPLIANT) ---
   static async _onRollWeapon(event, target) {
     event.preventDefault();
     const item = this.document.items.get(target.dataset.id);
@@ -311,57 +314,60 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     // 2. Dialog
     const useAmmo = system.ammo.max > 0;
     
+    // Default values if no dialog
+    let shotCount = 1;
+    let bonus = Number(system.attackBonus) || 0;
+
     if (useAmmo || modes.length > 1) {
-        const content = await renderTemplate("systems/colonial-weather/templates/chat/attack-dialog.hbs", {
+        // FIX: Namespaced renderTemplate
+        const content = await foundry.applications.handlebars.renderTemplate("systems/colonial-weather/templates/chat/attack-dialog.hbs", {
             modes: modes,
             hasAmmo: useAmmo,
             ammo: system.ammo.value
         });
 
-        new Dialog({
-            title: `Attack: ${item.name}`,
+        // FIX: DialogV2 Wait
+        const result = await DialogV2.wait({
+            window: { title: `Attack: ${item.name}`, icon: "fa-solid fa-crosshairs" },
             content: content,
-            buttons: {
-                attack: {
-                    label: "Attack",
-                    icon: '<i class="fas fa-crosshairs"></i>',
-                    callback: async (html) => {
-                        const form = html[0].querySelector("form");
-                        const selectedIdx = form.mode ? form.mode.value : 0;
-                        const modeVal = modes[selectedIdx];
-                        
-                        // Determine Shot Count
-                        let shotCount = 1;
-                        if (modeVal === "Auto") shotCount = 10; // Standard Full Auto burst
-                        else shotCount = Number(modeVal);
-
-                        // Ammo Check
-                        if (useAmmo) {
-                            if (system.ammo.value < shotCount) {
-                                ui.notifications.warn(`Click-click! Not enough ammo. Need ${shotCount}, have ${system.ammo.value}.`);
-                                return;
-                            }
-                            await item.update({"system.ammo.value": system.ammo.value - shotCount});
-                        }
-
-                        // Determine Bonus (Storyteller Rules)
-                        // +1 die for 3-round burst? +3 dice for full auto? 
-                        // You can customize this math:
-                        let bonus = Number(system.attackBonus) || 0; 
-                        if (shotCount === 3) bonus += 1; 
-                        if (shotCount >= 10) bonus += 3;
-
-                        this.document.rollDicePool(system.attribute, system.skill, bonus, item);
-                    }
+            buttons: [{
+                action: "attack",
+                label: "Attack",
+                icon: "fa-solid fa-crosshairs",
+                callback: (event, button, dialog) => {
+                    const form = dialog.element.querySelector("form");
+                    // Using FormDataExtended to grab the select value safely
+                    return new FormDataExtended(form).object;
                 }
-            },
-            default: "attack"
-        }).render(true);
-    } else {
-        // Melee or Single Shot default
-        const bonus = Number(system.attackBonus) || 0;
-        this.document.rollDicePool(system.attribute, system.skill, bonus, item);
+            }],
+            close: () => null
+        });
+
+        if (!result) return; // User closed dialog
+
+        const selectedIdx = result.mode;
+        const modeVal = modes[selectedIdx];
+        
+        // Determine Shot Count
+        if (modeVal === "Auto") shotCount = 10;
+        else shotCount = Number(modeVal);
+
+        // Ammo Check
+        if (useAmmo) {
+            if (system.ammo.value < shotCount) {
+                ui.notifications.warn(`Click-click! Not enough ammo. Need ${shotCount}, have ${system.ammo.value}.`);
+                return;
+            }
+            await item.update({"system.ammo.value": system.ammo.value - shotCount});
+        }
+
+        // Determine Bonus
+        if (shotCount === 3) bonus += 1; 
+        if (shotCount >= 10) bonus += 3;
     }
+
+    // Execute Roll
+    this.document.rollDicePool(system.attribute, system.skill, bonus, item);
   }
 
   // --- NEW RELOAD LOGIC ---
@@ -404,17 +410,11 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
       await item.update({"system.ammo.value": item.system.ammo.max});
       
       if (currentQty === 1) {
-          // Option A: Delete the item if it was the last one
-          // await magItem.delete(); 
-          // Option B: Set to 0 (Better so players don't lose the "slot")
           await magItem.update({"system.quantity": 0});
       } else {
           await magItem.update({"system.quantity": currentQty - 1});
       }
 
-      // Play a sound? (Optional)
-      // AudioHelper.play({src: "sounds/lock.wav", volume: 0.8, autoplay: true, loop: false}, true);
-      
       ui.notifications.info(`Reloaded ${item.name} using ${magItem.name}.`);
   }
 
@@ -452,8 +452,6 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     }
 
     // 2. Prepare effects for copying
-    // We toggle 'transfer' to false so they become specific to the Actor
-    // We also set the origin so we know where it came from later
     const effectsData = item.effects.map(e => {
         const data = e.toObject();
         data.transfer = false; 
@@ -488,11 +486,14 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     // Create the update path dynamically
     await this.document.update({[`system.health.levels.${index}`]: next});
   }
+
+  // --- UPDATED RESET XP (V13 COMPLIANT) ---
   static async _onResetXP(event, target) {
-      const confirmed = await Dialog.confirm({
-          title: "Reset XP History?",
+      // FIX: DialogV2 Confirm
+      const confirmed = await DialogV2.confirm({
+          window: { title: "Reset XP History?" },
           content: "<p>This will set 'Spent XP' to 0. Use this if you want to recalculate costs or reset the character. This cannot be undone.</p>",
-          defaultYes: false
+          rejectClose: false
       });
 
       if (confirmed) {
