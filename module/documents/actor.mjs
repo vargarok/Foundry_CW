@@ -344,6 +344,65 @@ getCombatant() {
     return roll;
   }
 
+  /**
+   * Apply damage to this actor, accounting for armor at the hit location.
+   * @param {number} damageSuccesses - The raw damage count.
+   * @param {string} location - The body part hit (e.g., "torso", "head").
+   * @param {string} type - "lethal", "bashing", or "aggravated".
+   */
+  async applyDamage(damageSuccesses, location = "torso", type = "lethal") {
+    const system = this.system;
+    
+    // 1. Get Armor/Soak for that location
+    // (Ensure your armor items are writing to this via prepareDerivedData)
+    const armor = system.health.locations[location]?.armor || 0;
+    const soak = armor + (system.attributes.sta.value || 0); // Standard Storyteller: Stamina + Armor
+
+    // 2. Calculate Final Damage
+    // (If damage is successes, we usually subtract soak successes. 
+    // If you use static soak, simply subtract the value.)
+    const finalDamage = Math.max(0, damageSuccesses - soak);
+
+    if (finalDamage === 0) {
+        ui.notifications.info(`${this.name} soaked all damage! (${soak} soak vs ${damageSuccesses} dmg)`);
+        return;
+    }
+
+    // 3. Update Health (Location)
+    // Reduce HP in the specific limb
+    const locPath = `system.health.locations.${location}.value`;
+    const currentLocHP = system.health.locations[location].value;
+    const newLocHP = currentLocHP - finalDamage;
+
+    // 4. Update Health (Global)
+    // Reduce Total HP
+    const totalPath = `system.health.total.value`;
+    const currentTotal = system.health.total.value;
+    const newTotal = currentTotal - finalDamage;
+
+    // 5. Apply Updates
+    await this.update({
+        [locPath]: newLocHP,
+        [totalPath]: newTotal
+    });
+
+    // 6. Report to Chat
+    ChatMessage.create({
+        content: `
+            <div class="cw-chat-card" style="border-color: #ff4a4a;">
+                <h3>${this.name} Damaged!</h3>
+                <p><strong>Hit Location:</strong> ${location.toUpperCase()}</p>
+                <p><strong>Raw Damage:</strong> ${damageSuccesses}</p>
+                <p><strong>Soak:</strong> -${soak}</p>
+                <hr>
+                <p style="font-size:1.2em; color:red; font-weight:bold;">
+                    ${finalDamage} ${type.toUpperCase()} Damage Applied
+                </p>
+            </div>
+        `
+    });
+  }
+
     async spendXP(type, key) {
       const system = this.system;
       const xpCostMap = CONFIG.CW.xpCosts; // Ensure this exists in config.mjs

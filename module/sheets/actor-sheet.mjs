@@ -376,15 +376,21 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         const extraSuccesses = Math.max(0, roll.total - 1);
         const damagePool = (system.damage || 0) + extraSuccesses;
 
+    // 6. Get the Location from the result (Default to torso if undefined)
+    const hitLoc = result.location || "torso";
+
         // Create the Damage Card
         ChatMessage.create({
             content: `
                 <div class="cw-chat-card" style="border-top: 1px solid #444; margin-top: 5px; padding-top: 5px;">
-                    <div style="font-size: 0.9em; margin-bottom: 5px;">Attack Hit! (${roll.total} Successes)</div>
+                    <div style="font-size: 0.9em; margin-bottom: 5px;">
+                        Attack Hit <strong>${hitLoc.toUpperCase()}</strong>! (${roll.total} Successes)
+                    </div>
+                    
                     <button data-action="roll-damage" 
                             data-damage="${damagePool}" 
-                            data-type="${system.type}">
-                        <i class="fas fa-skull"></i> Roll Damage (${damagePool} dice)
+                            data-type="${system.type}"
+                            data-location="${hitLoc}">  <i class="fas fa-skull"></i> Roll Damage (${damagePool} dice)
                     </button>
                 </div>
             `,

@@ -98,7 +98,6 @@ Hooks.on("renderActiveEffectConfig", (app, html, data) => {
 });
 
 Hooks.on("renderChatMessage", (message, html, data) => {
-    // 1. Find the "Roll Damage" button in the chat card
     const damageButton = html.find("button[data-action='roll-damage']");
     
     if (damageButton.length > 0) {
@@ -106,18 +105,36 @@ Hooks.on("renderChatMessage", (message, html, data) => {
             ev.preventDefault();
             const button = ev.currentTarget;
             
-            // 2. Grab data we stored on the button
-            const damageFormula = button.dataset.damage; // e.g. "4"
-            const type = button.dataset.type;            // e.g. "lethal"
-            
-            // 3. Roll the Damage
-            // (In WoD/Storyteller, damage is usually a pool of d10s vs Diff 6)
+            // 1. Get Button Data
+            const damageFormula = button.dataset.damage; 
+            const type = button.dataset.type;            
+            const location = button.dataset.location || "torso"; // Get the location!
+
+            // 2. Roll Damage
             const roll = await new Roll(`${damageFormula}d10cs>=6`).evaluate();
-            
-            // 4. Send Result to Chat
+            const damageSuccesses = roll.total;
+
+            // 3. Show the Roll Result
             await roll.toMessage({
-                flavor: `<span style="color:red; font-weight:bold">Damage Roll (${type})</span>`
+                flavor: `<span style="color:darkred; font-weight:bold">Damage Roll (${type}): ${damageSuccesses} Successes</span>`
             });
+
+            // 4. CHECK FOR TARGETS
+            const targets = game.user.targets;
+            
+            if (targets.size === 0) {
+                // No targets? Just finish here.
+                ui.notifications.warn("Damage rolled, but no tokens were targeted to apply it to.");
+                return;
+            }
+
+            // 5. Apply to Targets
+            for (const token of targets) {
+                if (token.actor) {
+                    // Call the function we created in Step 1
+                    await token.actor.applyDamage(damageSuccesses, location, type);
+                }
+            }
         });
     }
 });
