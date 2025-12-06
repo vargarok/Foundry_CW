@@ -566,3 +566,35 @@ img[data-action="editImage"]:hover {
   grid-template-columns: 30px 4fr 1fr 60px;
   gap: 5px;
 }
+
+/* --- ITEM SHEET LAYOUT FIX --- */
+
+/* 1. Make the wrapper div a Flex Container that fills the window */
+.cw-item-sheet {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden; /* Prevents double scrollbars */
+}
+
+/* 2. Ensure the form passes the height down to the wrapper */
+.cw.sheet.item form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 3. Ensure the tabs consume the remaining space and scroll */
+/* Note: We use .cw-item-sheet .tab-content to be specific */
+.cw-item-sheet .tab-content {
+    flex: 1;             /* Grow to fill empty space */
+    overflow-y: auto;    /* Enable Vertical Scrollbar */
+    padding-right: 5px;  /* Spacing for the scrollbar */
+    display: none;       /* Hidden by default */
+    flex-direction: column;
+}
+
+.cw-item-sheet .tab-content.active {
+    display: flex;       /* Show when active */
+}
