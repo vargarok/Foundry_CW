@@ -354,50 +354,49 @@ getCombatant() {
     const system = this.system;
     
     // 1. Get Armor/Soak for that location
-    // (Ensure your armor items are writing to this via prepareDerivedData)
+    // Note: We include Stamina in Soak (Standard Storyteller Rule)
     const armor = system.health.locations[location]?.armor || 0;
-    const soak = armor + (system.attributes.sta.value || 0); // Standard Storyteller: Stamina + Armor
+    const stamina = system.attributes.sta.value || 0;
+    const soak = armor + stamina; 
 
     // 2. Calculate Final Damage
-    // (If damage is successes, we usually subtract soak successes. 
-    // If you use static soak, simply subtract the value.)
     const finalDamage = Math.max(0, damageSuccesses - soak);
 
-    if (finalDamage === 0) {
-        ui.notifications.info(`${this.name} soaked all damage! (${soak} soak vs ${damageSuccesses} dmg)`);
-        return;
+    // 3. Update Health (Only if damage > 0)
+    if (finalDamage > 0) {
+        const locPath = `system.health.locations.${location}.value`;
+        const currentLocHP = system.health.locations[location].value;
+        const newLocHP = currentLocHP - finalDamage;
+
+        const totalPath = `system.health.total.value`;
+        const currentTotal = system.health.total.value;
+        const newTotal = currentTotal - finalDamage;
+
+        await this.update({
+            [locPath]: newLocHP,
+            [totalPath]: newTotal
+        });
     }
 
-    // 3. Update Health (Location)
-    // Reduce HP in the specific limb
-    const locPath = `system.health.locations.${location}.value`;
-    const currentLocHP = system.health.locations[location].value;
-    const newLocHP = currentLocHP - finalDamage;
+    // 4. Report to Chat (ALWAYS show this now)
+    // We change the border color based on result (Red = Ouch, Grey = Soaked)
+    const borderColor = finalDamage > 0 ? "#ff4a4a" : "#777";
+    const title = finalDamage > 0 ? `${this.name} Damaged!` : `${this.name} Soaked!`;
 
-    // 4. Update Health (Global)
-    // Reduce Total HP
-    const totalPath = `system.health.total.value`;
-    const currentTotal = system.health.total.value;
-    const newTotal = currentTotal - finalDamage;
-
-    // 5. Apply Updates
-    await this.update({
-        [locPath]: newLocHP,
-        [totalPath]: newTotal
-    });
-
-    // 6. Report to Chat
     ChatMessage.create({
         content: `
-            <div class="cw-chat-card" style="border-color: #ff4a4a;">
-                <h3>${this.name} Damaged!</h3>
-                <p><strong>Hit Location:</strong> ${location.toUpperCase()}</p>
-                <p><strong>Raw Damage:</strong> ${damageSuccesses}</p>
-                <p><strong>Soak:</strong> -${soak}</p>
-                <hr>
-                <p style="font-size:1.2em; color:red; font-weight:bold;">
-                    ${finalDamage} ${type.toUpperCase()} Damage Applied
-                </p>
+            <div class="cw-chat-card" style="border-top: 3px solid ${borderColor}; padding: 5px; background: rgba(0,0,0,0.1);">
+                <h3 style="border-bottom: 1px solid #555; margin-bottom: 5px;">${title}</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; font-size: 0.9em; gap: 2px;">
+                    <strong>Location:</strong> <span>${location.toUpperCase()}</span>
+                    <strong>Raw Dmg:</strong> <span>${damageSuccesses}</span>
+                    <strong>Armor:</strong> <span>${armor}</span>
+                    <strong>Stamina:</strong> <span>${stamina}</span>
+                </div>
+                <hr style="margin: 5px 0;">
+                <div style="text-align: center; font-size: 1.2em; font-weight: bold; color: ${borderColor};">
+                    ${finalDamage} ${type.toUpperCase()} Applied
+                </div>
             </div>
         `
     });
