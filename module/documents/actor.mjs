@@ -375,10 +375,6 @@ getCombatant() {
         const currentTotal = system.health.total.value;
         const maxTotal = system.health.total.max;
 
-        // RULE 4.c.i: OVERSHOOT EXCEPTION
-        // Damage to Total HP cannot exceed the HP currently remaining in the limb.
-        // If limb is already <= 0, no damage transfers to Total HP (unless it's a Vehicle Weapon, which ignores this).
-        // Note: We use Math.max(0, ...) to ensure we don't "heal" the total if limb is negative.
         const damageToTotal = Math.max(0, Math.min(finalDamage, currentLocHP));
 
         // Limb takes full damage (it can go negative/disabled)
@@ -390,14 +386,11 @@ getCombatant() {
         // --- UPDATE VISUAL HEALTH TRACK ---
         const totalBoxes = 7 + (system.health.bonusLevels || 0);
         const hpPerBox = maxTotal / totalBoxes;
-        
-        // Calculate boxes based on the New Total HP
         const totalDamageTaken = maxTotal - newTotal;
         const boxesToFill = Math.min(totalBoxes, Math.ceil(totalDamageTaken / hpPerBox));
 
         const newLevels = [...system.health.levels];
         
-        // Damage Codes: 1=Bashing, 2=Lethal, 3=Aggravated
         let typeCode = 1;
         if (type === "lethal") typeCode = 2;
         if (type === "aggravated") typeCode = 3;
@@ -417,12 +410,51 @@ getCombatant() {
             "system.health.levels": newLevels
         });
 
-        // --- OPTIONAL: STATUS CHECK (Chat Notification) ---
-        if (newLocHP < 0) {
-            flavorText += `<br><span style="font-size:0.8em; color:darkred;">⚠️ ${location.toUpperCase()} Disabled/Bleeding!</span>`;
+        // --- 5. AUTOMATED STATUS EFFECTS (Moved Inside) ---
+        // We use the 'newLocHP' and 'newTotal' variables we just calculated.
+        
+        // A. Vital Organs (Head/Chest/Stomach) -> Dead
+        if (["head", "chest", "stomach"].includes(location) && newLocHP < 0) {
+            const deadId = CONFIG.specialStatusEffects.DEFEATED || "dead";
+            // Check if not already dead
+            if (!this.statuses.has(deadId)) {
+                await this.toggleStatusEffect(deadId, { overlay: true });
+                ChatMessage.create({ content: `<strong>${this.name}</strong> has suffered a fatal wound to the ${location}!` });
+            }
         }
-        if (newTotal <= 0) {
-            flavorText += `<br><span style="font-size:0.8em; color:darkred;">💀 UNCONSCIOUS / DYING</span>`;
+
+        // B. Total HP < 0 -> Unconscious
+        else if (newTotal < 0) {
+            const unconsciousId = "unconscious"; // Standard Foundry ID
+            if (!this.statuses.has(unconsciousId)) {
+                 await this.toggleStatusEffect(unconsciousId, { overlay: true }); 
+                 ChatMessage.create({ content: `<strong>${this.name}</strong> collapses, Unconscious and Dying!` });
+            }
+        }
+
+        // C. Limb Disabled -> Bleeding
+        // If it's an arm or leg and it just dropped below 0
+        if (["rArm", "lArm", "rLeg", "lLeg"].includes(location) && newLocHP < 0) {
+            
+            // Check if we already have the Bleeding effect
+            const bleedingIcon = "icons/svg/blood.svg"; 
+            const hasBleeding = this.effects.some(e => e.img === bleedingIcon);
+
+            if (!hasBleeding) {
+                await this.createEmbeddedDocuments("ActiveEffect", [{
+                    name: "Bleeding",
+                    img: bleedingIcon,
+                    origin: this.uuid,
+                    description: "Losing 1 HP per turn.",
+                    // Optional: Add duration or changes here
+                }]);
+                ChatMessage.create({ content: `<strong>${this.name}</strong>'s ${location} is disabled! They are <strong>Bleeding</strong>.` });
+            }
+        }
+
+        // --- OPTIONAL: CHAT TEXT UPDATES ---
+        if (newLocHP < 0) {
+            flavorText += `<br><span style="font-size:0.8em; color:darkred;">⚠️ ${location.toUpperCase()} Disabled!</span>`;
         }
     }
 
@@ -446,58 +478,6 @@ getCombatant() {
             </div>
         `
     });
-
-    // --- 5. STATUS EFFECT AUTOMATION ---
-    // Get the token(s) associated with this actor
-    const tokens = this.getActiveTokens();
-
-    for (const token of tokens) {
-        // A. CHECK VITAL LOCATIONS (Head/Chest/Stomach)
-        // If any vital part is destroyed, the character is Incapacitated/Dead
-        const head = system.health.locations.head.value;
-        const chest = system.health.locations.chest.value;
-        const stomach = system.health.locations.stomach.value; // Assuming 'stomach' exists in your template
-
-        if (head < 0 || chest < 0 || stomach < 0) {
-            // Apply "Dead" Overlay
-            if (!token.actor.hasStatusEffect(CONFIG.specialStatusEffects.DEFEATED)) {
-                await token.toggleEffect(CONFIG.specialStatusEffects.DEFEATED, { overlay: true });
-                ChatMessage.create({ content: `<strong>${this.name}</strong> has suffered a fatal wound to a vital area!` });
-            }
-        }
-
-        // B. CHECK TOTAL HP (Unconscious/Dying)
-        // Rule 4.c.ii: If hit points go below zero... unconscious and dying.
-        else if (system.health.total.value < 0) {
-            if (!token.actor.hasStatusEffect("unconscious")) { // standard foundry id is usually "unconscious"
-                 // Note: You might need to map "unconscious" to a specific icon path if standard one fails
-                 await token.toggleEffect("icons/svg/unconscious.svg", { overlay: true }); 
-                 ChatMessage.create({ content: `<strong>${this.name}</strong> collapses, Unconscious and Dying!` });
-            }
-        }
-
-        // C. CHECK BLEEDING (Any location < 0)
-        // Rule 4.b.i: If location < 0... bleeding.
-        let isBleeding = false;
-        for (const loc of Object.values(system.health.locations)) {
-            if (loc.value < 0) isBleeding = true;
-        }
-
-        // Check if we need to add the Bleeding icon (usually a water drop or blood drop)
-        const bleedingIcon = "icons/svg/blood.svg"; 
-        const hasBleeding = token.actor.effects.some(e => e.img === bleedingIcon);
-
-        if (isBleeding && !hasBleeding) {
-            // We create a simpler Active Effect for bleeding
-            await this.createEmbeddedDocuments("ActiveEffect", [{
-                name: "Bleeding",
-                img: bleedingIcon,
-                origin: this.uuid,
-                description: "Losing 1 HP per turn."
-            }]);
-            ChatMessage.create({ content: `<strong>${this.name}</strong> is <strong>Bleeding</strong>! (1 HP/Turn)` });
-        }
-    }
   }
 
     async spendXP(type, key) {
