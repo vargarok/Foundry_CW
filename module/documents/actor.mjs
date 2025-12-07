@@ -384,18 +384,26 @@ getCombatant() {
         // --- UPDATE VISUAL HEALTH TRACK ---
         const totalBoxes = 7 + (system.health.bonusLevels || 0);
         const hpPerBox = maxTotal / totalBoxes;
+        
+        // A. Standard Math Calculation
         const totalDamageTaken = maxTotal - newTotal;
-        const boxesToFill = Math.min(totalBoxes, Math.ceil(totalDamageTaken / hpPerBox));
+        let boxesToFill = Math.min(totalBoxes, Math.ceil(totalDamageTaken / hpPerBox));
 
-        // --- FIX: Force Levels to Array ---
+        // B. CRITICAL OVERRIDE: Vital Organ Destruction
+        // If Head, Chest, or Stomach is destroyed (< 0), force Incapacitated
+        const isVitalFailure = ["head", "chest", "stomach"].includes(location) && newLocHP < 0;
+        
+        if (isVitalFailure) {
+            boxesToFill = totalBoxes; // Fill all boxes
+        }
+
+        // --- ROBUST ARRAY HANDLING ---
         let rawLevels = system.health.levels;
-        // If DB returned an object (e.g. {0:0, 1:0}), convert to array
         if (rawLevels && !Array.isArray(rawLevels)) {
             rawLevels = Object.values(rawLevels);
         }
         
         const currentLevels = rawLevels || [];
-        // Pad with 0s if short
         while (currentLevels.length < totalBoxes) currentLevels.push(0);
         
         const newLevels = [...currentLevels];
@@ -408,7 +416,8 @@ getCombatant() {
             if (newLevels[i] === undefined) newLevels[i] = 0;
 
             if (i < boxesToFill) {
-                // Only upgrade damage, never downgrade
+                // If this fill is due to the Critical Override and not normal damage,
+                // we still mark it. Defaulting to Lethal (2) if it wasn't already higher.
                 if (newLevels[i] < typeCode) newLevels[i] = typeCode;
             } else {
                 newLevels[i] = 0;
@@ -424,7 +433,7 @@ getCombatant() {
 
         // --- 5. AUTOMATED STATUS EFFECTS ---
         // A. Vital Organs (Head/Chest/Stomach) -> Dead
-        if (["head", "chest", "stomach"].includes(location) && newLocHP < 0) {
+        if (isVitalFailure) {
             const deadId = CONFIG.specialStatusEffects.DEFEATED || "dead";
             if (!this.statuses.has(deadId)) {
                 await this.toggleStatusEffect(deadId, { overlay: true });
