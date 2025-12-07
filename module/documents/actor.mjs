@@ -355,7 +355,9 @@ getCombatant() {
     const system = this.system;
     
     // 1. Calculate Soak (Armor + Stamina)
-    const armor = system.health.locations[location]?.armor || 0;
+    // Safely access armor, default to 0 if location doesn't exist
+    const locData = system.health.locations[location] || { armor: 0, value: 0 };
+    const armor = locData.armor || 0;
     const stamina = system.attributes.sta.value || 0;
     const soak = armor + stamina; 
 
@@ -371,16 +373,13 @@ getCombatant() {
         flavorText = `${finalDamage} ${type.toUpperCase()} Damage`;
 
         // --- UPDATE HP VALUES ---
-        const currentLocHP = system.health.locations[location].value;
+        const currentLocHP = locData.value;
         const currentTotal = system.health.total.value;
         const maxTotal = system.health.total.max;
 
         const damageToTotal = Math.max(0, Math.min(finalDamage, currentLocHP));
 
-        // Limb takes full damage (it can go negative/disabled)
         const newLocHP = currentLocHP - finalDamage;
-        
-        // Total takes capped damage
         const newTotal = currentTotal - damageToTotal;
 
         // --- UPDATE VISUAL HEALTH TRACK ---
@@ -389,14 +388,23 @@ getCombatant() {
         const totalDamageTaken = maxTotal - newTotal;
         const boxesToFill = Math.min(totalBoxes, Math.ceil(totalDamageTaken / hpPerBox));
 
-        const newLevels = [...system.health.levels];
+        // FIX: Safe access to levels using ( || [] )
+        const currentLevels = system.health.levels || [];
+        // Ensure we have enough zeros if the array is empty
+        while (currentLevels.length < 7) currentLevels.push(0);
+        
+        const newLevels = [...currentLevels];
         
         let typeCode = 1;
         if (type === "lethal") typeCode = 2;
         if (type === "aggravated") typeCode = 3;
 
         for (let i = 0; i < totalBoxes; i++) {
+            // Ensure the array index exists
+            if (newLevels[i] === undefined) newLevels[i] = 0;
+
             if (i < boxesToFill) {
+                // Only upgrade damage, never downgrade (unless healing)
                 if (newLevels[i] < typeCode) newLevels[i] = typeCode;
             } else {
                 newLevels[i] = 0;
@@ -410,13 +418,10 @@ getCombatant() {
             "system.health.levels": newLevels
         });
 
-        // --- 5. AUTOMATED STATUS EFFECTS (Moved Inside) ---
-        // We use the 'newLocHP' and 'newTotal' variables we just calculated.
-        
+        // --- 5. AUTOMATED STATUS EFFECTS ---
         // A. Vital Organs (Head/Chest/Stomach) -> Dead
         if (["head", "chest", "stomach"].includes(location) && newLocHP < 0) {
             const deadId = CONFIG.specialStatusEffects.DEFEATED || "dead";
-            // Check if not already dead
             if (!this.statuses.has(deadId)) {
                 await this.toggleStatusEffect(deadId, { overlay: true });
                 ChatMessage.create({ content: `<strong>${this.name}</strong> has suffered a fatal wound to the ${location}!` });
@@ -425,7 +430,7 @@ getCombatant() {
 
         // B. Total HP < 0 -> Unconscious
         else if (newTotal < 0) {
-            const unconsciousId = "unconscious"; // Standard Foundry ID
+            const unconsciousId = "unconscious";
             if (!this.statuses.has(unconsciousId)) {
                  await this.toggleStatusEffect(unconsciousId, { overlay: true }); 
                  ChatMessage.create({ content: `<strong>${this.name}</strong> collapses, Unconscious and Dying!` });
@@ -433,10 +438,7 @@ getCombatant() {
         }
 
         // C. Limb Disabled -> Bleeding
-        // If it's an arm or leg and it just dropped below 0
         if (["rArm", "lArm", "rLeg", "lLeg"].includes(location) && newLocHP < 0) {
-            
-            // Check if we already have the Bleeding effect
             const bleedingIcon = "icons/svg/blood.svg"; 
             const hasBleeding = this.effects.some(e => e.img === bleedingIcon);
 
@@ -445,8 +447,7 @@ getCombatant() {
                     name: "Bleeding",
                     img: bleedingIcon,
                     origin: this.uuid,
-                    description: "Losing 1 HP per turn.",
-                    // Optional: Add duration or changes here
+                    description: "Losing 1 HP per turn."
                 }]);
                 ChatMessage.create({ content: `<strong>${this.name}</strong>'s ${location} is disabled! They are <strong>Bleeding</strong>.` });
             }
@@ -469,7 +470,7 @@ getCombatant() {
                     <strong>Location:</strong> <span>${location.toUpperCase()}</span>
                     <strong>Raw Dmg:</strong> <span>${damageSuccesses}</span>
                     <strong>Soak:</strong> <span>-${soak}</span>
-                    <strong>HP Left:</strong> <span>${system.health.total.value - (finalDamage > 0 ? (Math.max(0, Math.min(finalDamage, system.health.locations[location].value))) : 0)} / ${system.health.total.max}</span>
+                    <strong>HP Left:</strong> <span>${system.health.total.value - (finalDamage > 0 ? (Math.max(0, Math.min(finalDamage, locData.value))) : 0)} / ${system.health.total.max}</span>
                 </div>
                 <hr style="margin: 5px 0; border-color: #555;">
                 <div style="text-align: center; font-size: 1.2em; font-weight: bold; color: ${flavorColor};">

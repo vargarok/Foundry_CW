@@ -97,18 +97,21 @@ Hooks.on("renderActiveEffectConfig", (app, html, data) => {
     });
 });
 
-Hooks.on("renderChatMessage", (message, html, data) => {
-    const damageButton = html.find("button[data-action='roll-damage']");
+Hooks.on("renderChatMessageHTML", (message, html, data) => {
+    // html is now a native HTMLElement, not a jQuery object.
+    // We use querySelector instead of .find()
+    const damageButton = html.querySelector("button[data-action='roll-damage']");
     
-    if (damageButton.length > 0) {
-        damageButton.click(async (ev) => {
+    if (damageButton) {
+        damageButton.addEventListener("click", async (ev) => {
             ev.preventDefault();
+            ev.stopPropagation(); // Stop event bubbling
             const button = ev.currentTarget;
             
             // 1. Get Button Data
             const damageFormula = button.dataset.damage; 
             const type = button.dataset.type;            
-            const location = button.dataset.location || "chest"; // Get the location!
+            const location = button.dataset.location || "chest"; 
 
             // 2. Roll Damage
             const roll = await new Roll(`${damageFormula}d10cs>=6`).evaluate();
@@ -123,7 +126,6 @@ Hooks.on("renderChatMessage", (message, html, data) => {
             const targets = game.user.targets;
             
             if (targets.size === 0) {
-                // No targets? Just finish here.
                 ui.notifications.warn("Damage rolled, but no tokens were targeted to apply it to.");
                 return;
             }
@@ -131,7 +133,6 @@ Hooks.on("renderChatMessage", (message, html, data) => {
             // 5. Apply to Targets
             for (const token of targets) {
                 if (token.actor) {
-                    // Call the function we created in Step 1
                     await token.actor.applyDamage(damageSuccesses, location, type);
                 }
             }

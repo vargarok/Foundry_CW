@@ -324,7 +324,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         buttons: [{
             action: "attack",
             label: "Fire",
-            callback: (event, button, dialog) => new FormDataExtended(dialog.element.querySelector("form")).object
+            ccallback: (event, button, dialog) => new foundry.applications.ux.FormDataExtended(dialog.element.querySelector("form")).object
         }]
     });
 
