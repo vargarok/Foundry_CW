@@ -371,6 +371,11 @@ getCombatant() {
         flavorColor = "#ff4a4a";
         flavorText = `${finalDamage} ${type.toUpperCase()} Damage`;
 
+        // --- RULE: MASSIVE DAMAGE THRESHOLD ---
+        // "If a limb takes more than 7 levels of damage in a single strike, it is destroyed
+        // and the person will automatically reach Incapacitated."
+        const isMassiveDamage = finalDamage > 7;
+
         // --- UPDATE HP VALUES ---
         const currentLocHP = locData.value;
         const currentTotal = system.health.total.value;
@@ -389,12 +394,17 @@ getCombatant() {
         const totalDamageTaken = maxTotal - newTotal;
         let boxesToFill = Math.min(totalBoxes, Math.ceil(totalDamageTaken / hpPerBox));
 
-        // B. CRITICAL OVERRIDE: Vital Organ Destruction
-        // If Head, Chest, or Stomach is destroyed (< 0), force Incapacitated
-        const isVitalFailure = ["head", "chest", "stomach"].includes(location) && newLocHP < 0;
+        // B. CRITICAL OVERRIDE: Vital Destruction OR Massive Damage
+        // Check 1: Did HP drop below zero?
+        const isDestroyedHP = newLocHP < 0;
+        // Check 2: Is it a vital location (Head/Chest/Stomach)?
+        const isVital = ["head", "chest", "stomach"].includes(location);
         
-        if (isVitalFailure) {
-            boxesToFill = totalBoxes; // Fill all boxes
+        // CONDITIONS FOR INCAPACITATION:
+        // 1. Massive Damage (>7) anywhere.
+        // 2. Vital Organ Destroyed (HP < 0).
+        if (isMassiveDamage || (isVital && isDestroyedHP)) {
+            boxesToFill = totalBoxes; // Force Incapacitated (Fill all boxes)
         }
 
         // --- ROBUST ARRAY HANDLING ---
@@ -416,8 +426,6 @@ getCombatant() {
             if (newLevels[i] === undefined) newLevels[i] = 0;
 
             if (i < boxesToFill) {
-                // If this fill is due to the Critical Override and not normal damage,
-                // we still mark it. Defaulting to Lethal (2) if it wasn't already higher.
                 if (newLevels[i] < typeCode) newLevels[i] = typeCode;
             } else {
                 newLevels[i] = 0;
@@ -432,26 +440,31 @@ getCombatant() {
         });
 
         // --- 5. AUTOMATED STATUS EFFECTS ---
-        // A. Vital Organs (Head/Chest/Stomach) -> Dead
-        if (isVitalFailure) {
+        
+        // A. DEFEATED (Dead)
+        // Trigger if: Vital Location Destroyed OR Massive Damage to Vital Location
+        if (isVital && (isDestroyedHP || isMassiveDamage)) {
             const deadId = CONFIG.specialStatusEffects.DEFEATED || "dead";
             if (!this.statuses.has(deadId)) {
                 await this.toggleStatusEffect(deadId, { overlay: true });
-                ChatMessage.create({ content: `<strong>${this.name}</strong> has suffered a fatal wound to the ${location}!` });
+                ChatMessage.create({ content: `<strong>${this.name}</strong> suffers a fatal injury to the ${location}!` });
             }
         }
 
-        // B. Total HP < 0 -> Unconscious
-        else if (newTotal < 0) {
+        // B. UNCONSCIOUS (Incapacitated)
+        // Trigger if: Total HP < 0 OR Massive Damage to Non-Vital Limb
+        else if (newTotal < 0 || isMassiveDamage) {
             const unconsciousId = "unconscious"; 
             if (!this.statuses.has(unconsciousId)) {
                  await this.toggleStatusEffect(unconsciousId, { overlay: true }); 
-                 ChatMessage.create({ content: `<strong>${this.name}</strong> collapses, Unconscious and Dying!` });
+                 ChatMessage.create({ content: `<strong>${this.name}</strong> is Incapacitated by trauma!` });
             }
         }
 
-        // C. Limb Disabled -> Bleeding
-        if (["rArm", "lArm", "rLeg", "lLeg"].includes(location) && newLocHP < 0) {
+        // C. BLEEDING / DISABLED LIMB
+        // Trigger if: Limb Destroyed (<0) OR Massive Damage to Limb
+        const isLimb = ["rArm", "lArm", "rLeg", "lLeg"].includes(location);
+        if (isLimb && (isDestroyedHP || isMassiveDamage)) {
             const bleedingIcon = "icons/svg/blood.svg"; 
             const hasBleeding = this.effects.some(e => e.img === bleedingIcon);
 
@@ -462,13 +475,13 @@ getCombatant() {
                     origin: this.uuid,
                     description: "Losing 1 HP per turn."
                 }]);
-                ChatMessage.create({ content: `<strong>${this.name}</strong>'s ${location} is disabled! They are <strong>Bleeding</strong>.` });
+                ChatMessage.create({ content: `<strong>${this.name}</strong>'s ${location} is destroyed! They are <strong>Bleeding</strong>.` });
             }
         }
 
         // --- OPTIONAL: CHAT TEXT UPDATES ---
-        if (newLocHP < 0) {
-            flavorText += `<br><span style="font-size:0.8em; color:darkred;">⚠️ ${location.toUpperCase()} Disabled!</span>`;
+        if (isDestroyedHP || isMassiveDamage) {
+            flavorText += `<br><span style="font-size:0.8em; color:darkred;">⚠️ ${location.toUpperCase()} DESTROYED!</span>`;
         }
     }
 
