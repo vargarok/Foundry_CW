@@ -142,44 +142,67 @@ Hooks.on("renderChatMessageHTML", (message, html, data) => {
 
 // --- COMBAT TURN AUTOMATION ---
 Hooks.on("updateCombat", async (combat, updateData, options, userId) => {
-    // Only run on the GM client to prevent double-damage
     if (!game.user.isGM) return;
-    
-    // Ensure it's a turn change (not just someone toggling hidden)
     if (!updateData.round && !updateData.turn) return;
 
     const combatant = combat.combatant;
     if (!combatant || !combatant.actor) return;
 
     const actor = combatant.actor;
-    
-    // Check for Bleeding Effect
-    // We look for an effect named "Bleeding" or with the blood drop icon
-    const bleedingEffect = actor.effects.find(e => e.name === "Bleeding" || e.img === "icons/svg/blood.svg");
+    let turnSkipped = false;
 
-    if (bleedingEffect) {
-        // Apply 1 Direct Damage (Internal/Bleeding ignores soak)
+    // 1. CHECK FOR INCAPACITATION (Unconscious / Dead)
+    if (actor.statuses.has("unconscious") || actor.statuses.has("dead") || actor.statuses.has(CONFIG.specialStatusEffects.DEFEATED)) {
+        ChatMessage.create({
+            content: `<div style="padding: 5px; background: #3c0000; color: #fff; font-weight: bold; border: 1px solid red;">
+                <i class="fas fa-skull"></i> ${actor.name} is Incapacitated and skips their turn.
+            </div>`
+        });
+        turnSkipped = true;
+    }
+
+    // 2. CHECK FOR STUN
+    // Stun typically lasts 1 turn (next action). 
+    // We skip this turn, then REMOVE the stun so they can act next round.
+    else if (actor.statuses.has("stun")) {
+        ChatMessage.create({
+            content: `<div style="padding: 5px; background: #444; color: #ffff00; font-weight: bold; border: 1px solid yellow;">
+                <i class="fas fa-bolt"></i> ${actor.name} is Stunned! Turn skipped.
+            </div>`
+        });
+        
+        // Remove Stun Effect
+        await actor.toggleStatusEffect("stun", { active: false });
+        turnSkipped = true;
+    }
+
+    // 3. CHECK FOR BLEEDING (Apply Damage)
+    const bleedingEffect = actor.effects.find(e => e.name === "Bleeding" || e.img === "icons/svg/blood.svg");
+    if (bleedingEffect && !actor.statuses.has("dead")) {
         const currentTotal = actor.system.health.total.value;
         const newTotal = currentTotal - 1;
         
-        // Update Actor
-        await actor.update({
-            "system.health.total.value": newTotal
-        });
+        await actor.update({ "system.health.total.value": newTotal });
 
-        // Chat Notification
         ChatMessage.create({
             content: `<div style="background: #3c0000; color: #ffcccc; padding: 5px; border: 1px solid darkred; font-size: 0.9em;">
-                        <i class="fas fa-tint"></i> <strong>${actor.name}</strong> bleeds! <br>
-                        1 Damage taken. (HP: ${newTotal} / ${actor.system.health.total.max})
+                        <i class="fas fa-tint"></i> <strong>${actor.name}</strong> bleeds! (1 Dmg)
                       </div>`,
             speaker: ChatMessage.getSpeaker({ actor: actor })
         });
         
-        // Check for Death by Bleeding
+        // Bleed Out Logic
         if (newTotal < 0 && !actor.statuses.has("unconscious")) {
              await actor.toggleStatusEffect("unconscious", { overlay: true });
         }
+    }
+
+    // 4. EXECUTE SKIP
+    // We add a small delay to ensure the chat message appears first and DB updates finish
+    if (turnSkipped) {
+        setTimeout(() => {
+            combat.nextTurn();
+        }, 500); 
     }
 });
 

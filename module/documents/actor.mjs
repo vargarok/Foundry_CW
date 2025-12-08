@@ -360,8 +360,7 @@ getCombatant() {
     const stamina = system.attributes.sta.value || 0;
     const soak = armor + stamina; 
 
-    // --- RULE: ABLATIVE ARMOR DESTRUCTION ---
-    // If Raw Damage > 2 * Armor, armor is damaged (-1 Soak)
+    // --- ARMOR DESTRUCTION LOGIC ---
     let armorMsg = "";
     if (armor > 0 && damageSuccesses > (2 * armor)) {
         // Find armor items on this location
@@ -371,19 +370,29 @@ getCombatant() {
             i.system.coverage.includes(location)
         );
 
-        // Degrade the first applicable armor found (usually the outer layer)
         if (armorItems.length > 0) {
             const targetArmor = armorItems[0];
+
+            /* --- OPTION A: STRICT RULES (Instant Destruction) --- 
+            await targetArmor.update({
+                "system.equipped": false,
+                "name": `${targetArmor.name} (Destroyed)`
+            });
+            armorMsg = `<div style="color: #ff4a4a; font-weight: bold; margin-top:5px;">
+                <i class="fas fa-shield-alt"></i> ARMOR DESTROYED!
+            </div>`;
+            */
+
+            // --- OPTION B: ABLATIVE (Current House Rule) ---
             const newSoak = Math.max(0, targetArmor.system.soak - 1);
-            
             await targetArmor.update({
                 "system.soak": newSoak,
                 "name": `${targetArmor.name} (Damaged)`
             });
-            
             armorMsg = `<div style="color: #ff8c00; font-size:0.85em; margin-top:5px;">
-                <i class="fas fa-shield-alt" style="color:red;"></i> Armor Damaged! (-1 Soak)
+                <i class="fas fa-shield-alt" style="color:red;"></i> Armor Degraded! (-1 Soak)
             </div>`;
+            // ------------------------------------------------
         }
     }
 
@@ -398,8 +407,7 @@ getCombatant() {
         flavorColor = "#ff4a4a";
         flavorText = `${finalDamage} ${type.toUpperCase()} Damage`;
 
-        // --- RULE: MASSIVE DAMAGE THRESHOLD ---
-        // If damage > 7 in one hit, limb is destroyed immediately.
+        // --- MASSIVE DAMAGE THRESHOLD ---
         const isMassiveDamage = finalDamage > 7;
 
         // --- UPDATE HP VALUES ---
@@ -412,12 +420,8 @@ getCombatant() {
         let newLocHP = currentLocHP - finalDamage;
         const newTotal = currentTotal - damageToTotal;
 
-        // FORCE LIMB DESTRUCTION
-        // If massive damage occurred, force the limb to -1 (Destroyed state) 
-        // regardless of remaining HP. This fixes the "It has 6 HP left" issue.
-        if (isMassiveDamage && newLocHP > -1) {
-            newLocHP = -1;
-        }
+        // Force Limb Destruction on Massive Damage
+        if (isMassiveDamage && newLocHP > -1) newLocHP = -1;
 
         // --- UPDATE VISUAL HEALTH TRACK ---
         const totalBoxes = 7 + (system.health.bonusLevels || 0);
@@ -426,32 +430,34 @@ getCombatant() {
         const totalDamageTaken = maxTotal - newTotal;
         let boxesToFill = Math.min(totalBoxes, Math.ceil(totalDamageTaken / hpPerBox));
 
-        // B. CRITICAL OVERRIDE: Vital Destruction OR Massive Damage
+        // --- FIX: PERSIST INCAPACITATION ---
+        // Check if vital destroyed OR massive damage OR already unconscious/dead
         const isDestroyedHP = newLocHP < 0;
         const isVital = ["head", "chest", "stomach"].includes(location);
         
-        if (isMassiveDamage || (isVital && isDestroyedHP)) {
-            boxesToFill = totalBoxes; // Force Incapacitated
+        // We check 'statuses' to see if they were ALREADY out of the fight.
+        const isAlreadyDown = this.statuses.has("unconscious") || 
+                              this.statuses.has(CONFIG.specialStatusEffects.DEFEATED) ||
+                              this.statuses.has("dead");
+
+        if (isMassiveDamage || (isVital && isDestroyedHP) || isAlreadyDown) {
+            boxesToFill = totalBoxes; // Force Full Track
         }
 
-        // --- ROBUST ARRAY HANDLING ---
+        // --- ARRAY HANDLING ---
         let rawLevels = system.health.levels;
-        if (rawLevels && !Array.isArray(rawLevels)) {
-            rawLevels = Object.values(rawLevels);
-        }
-        
+        if (rawLevels && !Array.isArray(rawLevels)) rawLevels = Object.values(rawLevels);
         const currentLevels = rawLevels || [];
         while (currentLevels.length < totalBoxes) currentLevels.push(0);
         
         const newLevels = [...currentLevels];
         
-        let typeCode = 1;
+        let typeCode = 1; // Bashing
         if (type === "lethal") typeCode = 2;
         if (type === "aggravated") typeCode = 3;
 
         for (let i = 0; i < totalBoxes; i++) {
             if (newLevels[i] === undefined) newLevels[i] = 0;
-
             if (i < boxesToFill) {
                 if (newLevels[i] < typeCode) newLevels[i] = typeCode;
             } else {
@@ -468,7 +474,7 @@ getCombatant() {
 
         // --- 5. AUTOMATED STATUS EFFECTS ---
         
-        // A. STUN CHECK (Damage >= Stamina)
+        // A. STUN CHECK
         if (finalDamage >= stamina) {
             const stunId = "stun"; 
             if (!this.statuses.has(stunId)) {
@@ -495,13 +501,10 @@ getCombatant() {
             }
         }
 
-        // D. BLEEDING (Limb Destroyed)
-        // Checks both HP < 0 OR Massive Damage
+        // D. BLEEDING
         const isLimb = ["rArm", "lArm", "rLeg", "lLeg"].includes(location);
         if (isLimb && (newLocHP < 0 || isMassiveDamage)) {
             const bleedingIcon = "icons/svg/blood.svg"; 
-            
-            // Check if effect exists (Safe check)
             const hasBleeding = this.effects.some(e => e.name === "Bleeding" || e.img === bleedingIcon);
 
             if (!hasBleeding) {
@@ -510,7 +513,7 @@ getCombatant() {
                     img: bleedingIcon,
                     origin: this.uuid,
                     description: "Losing 1 HP per turn.",
-                    duration: { rounds: 100 } // Just so it shows up in trackers
+                    duration: { rounds: 100 }
                 }]);
                 ChatMessage.create({ content: `<strong>${this.name}</strong>'s ${location} is destroyed! They are <strong>Bleeding</strong>.` });
             }
