@@ -21,8 +21,12 @@
     {{else}}
     <div class="form-group">
         <label>Attack Type:</label>
-        <div style="padding: 5px; font-weight: bold; text-align: center; background: rgba(0,0,0,0.2);">
-            Melee Attack
+        <div style="padding: 5px; font-weight: bold; text-align: center; background: rgba(0,0,0,0.2); border-radius: 4px;">
+            {{#if (eq suggestedRange "out")}}
+                <span style="color: #ff4a4a;"><i class="fas fa-exclamation-triangle"></i> Out of Range ({{targetDist}})</span>
+            {{else}}
+                Melee Attack
+            {{/if}}
         </div>
     </div>
     {{/if}}

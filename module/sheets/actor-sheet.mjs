@@ -306,7 +306,6 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     const actorData = this.document.system;
 
     // --- 1. DETERMINE WEAPON TYPE & DISTANCE ---
-    // Rule: If no Long Range is defined, it is a Melee weapon.
     const maxRange = Number(system.range?.long) || 0;
     const isRanged = maxRange > 0;
     const isMelee = !isRanged;
@@ -317,14 +316,14 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
     const targets = game.user.targets;
 
     if (targets.size > 0) {
-        // Grab the first target (standard behavior)
         const targetToken = targets.first();
         const selfToken = this.document.token?.object || canvas.tokens.controlled[0];
 
         if (selfToken) {
-            // Measure distance in Scene Units (e.g. meters)
-            targetDist = canvas.grid.measureDistance(selfToken, targetToken, { gridSpaces: true });
-            targetDist = Math.round(targetDist * 10) / 10; // Round to 1 decimal
+            // FIX: V13 Compatible Distance Measurement
+            const waypoints = [selfToken.center, targetToken.center];
+            const measurement = canvas.grid.measurePath(waypoints);
+            targetDist = Math.round(measurement.distance * 10) / 10;
         }
 
         // Logic for Auto-Selecting Range Bracket
@@ -336,7 +335,14 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
             if (targetDist <= s) suggestedRange = "short";
             else if (targetDist <= m) suggestedRange = "medium";
             else if (targetDist <= l) suggestedRange = "long";
-            else suggestedRange = "out"; // Out of range
+            else suggestedRange = "out"; 
+        } else {
+            // MELEE LOGIC: Check if within 1 grid unit (e.g. 1.5m or 5ft)
+            // We give a tiny epsilon (0.1) for floating point errors
+            const meleeReach = canvas.scene.grid.distance; 
+            if (targetDist > (meleeReach + 0.1)) {
+                suggestedRange = "out";
+            }
         }
     }
 
@@ -352,7 +358,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         short: "Short (No Penalty)",
         medium: "Medium (-2)",
         long: "Long (-4)",
-        out: "Out of Range (Automatic Fail)"
+        out: "Out of Range (Fail)"
     };
 
     // Render Dialog
@@ -363,7 +369,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         isRanged: isRanged,
         isMelee: isMelee,
         targetDist: targetDist,
-        suggestedRange: suggestedRange,
+        suggestedRange: suggestedRange, // Pass this to the template
         rangeOptions: rangeOptions
     });
 
@@ -389,24 +395,21 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
                actorData.skills[system.skill].value + 
                (Number(system.attackBonus) || 0);
 
-    // Modifier: Range (Only if Ranged)
+    // Modifier: Range (Ranged)
     let shotCount = 1;
     
     if (isRanged) {
-        // ROF Logic
         const selectedIdx = result.mode || 0;
         const modeVal = modes[selectedIdx];
         shotCount = (modeVal === "Auto") ? 10 : Number(modeVal);
 
-        // Range Logic
         if (result.range === "medium") pool -= 2;
         if (result.range === "long") pool -= 4;
         if (result.range === "out") {
             ui.notifications.warn("Target is out of range!");
-            // You could return here, or let them roll 0 dice (Botch risk)
+            return; // STOP ATTACK
         }
 
-        // Ammo Logic
         if (system.ammo.max > 0) {
             if (system.ammo.value < shotCount) {
                 ui.notifications.warn("Click! Not enough ammo.");
@@ -415,13 +418,19 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
             await item.update({"system.ammo.value": system.ammo.value - shotCount});
         }
 
-        // Burst Bonus
         if (shotCount === 3) pool += 1; 
         if (shotCount >= 10) pool += 3;
     } 
     else {
-        // Melee specific logic (if any)
-        // Standard Melee usually has no specific 'mode' bonuses in base Storyteller
+        // Melee Logic
+        // We use the `suggestedRange` we calculated earlier (or check distance again)
+        // Since `result` doesn't contain a range dropdown for melee, we check `targetDist` again or rely on pre-calc.
+        // Let's re-verify to be safe.
+        const meleeReach = canvas.scene.grid.distance;
+        if (targets.size > 0 && targetDist > (meleeReach + 0.1)) {
+             ui.notifications.warn("Target is out of melee reach!");
+             return; // STOP ATTACK
+        }
     }
 
     // Modifier: Strength Requirement
