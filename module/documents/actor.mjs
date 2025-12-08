@@ -360,6 +360,30 @@ getCombatant() {
     const stamina = system.attributes.sta.value || 0;
     const soak = armor + stamina; 
 
+    // --- RULE: ARMOR DESTRUCTION ---
+    // "If damage in a single attack exceeds twice the armour, the armour (or cover) is destroyed."
+    // We check Raw Damage (damageSuccesses) vs Armor
+    let armorDestroyedMsg = "";
+    if (armor > 0 && damageSuccesses > (2 * armor)) {
+        // Find armor items equipped on this location
+        const armorItems = this.items.filter(i => 
+            i.type === "armor" && 
+            i.system.equipped && 
+            i.system.coverage.includes(location)
+        );
+
+        if (armorItems.length > 0) {
+            const updates = armorItems.map(i => ({
+                _id: i.id,
+                "system.equipped": false, // Unequip it
+                "name": `${i.name} (Destroyed)` // Mark it
+            }));
+            
+            await this.updateEmbeddedDocuments("Item", updates);
+            armorDestroyedMsg = `<div style="color: #ff8c00; font-weight: bold; margin-top:5px;"><i class="fas fa-shield-alt"></i> ARMOR DESTROYED!</div>`;
+        }
+    }
+
     // 2. Calculate Final Raw Damage
     const finalDamage = Math.max(0, damageSuccesses - soak);
 
@@ -372,8 +396,6 @@ getCombatant() {
         flavorText = `${finalDamage} ${type.toUpperCase()} Damage`;
 
         // --- RULE: MASSIVE DAMAGE THRESHOLD ---
-        // "If a limb takes more than 7 levels of damage in a single strike, it is destroyed
-        // and the person will automatically reach Incapacitated."
         const isMassiveDamage = finalDamage > 7;
 
         // --- UPDATE HP VALUES ---
@@ -390,21 +412,15 @@ getCombatant() {
         const totalBoxes = 7 + (system.health.bonusLevels || 0);
         const hpPerBox = maxTotal / totalBoxes;
         
-        // A. Standard Math Calculation
         const totalDamageTaken = maxTotal - newTotal;
         let boxesToFill = Math.min(totalBoxes, Math.ceil(totalDamageTaken / hpPerBox));
 
         // B. CRITICAL OVERRIDE: Vital Destruction OR Massive Damage
-        // Check 1: Did HP drop below zero?
         const isDestroyedHP = newLocHP < 0;
-        // Check 2: Is it a vital location (Head/Chest/Stomach)?
         const isVital = ["head", "chest", "stomach"].includes(location);
         
-        // CONDITIONS FOR INCAPACITATION:
-        // 1. Massive Damage (>7) anywhere.
-        // 2. Vital Organ Destroyed (HP < 0).
         if (isMassiveDamage || (isVital && isDestroyedHP)) {
-            boxesToFill = totalBoxes; // Force Incapacitated (Fill all boxes)
+            boxesToFill = totalBoxes; // Force Incapacitated
         }
 
         // --- ROBUST ARRAY HANDLING ---
@@ -441,8 +457,17 @@ getCombatant() {
 
         // --- 5. AUTOMATED STATUS EFFECTS ---
         
-        // A. DEFEATED (Dead)
-        // Trigger if: Vital Location Destroyed OR Massive Damage to Vital Location
+        // A. STUN CHECK (General Rule based on "Sap")
+        // If damage exceeds Stamina, the target is Stunned (Lost Action)
+        if (finalDamage >= stamina) {
+            const stunId = "stun"; // Standard Foundry ID
+            if (!this.statuses.has(stunId)) {
+                await this.toggleStatusEffect(stunId, { overlay: false });
+                ChatMessage.create({ content: `<strong>${this.name}</strong> is <strong>Stunned</strong> by the impact!` });
+            }
+        }
+
+        // B. DEFEATED (Dead)
         if (isVital && (isDestroyedHP || isMassiveDamage)) {
             const deadId = CONFIG.specialStatusEffects.DEFEATED || "dead";
             if (!this.statuses.has(deadId)) {
@@ -451,8 +476,7 @@ getCombatant() {
             }
         }
 
-        // B. UNCONSCIOUS (Incapacitated)
-        // Trigger if: Total HP < 0 OR Massive Damage to Non-Vital Limb
+        // C. UNCONSCIOUS (Incapacitated)
         else if (newTotal < 0 || isMassiveDamage) {
             const unconsciousId = "unconscious"; 
             if (!this.statuses.has(unconsciousId)) {
@@ -461,8 +485,7 @@ getCombatant() {
             }
         }
 
-        // C. BLEEDING / DISABLED LIMB
-        // Trigger if: Limb Destroyed (<0) OR Massive Damage to Limb
+        // D. BLEEDING / DISABLED LIMB
         const isLimb = ["rArm", "lArm", "rLeg", "lLeg"].includes(location);
         if (isLimb && (isDestroyedHP || isMassiveDamage)) {
             const bleedingIcon = "icons/svg/blood.svg"; 
@@ -498,6 +521,7 @@ getCombatant() {
                     <strong>Soak:</strong> <span>-${soak}</span>
                     <strong>HP Left:</strong> <span>${system.health.total.value - (finalDamage > 0 ? (Math.max(0, Math.min(finalDamage, locData.value))) : 0)} / ${system.health.total.max}</span>
                 </div>
+                ${armorDestroyedMsg}
                 <hr style="margin: 5px 0; border-color: #555;">
                 <div style="text-align: center; font-size: 1.2em; font-weight: bold; color: ${flavorColor};">
                     ${flavorText}
