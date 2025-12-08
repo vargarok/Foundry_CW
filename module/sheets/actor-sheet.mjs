@@ -312,10 +312,8 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
     // Grid Distance Calculation
     let targetDist = 0;
-    let units = canvas.scene.grid.units || "units"; // Get Scene Units (m, ft, etc.)
+    let units = canvas.scene.grid.units || "units"; 
     let suggestedRange = "short"; 
-    
-    // Store the calculated bracket to compare later
     let calculatedBracket = "short"; 
 
     const targets = game.user.targets;
@@ -325,13 +323,11 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         const selfToken = this.document.token?.object || canvas.tokens.controlled[0];
 
         if (selfToken) {
-            // V13: Measure Distance between centers
             const waypoints = [selfToken.center, targetToken.center];
             const measurement = canvas.grid.measurePath(waypoints);
             targetDist = Math.round(measurement.distance * 10) / 10;
         }
 
-        // Logic for Auto-Selecting Range Bracket
         if (isRanged) {
             const s = Number(system.range.short) || 0;
             const m = Number(system.range.medium) || 0;
@@ -342,7 +338,6 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
             else if (targetDist <= l) { suggestedRange = "long"; calculatedBracket = "long"; }
             else { suggestedRange = "out"; calculatedBracket = "out"; }
         } else {
-            // Melee Logic (Reach check)
             const meleeReach = canvas.scene.grid.distance; 
             if (targetDist > (meleeReach + 0.1)) {
                 suggestedRange = "out";
@@ -351,7 +346,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         }
     }
 
-    // --- 2. PREPARE DIALOG DATA ---
+    // --- 2. PREPARE DIALOG ---
     let rofString = String(system.rof || "1");
     let modes = rofString.split('/').map(s => {
         const clean = s.trim().toLowerCase();
@@ -366,7 +361,6 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         out: "Out of Range (Fail)"
     };
 
-    // Render Dialog
     const content = await foundry.applications.handlebars.renderTemplate("systems/colonial-weather/templates/chat/attack-dialog.hbs", {
         modes: modes,
         hasAmmo: system.ammo.max > 0,
@@ -374,7 +368,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         isRanged: isRanged,
         isMelee: isMelee,
         targetDist: targetDist,
-        units: units, // Pass units to template
+        units: units, 
         suggestedRange: suggestedRange, 
         rangeOptions: rangeOptions
     });
@@ -396,24 +390,29 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
 
     // --- 3. CALCULATE POOL & MODIFIERS ---
     
-    // Base Dice Pool
     let pool = actorData.derived.attributes[system.attribute] + 
                actorData.skills[system.skill].value + 
                (Number(system.attackBonus) || 0);
 
-    // Modifier: Range (Ranged)
     let shotCount = 1;
-    
+    let rangeWarning = ""; // New variable to store the warning HTML
+
     if (isRanged) {
         const selectedIdx = result.mode || 0;
         const modeVal = modes[selectedIdx];
         shotCount = (modeVal === "Auto") ? 10 : Number(modeVal);
 
         // --- VALIDATION LOGIC ---
-        // If user selects a range BETTER than the physical distance, warn them.
         const rangeSeverity = { "short": 1, "medium": 2, "long": 3, "out": 4 };
         if (rangeSeverity[result.range] < rangeSeverity[calculatedBracket]) {
-             ui.notifications.warn(`⚠️ Range Override: You selected '${result.range.toUpperCase()}' but target is ${targetDist}${units} away (${calculatedBracket.toUpperCase()}).`);
+             // Create a warning string for the chat card
+             rangeWarning = `<div style="color: #d93e3e; font-size: 0.85em; border: 1px solid #d93e3e; background: #3c0000; padding: 2px; margin-bottom: 4px; text-align: center; border-radius: 4px;">
+                <i class="fas fa-exclamation-circle"></i> <strong>Range Override</strong><br>
+                Selected: ${result.range.toUpperCase()} | Actual: ${calculatedBracket.toUpperCase()}
+             </div>`;
+             
+             // Keep the local notification too so the player sees it immediately
+             ui.notifications.warn(`⚠️ Range Override detected.`);
         }
 
         if (result.range === "medium") pool -= 2;
@@ -435,21 +434,17 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         if (shotCount >= 10) pool += 3;
     } 
     else {
-        // Melee Logic
         const meleeReach = canvas.scene.grid.distance;
-        // Strict Melee Check
         if (targets.size > 0 && targetDist > (meleeReach + 0.1)) {
              ui.notifications.error(`Target is out of melee reach! (${targetDist}${units})`);
              return; 
         }
     }
 
-    // Modifier: Strength Requirement
     const str = actorData.derived.attributes.str;
     const req = system.strengthReq || 0;
     if (str < req) pool -= (req - str);
 
-    // Modifier: Hit Location
     let hitLoc = result.location || "random"; 
     let locationLabel = "Torso"; 
 
@@ -493,6 +488,7 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
         ChatMessage.create({
             content: `
                 <div class="cw-chat-card" style="border-top: 1px solid #444; margin-top: 5px; padding-top: 5px;">
+                    ${rangeWarning} 
                     <div style="font-size: 0.9em; margin-bottom: 5px;">
                         Hit <strong>${locationLabel}</strong>! (${roll.total} Successes)
                     </div>
