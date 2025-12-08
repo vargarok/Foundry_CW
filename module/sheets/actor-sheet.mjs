@@ -298,134 +298,196 @@ export class CWActorSheet extends HandlebarsApplicationMixin(ActorSheetV2) {
   }
 
   static async _onRollWeapon(event, target) {
-      event.preventDefault();
-      const item = this.document.items.get(target.dataset.id);
-      if (!item) return;
-      
-      const system = item.system;
-      const actorData = this.document.system;
+    event.preventDefault();
+    const item = this.document.items.get(target.dataset.id);
+    if (!item) return;
+    
+    const system = item.system;
+    const actorData = this.document.system;
 
-      // 1. Setup Dialog Data
-      let rofString = String(system.rof || "1");
-      let modes = rofString.split('/').map(s => {
-          const clean = s.trim().toLowerCase();
-          if (clean === "auto" || clean === "a") return "Auto";
-          return parseInt(clean) || 1;
-      });
+    // --- 1. DETERMINE WEAPON TYPE & DISTANCE ---
+    // Rule: If no Long Range is defined, it is a Melee weapon.
+    const maxRange = Number(system.range?.long) || 0;
+    const isRanged = maxRange > 0;
+    const isMelee = !isRanged;
 
-      // 2. Render Dialog
-      const content = await foundry.applications.handlebars.renderTemplate("systems/colonial-weather/templates/chat/attack-dialog.hbs", {
-          modes: modes,
-          hasAmmo: system.ammo.max > 0,
-          ammo: system.ammo.value
-      });
+    // Grid Distance Calculation
+    let targetDist = 0;
+    let suggestedRange = "short"; // Default
+    const targets = game.user.targets;
 
-      const result = await DialogV2.wait({
-          window: { title: `Attack: ${item.name}`, icon: "fa-solid fa-crosshairs" },
-          content: content,
-          buttons: [{
-              action: "attack",
-              label: "Fire",
-              callback: (event, button, dialog) => {
-                  const form = dialog.element.querySelector("form");
-                  // Use the namespaced FormDataExtended for V13
-                  return new foundry.applications.ux.FormDataExtended(form).object;
-              }
-          }]
-      });
+    if (targets.size > 0) {
+        // Grab the first target (standard behavior)
+        const targetToken = targets.first();
+        const selfToken = this.document.token?.object || canvas.tokens.controlled[0];
 
-      if (!result) return;
+        if (selfToken) {
+            // Measure distance in Scene Units (e.g. meters)
+            targetDist = canvas.grid.measureDistance(selfToken, targetToken, { gridSpaces: true });
+            targetDist = Math.round(targetDist * 10) / 10; // Round to 1 decimal
+        }
 
-      // 3. Process Modifiers
-      const selectedIdx = result.mode || 0;
-      const modeVal = modes[selectedIdx];
-      let shotCount = (modeVal === "Auto") ? 10 : Number(modeVal);
-      
-      // Base Dice Pool
-      let pool = actorData.derived.attributes[system.attribute] + 
-                actorData.skills[system.skill].value + 
-                (Number(system.attackBonus) || 0);
+        // Logic for Auto-Selecting Range Bracket
+        if (isRanged) {
+            const s = Number(system.range.short) || 0;
+            const m = Number(system.range.medium) || 0;
+            const l = Number(system.range.long) || 0;
 
-      // Modifiers
-      if (result.range === "medium") pool -= 2;
-      if (result.range === "long") pool -= 4;
+            if (targetDist <= s) suggestedRange = "short";
+            else if (targetDist <= m) suggestedRange = "medium";
+            else if (targetDist <= l) suggestedRange = "long";
+            else suggestedRange = "out"; // Out of range
+        }
+    }
 
-      const str = actorData.derived.attributes.str;
-      const req = system.strengthReq || 0;
-      if (str < req) pool -= (req - str);
+    // --- 2. PREPARE DIALOG DATA ---
+    let rofString = String(system.rof || "1");
+    let modes = rofString.split('/').map(s => {
+        const clean = s.trim().toLowerCase();
+        if (clean === "auto" || clean === "a") return "Auto";
+        return parseInt(clean) || 1;
+    });
 
-      // --- FIX: Safe Hit Location Logic ---
-      let hitLoc = result.location || "random"; 
-      let locationLabel = "Torso"; 
+    const rangeOptions = {
+        short: "Short (No Penalty)",
+        medium: "Medium (-2)",
+        long: "Long (-4)",
+        out: "Out of Range (Automatic Fail)"
+    };
 
-      if (hitLoc === "random") {
-          const r = await new Roll("1d10").evaluate();
-          const map = {
-              1: "head", 2: "chest", 3: "stomach", 4: "stomach", 
-              5: "rLeg", 6: "lLeg", 7: "rLeg", 8: "lLeg", 
-              9: "rArm", 10: "lArm"
-          };
-          hitLoc = map[r.total] || "chest"; 
-          locationLabel = hitLoc.toUpperCase() + " (Random)";
-      } else {
-          if (hitLoc === "head") pool -= 3;
-          else if (hitLoc === "torso" || hitLoc === "chest") pool -= 1;
-          else pool -= 2; // Limbs
-          
-          const label = hitLoc ? hitLoc.toUpperCase() : "UNKNOWN";
-          locationLabel = label + " (Called)";
-      }
+    // Render Dialog
+    const content = await foundry.applications.handlebars.renderTemplate("systems/colonial-weather/templates/chat/attack-dialog.hbs", {
+        modes: modes,
+        hasAmmo: system.ammo.max > 0,
+        ammo: system.ammo.value,
+        isRanged: isRanged,
+        isMelee: isMelee,
+        targetDist: targetDist,
+        suggestedRange: suggestedRange,
+        rangeOptions: rangeOptions
+    });
 
-      // 4. Handle Ammo
-      if (system.ammo.max > 0) {
-          if (system.ammo.value < shotCount) {
-              ui.notifications.warn("Click! Not enough ammo.");
-              return;
-          }
-          await item.update({"system.ammo.value": system.ammo.value - shotCount});
-      }
+    const result = await DialogV2.wait({
+        window: { title: `Attack: ${item.name}`, icon: isRanged ? "fa-solid fa-crosshairs" : "fa-solid fa-fist-raised" },
+        content: content,
+        buttons: [{
+            action: "attack",
+            label: "Attack",
+            callback: (event, button, dialog) => {
+                const form = dialog.element.querySelector("form");
+                return new foundry.applications.ux.FormDataExtended(form).object;
+            }
+        }]
+    });
 
-      // 5. Bonus for Burst/Auto
-      if (shotCount === 3) pool += 1; 
-      if (shotCount >= 10) pool += 3;
+    if (!result) return;
 
-      // 6. Roll Attack
-      const basePool = actorData.derived.attributes[system.attribute] + actorData.skills[system.skill].value;
-      const finalBonus = pool - basePool; 
+    // --- 3. CALCULATE POOL & MODIFIERS ---
+    
+    // Base Dice Pool
+    let pool = actorData.derived.attributes[system.attribute] + 
+               actorData.skills[system.skill].value + 
+               (Number(system.attackBonus) || 0);
 
-      const roll = await this.document.rollDicePool(system.attribute, system.skill, finalBonus, item);
+    // Modifier: Range (Only if Ranged)
+    let shotCount = 1;
+    
+    if (isRanged) {
+        // ROF Logic
+        const selectedIdx = result.mode || 0;
+        const modeVal = modes[selectedIdx];
+        shotCount = (modeVal === "Auto") ? 10 : Number(modeVal);
 
-      // 7. Damage Card
-      if (roll && roll.total > 0) {
-          const extraSuccesses = Math.max(0, roll.total - 1);
-          
-          let attrDamageBonus = 0;
-          if (system.damageBonusType === "str") {
-              attrDamageBonus = actorData.derived.attributes.str || 0;
-          } else if (system.damageBonusType === "dex") {
-              attrDamageBonus = actorData.derived.attributes.dex || 0;
-          }
+        // Range Logic
+        if (result.range === "medium") pool -= 2;
+        if (result.range === "long") pool -= 4;
+        if (result.range === "out") {
+            ui.notifications.warn("Target is out of range!");
+            // You could return here, or let them roll 0 dice (Botch risk)
+        }
 
-          const damagePool = Number(system.damage || 0) + attrDamageBonus + extraSuccesses;
+        // Ammo Logic
+        if (system.ammo.max > 0) {
+            if (system.ammo.value < shotCount) {
+                ui.notifications.warn("Click! Not enough ammo.");
+                return;
+            }
+            await item.update({"system.ammo.value": system.ammo.value - shotCount});
+        }
 
-          ChatMessage.create({
-              content: `
-                  <div class="cw-chat-card" style="border-top: 1px solid #444; margin-top: 5px; padding-top: 5px;">
-                      <div style="font-size: 0.9em; margin-bottom: 5px;">
-                          Hit <strong>${locationLabel}</strong>! (${roll.total} Successes)
-                      </div>
-                      <button data-action="roll-damage" 
-                              data-damage="${damagePool}" 
-                              data-type="${system.type}"
-                              data-location="${hitLoc}">
-                          <i class="fas fa-skull"></i> Roll Damage (${damagePool} dice)
-                      </button>
-                  </div>
-              `,
-              speaker: ChatMessage.getSpeaker({ actor: this.document })
-          });
-      }
-  }
+        // Burst Bonus
+        if (shotCount === 3) pool += 1; 
+        if (shotCount >= 10) pool += 3;
+    } 
+    else {
+        // Melee specific logic (if any)
+        // Standard Melee usually has no specific 'mode' bonuses in base Storyteller
+    }
+
+    // Modifier: Strength Requirement
+    const str = actorData.derived.attributes.str;
+    const req = system.strengthReq || 0;
+    if (str < req) pool -= (req - str);
+
+    // Modifier: Hit Location
+    let hitLoc = result.location || "random"; 
+    let locationLabel = "Torso"; 
+
+    if (hitLoc === "random") {
+        const r = await new Roll("1d10").evaluate();
+        const map = {
+            1: "head", 2: "chest", 3: "stomach", 4: "stomach", 
+            5: "rLeg", 6: "lLeg", 7: "rLeg", 8: "lLeg", 
+            9: "rArm", 10: "lArm"
+        };
+        hitLoc = map[r.total] || "chest"; 
+        locationLabel = hitLoc.toUpperCase() + " (Random)";
+    } else {
+        if (hitLoc === "head") pool -= 3;
+        else if (hitLoc === "torso" || hitLoc === "chest") pool -= 1;
+        else pool -= 2; // Limbs
+        
+        const label = hitLoc ? hitLoc.toUpperCase() : "UNKNOWN";
+        locationLabel = label + " (Called)";
+    }
+
+    // --- 4. ROLL ATTACK ---
+    const basePool = actorData.derived.attributes[system.attribute] + actorData.skills[system.skill].value;
+    const finalBonus = pool - basePool; 
+
+    const roll = await this.document.rollDicePool(system.attribute, system.skill, finalBonus, item);
+
+    // --- 5. DAMAGE CARD ---
+    if (roll && roll.total > 0) {
+        const extraSuccesses = Math.max(0, roll.total - 1);
+        
+        let attrDamageBonus = 0;
+        if (system.damageBonusType === "str") {
+            attrDamageBonus = actorData.derived.attributes.str || 0;
+        } else if (system.damageBonusType === "dex") {
+            attrDamageBonus = actorData.derived.attributes.dex || 0;
+        }
+
+        const damagePool = Number(system.damage || 0) + attrDamageBonus + extraSuccesses;
+
+        ChatMessage.create({
+            content: `
+                <div class="cw-chat-card" style="border-top: 1px solid #444; margin-top: 5px; padding-top: 5px;">
+                    <div style="font-size: 0.9em; margin-bottom: 5px;">
+                        Hit <strong>${locationLabel}</strong>! (${roll.total} Successes)
+                    </div>
+                    <button data-action="roll-damage" 
+                            data-damage="${damagePool}" 
+                            data-type="${system.type}"
+                            data-location="${hitLoc}">
+                        <i class="fas fa-skull"></i> Roll Damage (${damagePool} dice)
+                    </button>
+                </div>
+            `,
+            speaker: ChatMessage.getSpeaker({ actor: this.document })
+        });
+    }
+}
 
   // --- NEW RELOAD LOGIC ---
   static async _onReloadWeapon(event, target) {
