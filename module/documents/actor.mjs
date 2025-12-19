@@ -1,5 +1,27 @@
 export class CWActor extends Actor {
 
+/** @override */
+  async _preCreate(data, options, user) {
+    await super._preCreate(data, options, user);
+
+    // Set default token/avatar images if none are provided
+    if (!data.img || data.img === this.constructor.DEFAULT_ICON) {
+      const defaultImg = this.type === "npc" 
+        ? "systems/colonial-weather/assets/npc-default.svg" 
+        : "systems/colonial-weather/assets/character-default.svg"; // Make sure these files exist!
+      
+      this.updateSource({ img: defaultImg });
+    }
+
+    // Optional: Set default Prototype Token settings (like linking characters)
+    if (this.type === "character") {
+      this.updateSource({ 
+        "prototypeToken.actorLink": true,
+        "prototypeToken.disposition": 1 // Friendly
+      });
+    }
+  }
+
 prepareBaseData() {
     const system = this.system;
 
