@@ -574,6 +574,33 @@
     text-shadow: 0 0 3px #ff0000;
 }
 
+.panel {
+    background: var(--cw-panel);
+    padding: 10px;
+    border: 1px solid var(--cw-border);
+}
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+}
+.health-track {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.health-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2px;
+    background: rgba(0,0,0,0.2);
+}
+.health-row input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
 img[data-action="editImage"] {
     cursor: pointer;
     border: 1px solid var(--cw-border);
