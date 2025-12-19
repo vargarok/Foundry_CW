@@ -81,15 +81,15 @@ CW.backgrounds = {
   status: "Status"
 };
 
-CW.healthLevels = [
-  { label: "Bruised", penalty: 0 },
-  { label: "Hurt", penalty: -1 },
-  { label: "Injured", penalty: -1 },
-  { label: "Wounded", penalty: -2 },
-  { label: "Mauled", penalty: -2 },
-  { label: "Crippled", penalty: -5 },
-  { label: "Incapacitated", penalty: 99 }
-];
+CW.healthLevels = {
+    0: { label: "Bruised", penalty: 0 },
+    1: { label: "Injured", penalty: -1 },
+    2: { label: "Wounded", penalty: -1 },
+    3: { label: "Hurt", penalty: -2 },
+    4: { label: "Mauled", penalty: -2 },
+    5: { label: "Crippled", penalty: -5 },
+    6: { label: "Incapacitated", penalty: 99 } // 99 indicates unable to act
+};
 
 CW.damageTypes = {
   bashing: "Bashing",
